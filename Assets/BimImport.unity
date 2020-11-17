@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 182637886}
   - component: {fileID: 182637885}
   - component: {fileID: 182637884}
+  - component: {fileID: 182637887}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -204,6 +205,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &182637887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182637883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2df0ca0e019c62744a0acdbba56e885c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  distance: 2
+  xSpeed: 10
+  ySpeed: 10
+  yMinLimit: -90
+  yMaxLimit: 90
+  distanceMin: 10
+  distanceMax: 10
+  smoothTime: 1
 --- !u!1 &1059964825
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,7 +236,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1059964827}
   - component: {fileID: 1059964826}
-  - component: {fileID: 1059964828}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -234,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4283d278b63a9943a7982c3ca3babaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filePath: 
+  filePath: D:/Jason/BimImport/Assets/Ifc Sample/2011-09-14-Duplex-IFC/Duplex_A_20110907.ifc
 --- !u!4 &1059964827
 Transform:
   m_ObjectHideFlags: 0
@@ -249,26 +270,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1059964828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1059964825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17f1fec209b129e40be47f7f30a8d7b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  filePath: 
-  IFCClass: 
-  STEPName: 
-  STEPId: 
-  STEPIndex: 
-  IFCLayer: 
-  propertySets: []
-  quantitySets: []
 --- !u!1 &1239874043
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,30 +4,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using System.IO;
+using UnityEditor;
 
 public class IFCData : MonoBehaviour
 {
-    public string filePath;
     public string IFCClass;
     public string STEPName;
     public string STEPId;
     public string STEPIndex;
     public string IFCLayer;
+    public string Tag;
 
     public List<IFCPropertySet> propertySets;
     public List<IFCPropertySet> quantitySets;
 
-    private void AddProperties(XmlNode node, GameObject go)
+    public static void AddProperties(XmlNode node, GameObject go)
     {
+        go.tag = AddTag(node.Name);
         IFCData ifcData = go.AddComponent(typeof(IFCData)) as IFCData;
 
         ifcData.IFCClass = node.Name;
+
         ifcData.STEPId = node.Attributes.GetNamedItem("id").Value;
+        if (node.Attributes.GetNamedItem("Tag") != null)
+        {
+            ifcData.Tag = node.Attributes.GetNamedItem("Tag").Value;
+        }
         if (node.Attributes.GetNamedItem("Name") != null)
         {
             ifcData.STEPName = node.Attributes.GetNamedItem("Name").Value;
         }
-        
+
         // Initialize PropertySets and QuantitySets
         if (ifcData.propertySets == null)
             ifcData.propertySets = new List<IFCPropertySet>();
@@ -51,9 +58,9 @@ public class IFCData : MonoBehaviour
                     XmlNode propertySet = child.SelectSingleNode(path);
                     if (propertySet != null)
                     {
-                        Debug.Log(
-                            string.Format("PropertySet = {0}",
-                                          propertySet.Attributes.GetNamedItem("Name").Value));
+                        //Debug.Log(
+                        //    string.Format("PropertySet = {0}",
+                        //                  propertySet.Attributes.GetNamedItem("Name").Value));
 
                         // initialize this propertyset (Name, Id)
                         IFCPropertySet myPropertySet = new IFCPropertySet();
@@ -98,59 +105,29 @@ public class IFCData : MonoBehaviour
         } // end foreach
     }
 
-    public void AddElements(XmlNode node, GameObject parent)
+
+    private static string AddTag(string tag)
     {
-        if (node.Attributes.GetNamedItem("id") != null)
+        UnityEngine.Object[] asset = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
+        if ((asset != null) && (asset.Length > 0))
         {
-            if(node.Attributes.GetNamedItem("Name") != null)
-            {
-                UnityEngine.Debug.Log(string.Format("{0} => {1}",
-                                    node.Attributes.GetNamedItem("id").Value,
-                                    node.Attributes.GetNamedItem("Name").Value)
-                );
-            }
-            else
-            {
-                UnityEngine.Debug.Log(node.Attributes.GetNamedItem("id").Value);
-            }
-                
-            // Search an existing GameObject with this name
-            // This would apply only to elements which have
-            // a geometric representation and which are
-            // extracted from the 3D file.
-            string searchPath = Path.GetFileNameWithoutExtension(filePath) + "/" +
-                node.Attributes.GetNamedItem("id").Value;
-            GameObject goElement = null;
-            goElement = GameObject.Find(searchPath);
+            SerializedObject so = new SerializedObject(asset[0]);
+            SerializedProperty tags = so.FindProperty("tags");
 
-            // What if we can't find any? We need to create
-            // a new empty object
-            if (goElement == null)
-                goElement = new GameObject();
-
-            if (goElement != null)
+            for (int i = 0; i < tags.arraySize; ++i)
             {
-                // Set name from the IFC Name field
-                if(node.Attributes.GetNamedItem("Name") != null)
+                if (tags.GetArrayElementAtIndex(i).stringValue == tag)
                 {
-                    goElement.name = node.Attributes.GetNamedItem("Name").Value;
+                    return tag;     // Tag already present, nothing to do.
                 }
-                else
-                {
-                    goElement.name = "Empty";
-                }
-                // Link the object to the parent we received
-                if (parent != null)
-                    goElement.transform.SetParent(parent.transform);
-
-                // Add properties
-                AddProperties(node, goElement);
-
-                // Go through children (recursively)
-                foreach (XmlNode child in node.ChildNodes)
-                    AddElements(child, goElement);
             }
-        }// end if "id" attribute
+
+            tags.InsertArrayElementAtIndex(0);
+            tags.GetArrayElementAtIndex(0).stringValue = tag;
+            so.ApplyModifiedProperties();
+            so.Update();
+        }
+        return tag;
     }
 }
 

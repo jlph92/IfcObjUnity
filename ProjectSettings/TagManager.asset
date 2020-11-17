@@ -3,7 +3,27 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - IfcRoof
+  - IfcFooting
+  - IfcWall
+  - IfcFurnishingElement
+  - IfcSpace
+  - IfcBeam
+  - IfcCovering
+  - IfcRailing
+  - IfcMember
+  - IfcStairFlight
+  - IfcStair
+  - IfcSlab
+  - IfcDoor
+  - IfcWindow
+  - IfcOpeningElement
+  - IfcWallStandardCase
+  - IfcBuildingStorey
+  - IfcBuilding
+  - IfcSite
+  - IfcProject
   layers:
   - Default
   - TransparentFX

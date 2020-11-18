@@ -42,6 +42,9 @@ public class IfcOpenShellParser : MonoBehaviour
         string basePath = @"//ifc/decomposition";
         GameObject root = new GameObject();
         root.name = Path.GetFileNameWithoutExtension(filePath) + " (IFC)";
+        root.transform.SetParent(transform.parent);
+        root.transform.localPosition = Vector3.zero;
+        root.transform.localRotation = Quaternion.identity;
 
         foreach (XmlNode node in loadedXML.SelectNodes(basePath + "/IfcProject"))
             AddElements(node, root);
@@ -170,6 +173,8 @@ public class IfcOpenShellParser : MonoBehaviour
             ProcessStartInfo startInfo = new ProcessStartInfo();
             string curentDir = Directory.GetCurrentDirectory();
             string setDir = Path.Combine(curentDir, @"Assets\IfcConvert\");
+
+            if (!Directory.Exists(file_directory)) Directory.CreateDirectory(file_directory);
 
             startInfo.WorkingDirectory = setDir;
             startInfo.CreateNoWindow = false;

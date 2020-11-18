@@ -226,6 +226,50 @@ MonoBehaviour:
   distanceMin: 10
   distanceMax: 10
   smoothTime: 1
+--- !u!1 &509280129
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 509280131}
+  - component: {fileID: 509280130}
+  m_Layer: 0
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &509280130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509280129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b92f57a7c3a3ac4eba66fb47f0b0b9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  filePath: C:/Users/babypink/Downloads/2017 AR Ultraschall TK0901 Tablet/3D aufbereitet/Scan_Daten/Orginal/da1s1d1_binary.stl
+--- !u!4 &509280131
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509280129}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1059964825
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,7 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4283d278b63a9943a7982c3ca3babaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filePath: D:/Jason/BimImport/Assets/Ifc Sample/2011-09-14-Duplex-IFC/Duplex_A_20110907.ifc
+  filePath: C:/Users/babypink/Documents/IfcObjUnity/Assets/Ifc Sample/2011-09-14-Duplex-IFC/Duplex_A_20110907_optimized.ifc
 --- !u!4 &1059964827
 Transform:
   m_ObjectHideFlags: 0

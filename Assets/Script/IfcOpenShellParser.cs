@@ -98,6 +98,7 @@ public class IfcOpenShellParser : MonoBehaviour
                 node.Attributes.GetNamedItem("id").Value;
             GameObject goElement = null;
             goElement = GameObject.Find(searchPath);
+            if (goElement != null) goElement.AddComponent<MouseHighlight>();
 
             // What if we can't find any? We need to create
             // a new empty object

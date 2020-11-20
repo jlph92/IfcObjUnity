@@ -16,7 +16,7 @@ public class CameraControl : MonoBehaviour
     float yMaxLimit = 90f;
     float distanceMin = 10f;
     float distanceMax = 10f;
-    float smoothTime = 5.0f;
+    float smoothTime = 2.0f;
     float rotationYAxis = 0.0f;
     float rotationXAxis = 0.0f;
     float velocityX = 0.0f;
@@ -43,7 +43,7 @@ public class CameraControl : MonoBehaviour
         if (set)
         {
             CameraFocus();
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(0))
             {
                 velocityX += xSpeed * Input.GetAxis("Mouse X") * distance * 0.02f;
                 velocityY += ySpeed * Input.GetAxis("Mouse Y") * 0.02f;

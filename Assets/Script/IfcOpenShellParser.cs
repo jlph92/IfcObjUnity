@@ -13,6 +13,19 @@ public class IfcOpenShellParser : MonoBehaviour
     public string filePath;
     private GameObject loadedOBJ;
 
+    private void checkBound(GameObject model)
+    {
+        Bounds bounds = new Bounds(model.transform.position, Vector3.zero);
+        Renderer[] renderers = model.GetComponentsInChildren<Renderer>();
+
+        foreach (Renderer r in renderers)
+        {
+            bounds.Encapsulate(r.bounds);
+        }
+
+        GetComponentInChildren<CameraControl>().setModel(bounds);
+    }
+
     #region Object
     /// <summary>
     /// Load .obj file
@@ -58,6 +71,7 @@ public class IfcOpenShellParser : MonoBehaviour
             Destroy(ToBeDeleted);
 
         GroupElements();
+        checkBound(root);
     }
 
     private void AddElements(XmlNode node, GameObject parent)

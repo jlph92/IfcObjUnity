@@ -16,7 +16,7 @@ public class CameraControl : MonoBehaviour
     float yMaxLimit = 90f;
     float distanceMin = 10f;
     float distanceMax = 10f;
-    float smoothTime = 2.0f;
+    float smoothTime = 5.0f;
     float rotationYAxis = 0.0f;
     float rotationXAxis = 0.0f;
     float velocityX = 0.0f;
@@ -25,6 +25,8 @@ public class CameraControl : MonoBehaviour
     void Start()
     {
         cam = GetComponent<Camera>();
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = Color.white;
 
         Vector3 angles = transform.eulerAngles;
         rotationYAxis = angles.y;
@@ -35,7 +37,7 @@ public class CameraControl : MonoBehaviour
     {
         this.bound = bound;
         this.set = true;
-        scale = this.bound.size.y * 2.0f;
+        scale = this.bound.size.y * 2.5f;
     }
 
     void Update()
@@ -43,7 +45,7 @@ public class CameraControl : MonoBehaviour
         if (set)
         {
             CameraFocus();
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(1))
             {
                 velocityX += xSpeed * Input.GetAxis("Mouse X") * distance * 0.02f;
                 velocityY += ySpeed * Input.GetAxis("Mouse Y") * 0.02f;

@@ -8,6 +8,7 @@ using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 
+
 public class IfcOpenShellParser : MonoBehaviour
 {
     public string filePath;
@@ -98,7 +99,11 @@ public class IfcOpenShellParser : MonoBehaviour
                 node.Attributes.GetNamedItem("id").Value;
             GameObject goElement = null;
             goElement = GameObject.Find(searchPath);
-            if (goElement != null) goElement.AddComponent<MouseHighlight>();
+            if (goElement != null) 
+            {
+                goElement.AddComponent<MouseHighlight>();
+                goElement.AddComponent<MeshCollider>();
+            }
 
             // What if we can't find any? We need to create
             // a new empty object

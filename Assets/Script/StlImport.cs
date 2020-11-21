@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using Parabox.Stl;
 using System.IO;
+using SFB;
 
 public class StlImport : MonoBehaviour
 {
@@ -12,7 +12,13 @@ public class StlImport : MonoBehaviour
     [EasyButtons.Button]
     private void importSTL()
     {
-        filePath = EditorUtility.OpenFilePanel("Open with stl", "", "stl");
+        var extensions = new[] {
+            new ExtensionFilter("STL files", "stl"),
+            new ExtensionFilter("All Files", "*" ),
+        };
+
+        var path = StandaloneFileBrowser.OpenFilePanel("Open Settings File", "", extensions, false);
+        filePath = path[0];
         if (filePath.Length != 0)
         {
             GameObject root = GameObject.CreatePrimitive(PrimitiveType.Cube);

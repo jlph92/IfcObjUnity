@@ -14,13 +14,14 @@ public class IFCData : MonoBehaviour
     public string STEPIndex;
     public string IFCLayer;
     public string Tag;
+    public GameObject attachedObj;
 
     public List<IFCPropertySet> propertySets;
     public List<IFCPropertySet> quantitySets;
 
     public static void AddProperties(XmlNode node, GameObject go)
     {
-        go.tag = AddTag(node.Name);
+        //go.tag = AddTag(node.Name);
         IFCData ifcData = go.AddComponent(typeof(IFCData)) as IFCData;
 
         ifcData.IFCClass = node.Name;
@@ -34,6 +35,8 @@ public class IFCData : MonoBehaviour
         {
             ifcData.STEPName = node.Attributes.GetNamedItem("Name").Value;
         }
+
+        ifcData.attachedObj = go;
 
         // Initialize PropertySets and QuantitySets
         if (ifcData.propertySets == null)
@@ -106,29 +109,29 @@ public class IFCData : MonoBehaviour
     }
 
 
-    private static string AddTag(string tag)
-    {
-        UnityEngine.Object[] asset = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
-        if ((asset != null) && (asset.Length > 0))
-        {
-            SerializedObject so = new SerializedObject(asset[0]);
-            SerializedProperty tags = so.FindProperty("tags");
+    //private static string AddTag(string tag)
+    //{
+    //    UnityEngine.Object[] asset = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
+    //    if ((asset != null) && (asset.Length > 0))
+    //    {
+    //        SerializedObject so = new SerializedObject(asset[0]);
+    //        SerializedProperty tags = so.FindProperty("tags");
 
-            for (int i = 0; i < tags.arraySize; ++i)
-            {
-                if (tags.GetArrayElementAtIndex(i).stringValue == tag)
-                {
-                    return tag;     // Tag already present, nothing to do.
-                }
-            }
+    //        for (int i = 0; i < tags.arraySize; ++i)
+    //        {
+    //            if (tags.GetArrayElementAtIndex(i).stringValue == tag)
+    //            {
+    //                return tag;     // Tag already present, nothing to do.
+    //            }
+    //        }
 
-            tags.InsertArrayElementAtIndex(0);
-            tags.GetArrayElementAtIndex(0).stringValue = tag;
-            so.ApplyModifiedProperties();
-            so.Update();
-        }
-        return tag;
-    }
+    //        tags.InsertArrayElementAtIndex(0);
+    //        tags.GetArrayElementAtIndex(0).stringValue = tag;
+    //        so.ApplyModifiedProperties();
+    //        so.Update();
+    //    }
+    //    return tag;
+    //}
 }
 
 [System.Serializable]

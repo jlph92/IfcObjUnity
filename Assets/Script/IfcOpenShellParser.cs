@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
+using SFB;
 
 
 public class IfcOpenShellParser : MonoBehaviour
@@ -140,9 +141,31 @@ public class IfcOpenShellParser : MonoBehaviour
 
     }
 
+    private string gameTag(GameObject g)
+    {
+        IFCData ifcData = g.GetComponent(typeof(IFCData)) as IFCData;
+        return ifcData.IFCClass;
+    }
+
+    private GameObject[] getBuilding()
+    {
+        List<GameObject> elements = new List<GameObject>();
+        IFCData[] allObjects = FindObjectsOfType<IFCData>();
+        foreach (IFCData go in allObjects)
+        {
+            if (go.IFCClass == "IfcBuildingStorey")
+            {
+                //UnityEngine.Debug.Log(go.attachedObj.name);
+                elements.Add(go.attachedObj);
+            }
+        }
+
+        return elements.ToArray();
+    }
+
     private void GroupElements()
     {
-        GameObject[] BuildingStoreys = GameObject.FindGameObjectsWithTag("IfcBuildingStorey");
+        GameObject[] BuildingStoreys = getBuilding();
         Dictionary<GameObject, Transform> GroupParents = new Dictionary<GameObject, Transform>();
         Dictionary<GameObject, Transform> GroupChildren = new Dictionary<GameObject, Transform>();
 
@@ -152,15 +175,15 @@ public class IfcOpenShellParser : MonoBehaviour
 
             foreach (Transform child in BuildingStorey.transform)
             {
-                if (child.gameObject.tag != "Untagged")
+                if (gameTag(child.gameObject).Length > 0)
                 {
-                    if (!Groups.ContainsKey(child.gameObject.tag))
+                    if (!Groups.ContainsKey(gameTag(child.gameObject)))
                     {
-                        Groups.Add(child.gameObject.tag, new GameObject(child.gameObject.tag));
-                        GroupParents.Add(Groups[child.gameObject.tag], BuildingStorey.transform);
+                        Groups.Add(gameTag(child.gameObject), new GameObject(gameTag(child.gameObject)));
+                        GroupParents.Add(Groups[gameTag(child.gameObject)], BuildingStorey.transform);
                     }
 
-                    GroupChildren.Add(child.gameObject, Groups[child.gameObject.tag].transform);
+                    GroupChildren.Add(child.gameObject, Groups[gameTag(child.gameObject)].transform);
                 }
             }
         }
@@ -185,7 +208,14 @@ public class IfcOpenShellParser : MonoBehaviour
     [EasyButtons.Button]
     private void openFile()
     {
-        filePath = EditorUtility.OpenFilePanel("Open with ifc", "", "ifc");
+        var extensions = new [] { 
+            new ExtensionFilter("IFC files", "ifc"),
+            new ExtensionFilter("All Files", "*" ),
+        };
+
+        var path = StandaloneFileBrowser.OpenFilePanel("Open Settings File", "", extensions, false);
+        filePath = path[0];
+        //filePath = EditorUtility.OpenFilePanel("Open with ifc", "", "ifc");
         if (filePath.Length != 0)
         {
             string file_directory = Path.GetDirectoryName(filePath) + @"\Output\";

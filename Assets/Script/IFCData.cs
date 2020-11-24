@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using System.IO;
-using UnityEditor;
 
 public class IFCData : MonoBehaviour
 {

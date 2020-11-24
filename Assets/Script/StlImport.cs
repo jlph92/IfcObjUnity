@@ -31,4 +31,22 @@ public class StlImport : MonoBehaviour
             m.mesh = mesh[0];
         }
     }
+
+    void OnGUI()
+    {
+        if (GUI.Button(new Rect(10, 10, 100, 30), "Load STL file"))
+        {
+            importSTL();
+        }
+
+        int index = 40;
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.black;
+
+        foreach (GameObject g in FindObjectsOfType<GameObject>())
+        {
+            GUI.Label(new Rect(10, index, 100, 20), g.name, style);
+            index += 20;
+        }
+    }
 }

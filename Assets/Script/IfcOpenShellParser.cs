@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Dummiesman;
+using AsImpL;
 using UnityEditor;
 using System;
 using System.IO;
@@ -8,12 +8,14 @@ using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 using SFB;
+using UnityEngine.Events;
 
 
 public class IfcOpenShellParser : MonoBehaviour
 {
     public string filePath;
     private GameObject loadedOBJ;
+    private UnityEvent finish_loadEvent = new UnityEvent();
 
     private void checkBound(GameObject model)
     {
@@ -25,7 +27,7 @@ public class IfcOpenShellParser : MonoBehaviour
             bounds.Encapsulate(r.bounds);
         }
 
-        GetComponentInChildren<CameraControl>().setModel(bounds);
+        FindObjectOfType<CameraControl>().setModel(bounds);
     }
 
     #region Object
@@ -34,13 +36,21 @@ public class IfcOpenShellParser : MonoBehaviour
     /// </summary>
     private void LoadOBJ(string file)
     {
-        OBJLoader obj = new OBJLoader();
-        loadedOBJ = obj.Load(file);
-        if (loadedOBJ != null)
-        {
-            // turn -90 on the X-Axis (CAD/BIM uses Z up)
-            loadedOBJ.transform.Rotate(-90, 0, 0);
-        }
+        //var StlFile = Path.ChangeExtension(file, ".mtl");
+        MultiObjectImporter obj = FindObjectOfType<MultiObjectImporter>();
+        string filename = Path.GetFileNameWithoutExtension(file);
+
+        obj.objectsList.Add(new ModelImportInfo(filename, file));
+        obj.loadObj();
+
+        FindObjectOfType<ObjectImporterUI>().addLoadEvent(finish_loadEvent);
+        //loadedOBJ = obj.Load(file);
+        //if (loadedOBJ != null)
+        //{
+        //    // turn -90 on the X-Axis (CAD/BIM uses Z up)
+        //    loadedOBJ.transform.Rotate(-90, 0, 0);
+        //}
+
     }
     #endregion
 
@@ -96,8 +106,9 @@ public class IfcOpenShellParser : MonoBehaviour
             // This would apply only to elements which have
             // a geometric representation and which are
             // extracted from the 3D file.
-            string searchPath = Path.GetFileNameWithoutExtension(filePath) + "/" +
-                node.Attributes.GetNamedItem("id").Value;
+            //string searchPath = Path.GetFileNameWithoutExtension(filePath) + "/" +
+            //    node.Attributes.GetNamedItem("id").Value;
+            string searchPath = node.Attributes.GetNamedItem("id").Value;
             GameObject goElement = null;
             goElement = GameObject.Find(searchPath);
             if (goElement != null) 
@@ -226,7 +237,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
             if (!Directory.Exists(file_directory)) Directory.CreateDirectory(file_directory);
 
-            startInfo.WorkingDirectory = setDir;
+            startInfo.WorkingDirectory = curentDir;
             startInfo.CreateNoWindow = false;
             startInfo.UseShellExecute = false;
             startInfo.FileName = "cmd.exe";
@@ -265,13 +276,27 @@ public class IfcOpenShellParser : MonoBehaviour
             }
 
             if (File.Exists(outputFile_obj)) LoadOBJ(outputFile_obj);
-            else UnityEngine.Debug.Log("Converting Obj file fails!");
+            else
+            {
+                UnityEngine.Debug.Log("Converting Obj file fails!");
+                ObjFail = true;
+            }
 
-            if (File.Exists(outputFile_xml)) LoadXML(outputFile_xml);
-            else UnityEngine.Debug.Log("Converting xml file fails!");
+            if (File.Exists(outputFile_xml))
+            {
+                finish_loadEvent.AddListener(() => LoadXML(outputFile_xml));
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Converting xml file fails!");
+                XmlFail = true;
+            }
         }
     }
     #endregion
+
+    bool ObjFail = false;
+    bool XmlFail = false;
 
     #region GUI button
     /// <summary>
@@ -283,9 +308,23 @@ public class IfcOpenShellParser : MonoBehaviour
         {
             if (GUI.Button(new Rect(10, 10, 100, 30), "Load ifc file"))
             {
+                ObjFail = false;
+                XmlFail = false;
                 openFile();
-            }
+            }  
         }
+
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.black;
+
+        if (ObjFail) GUI.Label(new Rect(10, 40, 100, 20), "Converting Obj file fails!", style);
+        if (XmlFail) GUI.Label(new Rect(10, 60, 100, 20), "Converting Xml file fails!", style);
+
+        IFCData[] allObjects = FindObjectsOfType<IFCData>();
+
+        String g = String.Format("GameObject Loaded : {0}.", allObjects.Length);
+        GUI.Label(new Rect(10, 50, 100, 20), g, style);
+        
     }
     #endregion
 }

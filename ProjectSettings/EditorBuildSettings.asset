@@ -8,4 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 0
+    path: Assets/AsImpL/Examples/001_Import_SimpleTest.unity
+    guid: 451f9a57a3bcde1459f722853aa9e942
+  - enabled: 0
+    path: Assets/AsImpL/Examples/003_Import_URL_Test.unity
+    guid: d5954e0fc8f8fac4682e7b99da510760
   m_configObjects: {}

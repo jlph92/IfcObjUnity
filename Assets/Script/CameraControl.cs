@@ -22,6 +22,11 @@ public class CameraControl : MonoBehaviour
     float velocityX = 0.0f;
     float velocityY = 0.0f;
 
+    float t_velocityX = 0.0f;
+    float t_velocityY = 0.0f;
+    float posYAxis = 0.0f;
+    float posXAxis = 0.0f;
+
     void Start()
     {
         cam = GetComponent<Camera>();
@@ -31,13 +36,14 @@ public class CameraControl : MonoBehaviour
         Vector3 angles = transform.eulerAngles;
         rotationYAxis = angles.y;
         rotationXAxis = angles.x;
+
     }
 
     public void setModel(Bounds bound)
     {
         this.bound = bound;
         this.set = true;
-        scale = this.bound.size.y * 2.5f;
+        scale = this.bound.size.y * 3.0f;
     }
 
     void Update()
@@ -45,6 +51,8 @@ public class CameraControl : MonoBehaviour
         if (set)
         {
             CameraFocus();
+
+            // Rotation
             if (Input.GetMouseButton(1))
             {
                 velocityX += xSpeed * Input.GetAxis("Mouse X") * distance * 0.02f;
@@ -60,6 +68,21 @@ public class CameraControl : MonoBehaviour
             transform.rotation = rotation;
             velocityX = Mathf.Lerp(velocityX, 0, Time.deltaTime * smoothTime);
             velocityY = Mathf.Lerp(velocityY, 0, Time.deltaTime * smoothTime);
+
+
+            // Translation
+            if (Input.GetMouseButton(2))
+            {
+                t_velocityX += xSpeed * Input.GetAxis("Mouse X") * 0.01f;
+                t_velocityY += ySpeed * Input.GetAxis("Mouse Y") * 0.01f;
+            }
+            posXAxis -= t_velocityX;
+            posYAxis -= t_velocityY;
+            Vector3 toPosition = new Vector3(posXAxis, posYAxis, 0.0f);
+            transform.Translate(toPosition);
+
+            t_velocityX = Mathf.Lerp(t_velocityX, 0, Time.deltaTime * smoothTime);
+            t_velocityY = Mathf.Lerp(t_velocityY, 0, Time.deltaTime * smoothTime);
         }
     }
 

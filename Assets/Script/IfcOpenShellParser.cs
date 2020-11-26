@@ -14,6 +14,7 @@ using UnityEngine.Events;
 public class IfcOpenShellParser : MonoBehaviour
 {
     public string filePath;
+    public float alpha = 0.5f;
     private GameObject loadedOBJ;
     private UnityEvent finish_loadEvent = new UnityEvent();
 
@@ -66,6 +67,7 @@ public class IfcOpenShellParser : MonoBehaviour
         // basepath
         string basePath = @"//ifc/decomposition";
         GameObject root = new GameObject();
+        root.layer = 8;
         root.name = Path.GetFileNameWithoutExtension(filePath) + " (IFC)";
         root.transform.SetParent(transform.parent);
         root.transform.localPosition = Vector3.zero;
@@ -84,6 +86,37 @@ public class IfcOpenShellParser : MonoBehaviour
 
         GroupElements();
         checkBound(root);
+        cloneForShow(root);
+    }
+
+    private void cloneForShow(GameObject root)
+    {
+        GameObject duplicate = Instantiate(root);
+        duplicate.layer = 9;
+
+        foreach (Transform child in duplicate.GetComponentsInChildren<Transform>())
+        {
+            child.gameObject.layer = 9;  // change to the Damage layer. 
+        }
+
+        foreach (Renderer m_renderer in duplicate.GetComponentsInChildren<MeshRenderer>())
+        {
+            Color color = m_renderer.material.color;
+            color.a = alpha;
+
+            Material m_material = new Material(Shader.Find("Standard"));
+            m_material.SetFloat("_Mode", 2.0f);
+            m_material.SetColor("_Color", color);
+            m_material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            m_material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            m_material.SetInt("_ZWrite", 0);
+            m_material.DisableKeyword("_ALPHATEST_ON");
+            m_material.EnableKeyword("_ALPHABLEND_ON");
+            m_material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            m_material.renderQueue = 3000;
+
+            m_renderer.material = m_material;
+        }
     }
 
     private void AddElements(XmlNode node, GameObject parent)
@@ -124,6 +157,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
             if (goElement != null)
             {
+                goElement.layer = 8;
                 // Set name from the IFC Name field
                 if (node.Attributes.GetNamedItem("Name") != null)
                 {
@@ -304,14 +338,11 @@ public class IfcOpenShellParser : MonoBehaviour
     /// </summary>
     void OnGUI()
     {
-        if (loadedOBJ == null)
+        if (GUI.Button(new Rect(10, 10, 100, 30), "Load ifc file"))
         {
-            if (GUI.Button(new Rect(10, 10, 100, 30), "Load ifc file"))
-            {
-                ObjFail = false;
-                XmlFail = false;
-                openFile();
-            }  
+            ObjFail = false;
+            XmlFail = false;
+            openFile();
         }
 
         GUIStyle style = new GUIStyle();

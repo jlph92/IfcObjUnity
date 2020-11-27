@@ -978,6 +978,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   filePath: 
+  Edge: {fileID: 2100000, guid: 5e997875f0fdff146a3d9ab42d21e5fe, type: 2}
   alpha: 0.25
 --- !u!81 &1319498490
 AudioListener:

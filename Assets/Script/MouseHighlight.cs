@@ -7,8 +7,9 @@ public class MouseHighlight : MonoBehaviour
     //Get the GameObject’s mesh renderer to access the GameObject’s material and color
     MeshRenderer m_Renderer;
 
-    public Material original;
+    private Material original;
     public Material highlighted;
+    private List<Material> m_list = new List<Material>();
 
     // Start is called before the first frame update
     void Start()
@@ -17,31 +18,35 @@ public class MouseHighlight : MonoBehaviour
         m_Renderer = GetComponent<MeshRenderer>();
 
         original = m_Renderer.material;
-        if (Resources.Load<Material>("Materials/Highlighted") == null) 
+        if (Resources.Load<Material>("Materials/Edge") == null) 
             Debug.Log("No Path found");
         else
-            highlighted = Resources.Load<Material>("Materials/Highlighted");
+            highlighted = Resources.Load<Material>("Materials/Edge");
 
+        m_list.Add(original);
+        m_list.Add(highlighted);
     }
 
     // The mesh goes red when the mouse is over it...
     void OnMouseEnter()
     {
-        Debug.Log("Entered");
-        m_Renderer.material = highlighted;
+        //Debug.Log("Entered");
+        if (m_list.Count > 0) m_Renderer.materials = m_list.ToArray();
     }
 
     // ...the red fades out to cyan as the mouse is held over...
     void OnMouseOver()
     {
-        Debug.Log("Overed");
-        m_Renderer.material.color -= new Color(0.1F, 0, 0) * Time.deltaTime;
+        //Debug.Log("Overed");
+        if (m_list.Count > 0) m_Renderer.materials = m_list.ToArray();
+        //m_Renderer.material.color -= new Color(0.1F, 0, 0) * Time.deltaTime;
     }
 
     // ...and the mesh finally turns white when the mouse moves away.
     void OnMouseExit()
     {
-        Debug.Log("Exited");
-        m_Renderer.material = original;
+        //Debug.Log("Exited");
+        Material[] m_original = { original };
+        m_Renderer.materials = m_original;
     }
 }

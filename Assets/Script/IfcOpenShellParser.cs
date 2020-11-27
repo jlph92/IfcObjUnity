@@ -14,6 +14,7 @@ using UnityEngine.Events;
 public class IfcOpenShellParser : MonoBehaviour
 {
     public string filePath;
+    public Material Edge;
     public float alpha = 0.5f;
     private GameObject loadedOBJ;
     private UnityEvent finish_loadEvent = new UnityEvent();

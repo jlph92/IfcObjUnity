@@ -88,6 +88,16 @@ public class IfcOpenShellParser : MonoBehaviour
         GroupElements();
         checkBound(root);
         cloneForShow(root);
+        addMouseHighlight(root);
+    }
+
+    // Add in Highlighting feature
+    private void addMouseHighlight(GameObject root)
+    {
+        foreach (MeshRenderer m_render in root.GetComponentsInChildren<MeshRenderer>())
+        {
+            m_render.gameObject.AddComponent<MouseHighlight>();
+        }
     }
 
     private void cloneForShow(GameObject root)
@@ -147,7 +157,6 @@ public class IfcOpenShellParser : MonoBehaviour
             goElement = GameObject.Find(searchPath);
             if (goElement != null) 
             {
-                goElement.AddComponent<MouseHighlight>();
                 goElement.AddComponent<MeshCollider>();
             }
 
@@ -330,6 +339,36 @@ public class IfcOpenShellParser : MonoBehaviour
     }
     #endregion
 
+    #region LoadFile
+    /// <summary>
+    /// Open files
+    /// </summary>
+    [EasyButtons.Button]
+    private void openXMLFile()
+    {
+        var extensions = new[] {
+            new ExtensionFilter("XML files", "xml"),
+            new ExtensionFilter("All Files", "*" ),
+        };
+
+        var path = StandaloneFileBrowser.OpenFilePanel("Open Settings File", "", extensions, false);
+        string xmlFilePath = path[0];
+        //filePath = EditorUtility.OpenFilePanel("Open with ifc", "", "ifc");
+        if (xmlFilePath.Length != 0)
+        {
+            if (File.Exists(xmlFilePath))
+            {
+                LoadXML(xmlFilePath);
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Loading xml file fails!");
+                XmlFail = true;
+            }
+        }
+    }
+    #endregion
+
     bool ObjFail = false;
     bool XmlFail = false;
 
@@ -344,6 +383,12 @@ public class IfcOpenShellParser : MonoBehaviour
             ObjFail = false;
             XmlFail = false;
             openFile();
+        }
+
+        GUI.backgroundColor = Color.red;
+        if (GUI.Button(new Rect(Screen.width - 40, 10, 30, 30), "X"))
+        {
+            Application.Quit();
         }
 
         GUIStyle style = new GUIStyle();

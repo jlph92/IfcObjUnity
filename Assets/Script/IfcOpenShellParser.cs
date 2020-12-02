@@ -16,6 +16,7 @@ public class IfcOpenShellParser : MonoBehaviour
     public string filePath;
     public Material Edge;
     public float alpha = 0.5f;
+    
     private GameObject loadedOBJ;
     private UnityEvent finish_loadEvent = new UnityEvent();
 
@@ -89,6 +90,15 @@ public class IfcOpenShellParser : MonoBehaviour
         checkBound(root);
         cloneForShow(root);
         addMouseHighlight(root);
+
+        root.AddComponent<SelectHandler>();
+        openIfcfile();
+    }
+
+    private void openIfcfile()
+    {
+        IfcInteract ifcInteract = GetComponent<IfcInteract>();
+        ifcInteract.openFile(filePath);
     }
 
     // Add in Highlighting feature
@@ -339,7 +349,7 @@ public class IfcOpenShellParser : MonoBehaviour
     }
     #endregion
 
-    #region LoadFile
+    #region LoadXMLFile
     /// <summary>
     /// Open files
     /// </summary>
@@ -397,10 +407,9 @@ public class IfcOpenShellParser : MonoBehaviour
         if (ObjFail) GUI.Label(new Rect(10, 40, 100, 20), "Converting Obj file fails!", style);
         if (XmlFail) GUI.Label(new Rect(10, 60, 100, 20), "Converting Xml file fails!", style);
 
-        IFCData[] allObjects = FindObjectsOfType<IFCData>();
-
-        String g = String.Format("GameObject Loaded : {0}.", allObjects.Length);
-        GUI.Label(new Rect(10, 50, 100, 20), g, style);
+        //IFCData[] allObjects = FindObjectsOfType<IFCData>();
+        //String g = String.Format("GameObject Loaded : {0}.", allObjects.Length);
+        //GUI.Label(new Rect(10, 50, 100, 20), g, style);
         
     }
     #endregion

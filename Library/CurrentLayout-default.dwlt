@@ -21,7 +21,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 4}
-  m_MinSize: {x: 875, y: 392}
+  m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
   m_Maximized: 1
 --- !u!114 &2
@@ -74,7 +74,7 @@ MonoBehaviour:
   m_MinSize: {x: 201, y: 342}
   m_MaxSize: {x: 4001, y: 8042}
   vertical: 1
-  controlID: 57
+  controlID: 55
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -97,7 +97,7 @@ MonoBehaviour:
     y: 0
     width: 2560
     height: 1357
-  m_MinSize: {x: 875, y: 392}
+  m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &5
 MonoBehaviour:
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_MinSize: {x: 911, y: 342}
   m_MaxSize: {x: 22006, y: 10021}
   vertical: 0
-  controlID: 103
+  controlID: 54
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -360,7 +360,7 @@ MonoBehaviour:
     m_VAllowExceedBaseRangeMax: 1
     m_ScaleWithWindow: 0
     m_HSlider: 0
-    m_VSlider: 1
+    m_VSlider: 0
     m_IgnoreScrollWheelUntilClicked: 0
     m_EnableMouseInput: 1
     m_EnableSliderZoomHorizontal: 0
@@ -373,7 +373,7 @@ MonoBehaviour:
       y: 21
       width: 1052
       height: 573
-    m_Scale: {x: 0.7734375, y: 0.7734375}
+    m_Scale: {x: 0.74609375, y: 0.74609375}
     m_Translation: {x: 526, y: 286.5}
     m_MarginLeft: 0
     m_MarginRight: 0
@@ -381,12 +381,12 @@ MonoBehaviour:
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -680.0808
-      y: -370.42426
-      width: 1360.1616
-      height: 740.8485
+      x: -705.00525
+      y: -384
+      width: 1410.0105
+      height: 768
     m_MinimalGUI: 1
-  m_defaultScale: 0.7734375
+  m_defaultScale: 0.74609375
   m_LastWindowPixelSize: {x: 1052, y: 594}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
@@ -448,9 +448,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 9c370000
-      m_LastClickedID: 0
-      m_ExpandedIDs: 6cfbffff
+      m_SelectedIDs: 5495ffff
+      m_LastClickedID: -27308
+      m_ExpandedIDs: f4cbffff04ccffff0accffff10ccffff16ccffff1accffff24ccffff38f6ffff48f6ffff4ef6ffff54f6ffff5af6ffff5ef6ffff68f6ffff9cf8ffffacf8ffffb2f8ffffb8f8ffffbef8ffffccf8ffff3cfaffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -551,20 +551,20 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/DLL
+    - Assets/Script
   m_ViewMode: 1
   m_StartGridSize: 74
   m_LastFolders:
-  - Assets/DLL
+  - Assets/Script
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\Jason\BimImport
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 6e370000
-    m_LastClickedID: 14190
-    m_ExpandedIDs: 000000006037000062370000643700006e37000000ca9a3b
+    m_SelectedIDs: 28380000
+    m_LastClickedID: 14376
+    m_ExpandedIDs: 00000000fa370000fc370000fe3700001238000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -592,7 +592,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000603700006237000064370000
+    m_ExpandedIDs: 00000000fa370000fc370000fe370000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -734,7 +734,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0.10124633, y: 0.5951754, z: -0.075934716, w: 0.7935686}
     speed: 2
-    m_Value: {x: 0.10124633, y: 0.5951754, z: -0.075934716, w: 0.7935686}
+    m_Value: {x: 0.101246245, y: 0.5951749, z: -0.07593465, w: 0.79356796}
   m_Size:
     m_Target: 15.041609
     speed: 2

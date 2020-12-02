@@ -33,6 +33,7 @@ public class MouseHighlight : MonoBehaviour
         //Debug.Log("Entered");
         //if (m_list.Count > 0) m_Renderer.materials = m_list.ToArray();
         m_Renderer.material = highlighted;
+        FindObjectOfType<SelectHandler>().onSelect(this.gameObject);
     }
 
     // ...the red fades out to cyan as the mouse is held over...

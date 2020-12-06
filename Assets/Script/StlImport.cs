@@ -7,8 +7,11 @@ using SFB;
 
 public class StlImport : MonoBehaviour
 {
+    
     public string filePath;
     public float alpha = 0.5f;
+    public Unit unit;
+    public bool smooth = false;
     private Color default_color;
 
     [EasyButtons.Button]
@@ -23,27 +26,51 @@ public class StlImport : MonoBehaviour
         filePath = path[0];
         if (filePath.Length != 0)
         {
-            GameObject root = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject root = Instantiate(Resources.Load<GameObject>("Prefabs/Axis_Arrow"), Vector3.zero, Quaternion.identity) as GameObject;
             root.name = Path.GetFileNameWithoutExtension(filePath);
-            default_color = root.GetComponent<MeshRenderer>().material.color;
-            root.GetComponent<MeshRenderer>().material.color = Color.red;
-            if (root.GetComponent<BoxCollider>()) Destroy(root.GetComponent<BoxCollider>());
-            root.AddComponent<MeshCollider>();
 
-            MeshFilter m = root.GetComponent<MeshFilter>();
+            Mesh[] meshes = Importer.Import(filePath, smooth: smooth, unit: unit);
 
-            Mesh[] mesh = Importer.Import(filePath);
+            foreach (Mesh mesh in meshes)
+            {
+                GameObject child = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                child.transform.parent = root.transform;
+                child.name = "Element";
+                //default_color = child.GetComponent<MeshRenderer>().material.color;
+                child.GetComponent<MeshRenderer>().material.color = Color.red;
+                setTransparent(child.GetComponent<MeshRenderer>());
+                if (child.GetComponent<BoxCollider>()) Destroy(child.GetComponent<BoxCollider>());
 
-            m.mesh = mesh[0];
+                MeshFilter m = child.GetComponent<MeshFilter>();
+                m.mesh = mesh;
+                m.mesh.RecalculateNormals();
+            }
 
-            root.transform.Rotate(0.0f, -90.0f, 90.0f, Space.Self);
-            root.transform.localScale = new Vector3(1.0f, -1.0f, 1.0f);
             root.layer = 9;
 
-            cloneForShow(root);
-            root.AddComponent<MouseHighlight>();
+            //cloneForShow(root);
         }
         
+    }
+
+    void setTransparent(MeshRenderer m_renderer)
+    {
+        Color color = m_renderer.material.color;
+
+        color.a = alpha;
+
+        Material m_material = new Material(Shader.Find("Standard"));
+        m_material.SetFloat("_Mode", 2.0f);
+        m_material.SetColor("_Color", color);
+        m_material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m_material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m_material.SetInt("_ZWrite", 0);
+        m_material.DisableKeyword("_ALPHATEST_ON");
+        m_material.EnableKeyword("_ALPHABLEND_ON");
+        m_material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+        m_material.renderQueue = 3000;
+
+        m_renderer.material = m_material;
     }
 
     private void cloneForShow(GameObject root)

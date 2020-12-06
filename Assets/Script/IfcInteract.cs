@@ -17,7 +17,7 @@ public class IfcInteract : MonoBehaviour
 {
     private string filePath;
     private readonly ObservableCollection<PropertyItem> _properties = new ObservableCollection<PropertyItem>();
-    private List <IIfcElement> ifcProducts = new List<IIfcElement>();
+    private List <IIfcElement> ifcElements = new List<IIfcElement>();
 
     public class PropertyItem
     {
@@ -104,12 +104,12 @@ public class IfcInteract : MonoBehaviour
         {
             using (var model = IfcStore.Open(filePath))
             {
-                ifcProducts = model.Instances.OfType<IIfcElement>().ToList();
+                ifcElements = model.Instances.OfType<IIfcElement>().ToList();
 
-                foreach (var ifcProduct in ifcProducts)
+                foreach (var ifcElement in ifcElements)
                 {
-                    Debug.Log($"IfcProduct ID: {ifcProduct.GlobalId}, Name: {ifcProduct.Name}");
-                    FillPropertyData(ifcProduct);
+                    Debug.Log($"IfcProduct ID: {ifcElement.GlobalId}, Name: {ifcElement.Name}");
+                    FillPropertyData(ifcElement);
                 }  
             }
         }
@@ -125,11 +125,11 @@ public class IfcInteract : MonoBehaviour
         {
             using (var model = IfcStore.Open(filePath))
             {
-                ifcProducts = model.Instances.OfType<IIfcElement>().ToList();
+                ifcElements = model.Instances.OfType<IIfcElement>().ToList();
 
-                foreach (var ifcProduct in ifcProducts)
+                foreach (var ifcElement in ifcElements)
                 {
-                    Debug.Log($"IfcProduct ID: {ifcProduct.GlobalId}, Name: {ifcProduct.Name}");
+                    Debug.Log($"IfcProduct ID: {ifcElement.GlobalId}, Name: {ifcElement.Name}");
                 }
             }
         }
@@ -244,6 +244,7 @@ public class IfcInteract : MonoBehaviour
             });
         }
     }
+
 
     private void Clear(bool clearHistory = true)
     {

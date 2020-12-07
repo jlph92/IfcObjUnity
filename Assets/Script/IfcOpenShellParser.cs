@@ -47,13 +47,6 @@ public class IfcOpenShellParser : MonoBehaviour
         obj.loadObj();
 
         FindObjectOfType<ObjectImporterUI>().addLoadEvent(finish_loadEvent);
-        //loadedOBJ = obj.Load(file);
-        //if (loadedOBJ != null)
-        //{
-        //    // turn -90 on the X-Axis (CAD/BIM uses Z up)
-        //    loadedOBJ.transform.Rotate(-90, 0, 0);
-        //}
-
     }
     #endregion
 
@@ -91,14 +84,13 @@ public class IfcOpenShellParser : MonoBehaviour
         cloneForShow(root);
         addMouseHighlight(root);
 
-        root.AddComponent<SelectHandler>();
+        //root.AddComponent<SelectHandler>();
         openIfcfile();
     }
 
     private void openIfcfile()
     {
-        IfcInteract ifcInteract = GetComponent<IfcInteract>();
-        ifcInteract.openFile(filePath);
+        GetComponent<IFCTreeView>().openFile(filePath);
     }
 
     // Add in Highlighting feature
@@ -144,24 +136,6 @@ public class IfcOpenShellParser : MonoBehaviour
     {
         if (node.Attributes.GetNamedItem("id") != null)
         {
-            //if (node.Attributes.GetNamedItem("Name") != null)
-            //{
-            //    UnityEngine.Debug.Log(string.Format("{0} => {1}",
-            //                        node.Attributes.GetNamedItem("id").Value,
-            //                        node.Attributes.GetNamedItem("Name").Value)
-            //    );
-            //}
-            //else
-            //{
-            //    UnityEngine.Debug.Log(node.Attributes.GetNamedItem("id").Value);
-            //}
-
-            // Search an existing GameObject with this name
-            // This would apply only to elements which have
-            // a geometric representation and which are
-            // extracted from the 3D file.
-            //string searchPath = Path.GetFileNameWithoutExtension(filePath) + "/" +
-            //    node.Attributes.GetNamedItem("id").Value;
             string searchPath = node.Attributes.GetNamedItem("id").Value;
             GameObject goElement = null;
             goElement = GameObject.Find(searchPath);
@@ -287,7 +261,6 @@ public class IfcOpenShellParser : MonoBehaviour
             string OutputFileName = Path.GetFileNameWithoutExtension(filePath);
             ProcessStartInfo startInfo = new ProcessStartInfo();
             string curentDir = Directory.GetCurrentDirectory();
-            string setDir = Path.Combine(curentDir, @"Assets\IfcConvert\");
 
             if (!Directory.Exists(file_directory)) Directory.CreateDirectory(file_directory);
 
@@ -313,21 +286,21 @@ public class IfcOpenShellParser : MonoBehaviour
                 UnityEngine.Debug.Log("Converting Error!");
             }
 
-            string outputFile_xml = file_directory + OutputFileName + ".xml";
+            //string outputFile_xml = file_directory + OutputFileName + ".xml";
             //UnityEngine.Debug.Log(outputFile_xml);
-            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_xml + '"' + " --use-element-guids";
+            //startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_xml + '"' + " --use-element-guids";
 
-            try
-            {
-                using (Process exeProcess = Process.Start(startInfo))
-                {
-                    exeProcess.WaitForExit();
-                }
-            }
-            catch
-            {
-                UnityEngine.Debug.Log("Converting Error!");
-            }
+            //try
+            //{
+            //    using (Process exeProcess = Process.Start(startInfo))
+            //    {
+            //        exeProcess.WaitForExit();
+            //    }
+            //}
+            //catch
+            //{
+            //    UnityEngine.Debug.Log("Converting Error!");
+            //}
 
             if (File.Exists(outputFile_obj)) LoadOBJ(outputFile_obj);
             else
@@ -335,16 +308,16 @@ public class IfcOpenShellParser : MonoBehaviour
                 UnityEngine.Debug.Log("Converting Obj file fails!");
                 ObjFail = true;
             }
-
-            if (File.Exists(outputFile_xml))
-            {
-                finish_loadEvent.AddListener(() => LoadXML(outputFile_xml));
-            }
-            else
-            {
-                UnityEngine.Debug.Log("Converting xml file fails!");
-                XmlFail = true;
-            }
+            openIfcfile();
+            //if (File.Exists(outputFile_xml))
+            //{
+            //    finish_loadEvent.AddListener(() => LoadXML(outputFile_xml));
+            //}
+            //else
+            //{
+            //    UnityEngine.Debug.Log("Converting xml file fails!");
+            //    XmlFail = true;
+            //}
         }
     }
     #endregion
@@ -373,14 +346,12 @@ public class IfcOpenShellParser : MonoBehaviour
             else
             {
                 UnityEngine.Debug.Log("Loading xml file fails!");
-                XmlFail = true;
             }
         }
     }
     #endregion
 
     bool ObjFail = false;
-    bool XmlFail = false;
 
     #region GUI button
     /// <summary>
@@ -391,7 +362,6 @@ public class IfcOpenShellParser : MonoBehaviour
         if (GUI.Button(new Rect(10, 10, 100, 30), "Load ifc file"))
         {
             ObjFail = false;
-            XmlFail = false;
             openFile();
         }
 
@@ -405,7 +375,7 @@ public class IfcOpenShellParser : MonoBehaviour
         style.normal.textColor = Color.black;
 
         if (ObjFail) GUI.Label(new Rect(10, 40, 100, 20), "Converting Obj file fails!", style);
-        if (XmlFail) GUI.Label(new Rect(10, 60, 100, 20), "Converting Xml file fails!", style);
+        //if (XmlFail) GUI.Label(new Rect(10, 60, 100, 20), "Converting Xml file fails!", style);
 
         //IFCData[] allObjects = FindObjectsOfType<IFCData>();
         //String g = String.Format("GameObject Loaded : {0}.", allObjects.Length);

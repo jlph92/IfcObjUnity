@@ -135,6 +135,7 @@ namespace Battlehub.UIControls
                 //We display dataItem.name using UI.Text 
                 Text text = e.ItemPresenter.GetComponentInChildren<Text>(true);
                 text.text = dataItem.name;
+                Debug.Log(dataItem.name);
 
                 //Load icon from resources
                 Image icon = e.ItemPresenter.GetComponentsInChildren<Image>()[4];

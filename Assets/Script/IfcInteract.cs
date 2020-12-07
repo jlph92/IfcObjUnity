@@ -10,14 +10,14 @@ using Xbim.Ifc4.ProductExtension;
 using Xbim.Ifc4.Interfaces;
 using Xbim.Ifc4.Kernel;
 using Xbim.Common;
+using Xbim.Ifc.ViewModels;
 using SFB;
 
 
-public class IfcInteract : MonoBehaviour
+public class IfcInteract
 {
-    private string filePath;
+
     private readonly ObservableCollection<PropertyItem> _properties = new ObservableCollection<PropertyItem>();
-    private List <IIfcElement> ifcElements = new List<IIfcElement>();
 
     public class PropertyItem
     {
@@ -54,22 +54,6 @@ public class IfcInteract : MonoBehaviour
                 return _schemas.Contains(schema);
             }
         }
-
-        public void print()
-        {
-            Debug.Log($"IfcLabel: {IfcLabel}, PropertySetName: {PropertySetName}, Name: {Name}, Value: {Value}");
-        }
-
-        //public void printUI()
-        //{
-        //    GUIStyle style = new GUIStyle();
-        //    style.normal.textColor = Color.black;
-        //    String s1 = String.Format("Name: {0}.", Name);
-        //    String s2 = String.Format("Value: {0}.", Value);
-
-        //    GUI.Label(new Rect(10, 50, 100, 20), s1, style);
-        //    GUI.Label(new Rect(10, 70, 100, 20), s2, style);
-        //}
     }
 
     public ObservableCollection<PropertyItem> Properties
@@ -77,100 +61,19 @@ public class IfcInteract : MonoBehaviour
         get { return _properties; }
     }
 
-    public void setProduct(string Guid)
-    {
-        if (filePath.Length != 0)
-        {
-            using (var model = IfcStore.Open(filePath))
-            {
-                var ifcProduct = model.Instances.FirstOrDefault<IIfcElement>(d => d.GlobalId == Guid);
-                FillPropertyData(ifcProduct);
-            }
-        }
-    }
-
-    [EasyButtons.Button]
-    void open()
-    {
-        var extensions = new[] {
-            new ExtensionFilter("IFC files", "ifc"),
-            new ExtensionFilter("All Files", "*" ),
-        };
-
-        var path = StandaloneFileBrowser.OpenFilePanel("Open IFC File", "", extensions, false);
-        filePath = path[0];
-
-        if (filePath.Length != 0)
-        {
-            using (var model = IfcStore.Open(filePath))
-            {
-                ifcElements = model.Instances.OfType<IIfcElement>().ToList();
-
-                foreach (var ifcElement in ifcElements)
-                {
-                    Debug.Log($"IfcProduct ID: {ifcElement.GlobalId}, Name: {ifcElement.Name}");
-                    FillPropertyData(ifcElement);
-                }  
-            }
-        }
-
-        foreach (var _property in _properties)
-            _property.print();
-    }
-
-    public void openFile(string filename)
-    {
-        filePath = filename;
-        if (filePath.Length != 0)
-        {
-            using (var model = IfcStore.Open(filePath))
-            {
-                ifcElements = model.Instances.OfType<IIfcElement>().ToList();
-
-                foreach (var ifcElement in ifcElements)
-                {
-                    Debug.Log($"IfcProduct ID: {ifcElement.GlobalId}, Name: {ifcElement.Name}");
-                }
-            }
-        }
-
-        foreach (var _property in _properties)
-            _property.print();
-    }
-
-    private void printProperty(IIfcProduct product)
-    {
-        //get all relations which can define property and quantity sets
-        var properties = product.IsDefinedBy
-
-                        //Search across all property and quantity sets. You might also want to search in a specific property set
-                        .Where(r => r.RelatingPropertyDefinition is IIfcPropertySet)
-
-                        //Only consider property sets in this case.
-                        .SelectMany(r => ((IIfcPropertySet)r.RelatingPropertyDefinition).HasProperties)
-
-                        //lets only consider single value properties. There are also enumerated properties, 
-                        //table properties, reference properties, complex properties and other
-                        .OfType<IIfcPropertySingleValue>();
-
-        foreach (var property in properties)
-            Debug.Log($"Property: {property.Name}, Value: {property.NominalValue}");
-    }
-
     static void properties_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         
     }
 
-    private void FillPropertyData(IIfcProduct _entity)
+    public void FillPropertyData(IIfcObjectDefinition _entity)
     {
         if (_properties.Any()) //don't try to fill unless empty
             return;
         //now the property sets for any 
-
         if (_entity is IIfcObject)
         {
-            var asIfcObject = (IIfcObject)_entity;
+            var asIfcObject = _entity as IIfcObject;
             foreach (
                 var pSet in
                     asIfcObject.IsDefinedBy.Select(
@@ -245,8 +148,7 @@ public class IfcInteract : MonoBehaviour
         }
     }
 
-
-    private void Clear(bool clearHistory = true)
+    public void Clear(bool clearHistory = true)
     {
         _properties.Clear();
 

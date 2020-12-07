@@ -22,7 +22,6 @@ public class SelectHandler : MonoBehaviour
     public void onSelect(GameObject selected)
     {
         this.selected = selected;
-        FindObjectOfType<IfcInteract>().setProduct(getGuid());
     }
 
     private string getGuid()
@@ -31,23 +30,23 @@ public class SelectHandler : MonoBehaviour
         else return "NIL";
     }
 
-    void OnGUI()
-    {
-        if (!getGuid().Equals("NIL"))
-        {
-            GUIStyle style = new GUIStyle();
-            style.normal.textColor = Color.black;
+    //void OnGUI()
+    //{
+    //    if (!getGuid().Equals("NIL"))
+    //    {
+    //        GUIStyle style = new GUIStyle();
+    //        style.normal.textColor = Color.black;
 
-            var _properties = FindObjectOfType<IfcInteract>().Properties;
+    //        //var _properties = FindObjectOfType<IfcInteract>().Properties;
 
-            int height = 80;
+    //        int height = 80;
 
-            foreach (var _property in _properties)
-            {
-                String s = String.Format("{0}: {1}", _property.Name, _property.Value);
-                GUI.Label(new Rect(10, height, 100, 20), s, style);
-                height += 20;
-            }
-        }
-    }
+    //        foreach (var _property in _properties)
+    //        {
+    //            String s = String.Format("{0}: {1}", _property.Name, _property.Value);
+    //            GUI.Label(new Rect(10, height, 100, 20), s, style);
+    //            height += 20;
+    //        }
+    //    }
+    //}
 }

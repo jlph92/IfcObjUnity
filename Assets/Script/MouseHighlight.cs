@@ -51,4 +51,9 @@ public class MouseHighlight : MonoBehaviour
         //Material[] m_original = { original };
         m_Renderer.material = original;
     }
+
+    public void Select()
+    {
+        m_Renderer.material = highlighted;
+    }
 }

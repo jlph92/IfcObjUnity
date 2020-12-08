@@ -25,7 +25,7 @@ namespace AsImpL
         }
 
         // Default constructor needed by XmlSerializer
-        public ModelImportInfo(string name, string path)
+        public ModelImportInfo(string path, string name = null)
         {
             this.name = name;
             this.path = path;

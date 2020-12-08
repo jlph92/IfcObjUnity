@@ -41,9 +41,8 @@ public class IfcOpenShellParser : MonoBehaviour
     {
         //var StlFile = Path.ChangeExtension(file, ".mtl");
         MultiObjectImporter obj = FindObjectOfType<MultiObjectImporter>();
-        string filename = Path.GetFileNameWithoutExtension(file);
 
-        obj.objectsList.Add(new ModelImportInfo(filename, file));
+        obj.objectsList.Add(new ModelImportInfo(path: file));
         obj.loadObj();
 
         FindObjectOfType<ObjectImporterUI>().addLoadEvent(finish_loadEvent);
@@ -90,6 +89,8 @@ public class IfcOpenShellParser : MonoBehaviour
 
     private void openIfcfile()
     {
+        var root = GameObject.Find(Path.GetFileNameWithoutExtension(filePath));
+        checkBound(root);
         GetComponent<IFCTreeView>().openFile(filePath);
     }
 
@@ -272,7 +273,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
             string outputFile_obj = file_directory + OutputFileName + ".obj";
             //UnityEngine.Debug.Log(outputFile_obj);
-            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_obj + '"' + " --use-element-guids";
+            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_obj + '"' + " --use-element-guids --convert-back-units";
 
             try
             {
@@ -308,7 +309,7 @@ public class IfcOpenShellParser : MonoBehaviour
                 UnityEngine.Debug.Log("Converting Obj file fails!");
                 ObjFail = true;
             }
-            openIfcfile();
+            finish_loadEvent.AddListener(() => openIfcfile());
             //if (File.Exists(outputFile_xml))
             //{
             //    finish_loadEvent.AddListener(() => LoadXML(outputFile_xml));

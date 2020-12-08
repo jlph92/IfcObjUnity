@@ -588,6 +588,10 @@ PrefabInstance:
       propertyPath: Indent
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 11482828, guid: 3501fc63b6a4f834fb6eb06eab3b9ee8, type: 3}
+      propertyPath: ItemContainerPrefab
+      value: 
+      objectReference: {fileID: 1214809469}
     - target: {fileID: 22410476, guid: 3501fc63b6a4f834fb6eb06eab3b9ee8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -642,11 +646,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22410476, guid: 3501fc63b6a4f834fb6eb06eab3b9ee8, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 250
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 22410476, guid: 3501fc63b6a4f834fb6eb06eab3b9ee8, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 300
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 22410476, guid: 3501fc63b6a4f834fb6eb06eab3b9ee8, type: 3}
       propertyPath: m_AnchorMin.x
@@ -1193,6 +1197,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 140, z: 0}
+--- !u!1 &1214809469 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 168120, guid: c1a1ed5be49ce9d489bfdb8f2f5dbf9f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1787726942}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1252827613
 GameObject:
   m_ObjectHideFlags: 0
@@ -1673,7 +1683,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11459558, guid: c1a1ed5be49ce9d489bfdb8f2f5dbf9f, type: 3}
       propertyPath: m_FontData.m_FontSize
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 22403862, guid: c1a1ed5be49ce9d489bfdb8f2f5dbf9f, type: 3}
       propertyPath: m_AnchorMin.y

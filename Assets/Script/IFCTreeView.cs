@@ -17,7 +17,8 @@ public class IFCTreeView : MonoBehaviour
     public TreeView TreeView;
     private string filePath;
     IEnumerable<IXbimViewModel> dataItems;
-    private IfcInteract ifcInteract;
+    private IfcInteract ifcInteract= new IfcInteract();
+    private ObjectBinding ObjectBindingProperty = new ObjectBinding();
 
     private void Start()
     {
@@ -26,7 +27,6 @@ public class IFCTreeView : MonoBehaviour
             Debug.LogError("Set TreeView field");
             return;
         }
-        ifcInteract = new IfcInteract();
     }
 
     public void openFile(string filename)
@@ -36,6 +36,7 @@ public class IFCTreeView : MonoBehaviour
         {
             using (var model = IfcStore.Open(filePath))
             {
+                ObjectBindingProperty.setModel(model);
                 setup(model);
             }
         }
@@ -66,9 +67,10 @@ public class IFCTreeView : MonoBehaviour
     private void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
         // get list box item and tranlate to entity
-        //base.OnSelectionChanged(e);
+        ifcInteract.Clear();
+
         if (e.NewItems.Length <= 0)
-         return;
+            return;
         var p = e.NewItems[0] as IXbimViewModel;
         var p2 = TreeView.SelectedItem as IXbimViewModel;
         if (p2 == null)
@@ -76,18 +78,22 @@ public class IFCTreeView : MonoBehaviour
         else if (!(Equals(p.Model, p2.Model) && p.EntityLabel == p2.EntityLabel))
             TreeView.SelectedItem = p;
 
-        ifcInteract.Clear();
+        var go = ObjectBindingProperty.GetValue(TreeView.SelectedItem as IXbimViewModel);
+        if ( go != null)
+        {
+            go.GetComponent<MouseHighlight>().Select();
+        }
+
         using (var model = IfcStore.Open(filePath))
         {
             var id = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
             IIfcObjectDefinition selected = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
             ifcInteract.FillPropertyData(selected);
-        }
-        
-        var _properties = ifcInteract.Properties;
-        foreach (var _property in _properties)
-        {
-            Debug.Log(String.Format("{0}: {1}", _property.Name, _property.Value));
+            var _properties = ifcInteract.Properties;
+            /*foreach (var _property in _properties)
+            {
+                Debug.Log(String.Format("{0}: {1}", _property.Name, _property.Value));
+            }*/
         }
     }
 
@@ -197,6 +203,7 @@ public class IFCTreeView : MonoBehaviour
     {
         foreach (var child in parent.Children)
         {
+            ObjectBindingProperty.Register(child as IXbimViewModel);
             LazyLoadAll(child);
         }
     }

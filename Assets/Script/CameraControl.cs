@@ -42,6 +42,7 @@ public class CameraControl : MonoBehaviour
     public void setModel(Bounds bound)
     {
         this.bound = bound;
+        //Debug.Log(System.String.Format(" X: {0} Y:{1} Z:{2}",this.bound.size.x, this.bound.size.y, this.bound.size.z));
         this.set = true;
         scale = this.bound.size.y * 3.0f;
     }

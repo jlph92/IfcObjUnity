@@ -60,7 +60,7 @@ public class IFCTreeView : MonoBehaviour
     private void OnItemExpanding(object sender, ItemExpandingArgs e)
     {
         //get parent data item (game object in our case)
-        IXbimViewModel node = (IXbimViewModel)e.Item;
+        IXbimViewModel node = e.Item as IXbimViewModel;
         e.Children = node.Children.Cast<IXbimViewModel>().ToArray();
     }
 
@@ -73,16 +73,17 @@ public class IFCTreeView : MonoBehaviour
             return;
         var p = e.NewItems[0] as IXbimViewModel;
         var p2 = TreeView.SelectedItem as IXbimViewModel;
-        if (p2 == null)
-            TreeView.SelectedItem = p;
-        else if (!(Equals(p.Model, p2.Model) && p.EntityLabel == p2.EntityLabel))
-            TreeView.SelectedItem = p;
 
-        var go = ObjectBindingProperty.GetValue(TreeView.SelectedItem as IXbimViewModel);
-        if ( go != null)
+        if (p2 == null)
         {
-            go.GetComponent<MouseHighlight>().Select();
+            TreeView.SelectedItem = p;
         }
+        else if (p.EntityLabel != p2.EntityLabel)
+        {
+            TreeView.SelectedItem = p;
+        }
+
+        ObjectBindingProperty.select(TreeView.SelectedItem as IXbimViewModel);
 
         using (var model = IfcStore.Open(filePath))
         {
@@ -90,10 +91,10 @@ public class IFCTreeView : MonoBehaviour
             IIfcObjectDefinition selected = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
             ifcInteract.FillPropertyData(selected);
             var _properties = ifcInteract.Properties;
-            /*foreach (var _property in _properties)
+            foreach (var _property in _properties)
             {
                 Debug.Log(String.Format("{0}: {1}", _property.Name, _property.Value));
-            }*/
+            }
         }
     }
 

@@ -8,12 +8,29 @@ public class MouseHighlight : MonoBehaviour
     MeshRenderer m_Renderer;
 
     private Material original;
-    public Material highlighted;
+    private Material highlighted;
     //private List<Material> m_list = new List<Material>();
+
+    public bool onHighlight = false;
+    private System.Action HighlightChanged;
+
+    public bool highlight
+    {
+        get => onHighlight;
+
+        set
+        {
+            onHighlight = value;
+            OnHighlightChanged();
+        }
+    }
+
+    protected virtual void OnHighlightChanged() => HighlightChanged?.Invoke();
 
     // Start is called before the first frame update
     void Start()
     {
+        HighlightChanged += () => { Select(); };
         //Fetch the mesh renderer component from the GameObject
         m_Renderer = GetComponent<MeshRenderer>();
 
@@ -22,38 +39,29 @@ public class MouseHighlight : MonoBehaviour
             Debug.Log("No Path found");
         else
             highlighted = Resources.Load<Material>("Materials/Highlighted");
-
-        //m_list.Add(original);
-        //m_list.Add(highlighted);
     }
 
     // The mesh goes red when the mouse is over it...
     void OnMouseEnter()
     {
-        //Debug.Log("Entered");
-        //if (m_list.Count > 0) m_Renderer.materials = m_list.ToArray();
-        m_Renderer.material = highlighted;
-        //FindObjectOfType<SelectHandler>().onSelect(this.gameObject);
+        highlight = true;
     }
 
     // ...the red fades out to cyan as the mouse is held over...
     void OnMouseOver()
     {
-        //Debug.Log("Overed");
-        //if (m_list.Count > 0) m_Renderer.materials = m_list.ToArray();
         m_Renderer.material.color -= new Color(0.1F, 0, 0) * Time.deltaTime;
     }
 
     // ...and the mesh finally turns white when the mouse moves away.
     void OnMouseExit()
     {
-        //Debug.Log("Exited");
-        //Material[] m_original = { original };
-        m_Renderer.material = original;
+        highlight = false;
     }
 
     public void Select()
     {
-        m_Renderer.material = highlighted;
+        if (highlight) m_Renderer.material = highlighted;
+        else m_Renderer.material = original;
     }
 }

@@ -27,6 +27,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
         foreach (Renderer r in renderers)
         {
+            UnityEngine.Debug.Log(System.String.Format(" X: {0} Y:{1} Z:{2}", r.bounds.size.x, r.bounds.size.y, r.bounds.size.z));
             bounds.Encapsulate(r.bounds);
         }
 
@@ -273,7 +274,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
             string outputFile_obj = file_directory + OutputFileName + ".obj";
             //UnityEngine.Debug.Log(outputFile_obj);
-            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_obj + '"' + " --use-element-guids --convert-back-units";
+            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_obj + '"' + " --use-element-guids";
 
             try
             {

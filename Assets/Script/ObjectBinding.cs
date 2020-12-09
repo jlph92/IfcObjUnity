@@ -52,6 +52,15 @@ public class ObjectBinding
         }
     }
 
+    public void select(IXbimViewModel xm)
+    {
+        //Debug.Log(String.Format("{0}: {1}", xm.EntityLabel, xm.Name));
+        var go = GetValue(xm);
+
+        if (go != null) go.GetComponent<MouseHighlight>().highlight = true;
+        else return; 
+    }
+
     public void Register(IXbimViewModel IfcModel)
     {
         GameObject goElement = null;
@@ -69,7 +78,6 @@ public class ObjectBinding
     {
         var id = IfcModel.EntityLabel;
         IIfcObjectDefinition specificObject = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
-        Debug.Log(specificObject.GlobalId);
         return String.Format("{0}",specificObject.GlobalId);
     }
 }

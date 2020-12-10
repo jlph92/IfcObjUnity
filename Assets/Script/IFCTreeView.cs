@@ -15,6 +15,7 @@ using Battlehub.UIControls;
 public class IFCTreeView : MonoBehaviour
 {
     public TreeView TreeView;
+    public IfcPropertyView ifcPropertyView;
     private string filePath;
     IEnumerable<IXbimViewModel> dataItems;
     private IfcInteract ifcInteract= new IfcInteract();
@@ -64,6 +65,8 @@ public class IFCTreeView : MonoBehaviour
         e.Children = node.Children.Cast<IXbimViewModel>().ToArray();
     }
 
+    private IXbimViewModel selectedItem = null;
+
     private void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
         // get list box item and tranlate to entity
@@ -71,16 +74,27 @@ public class IFCTreeView : MonoBehaviour
 
         if (e.NewItems.Length <= 0)
             return;
-        var p = e.NewItems[0] as IXbimViewModel;
-        var p2 = TreeView.SelectedItem as IXbimViewModel;
+
+        var p = TreeView.SelectedItem as IXbimViewModel;
+        var p2 = selectedItem;
+
+        //Debug.Log(String.Format("Selected Items: {0}", (TreeView.SelectedItem as IXbimViewModel).Name));
 
         if (p2 == null)
         {
-            TreeView.SelectedItem = p;
+            //Debug.Log(String.Format("No Selected Item Before: {0}", p.Name));
+            selectedItem = p;
         }
-        else if (p.EntityLabel != p2.EntityLabel)
+        else if (p.EntityLabel == p2.EntityLabel)
         {
-            TreeView.SelectedItem = p;
+            //Debug.Log(String.Format("Same Items: {0}, {1}", p.Name, p2.Name));
+            return;
+        }
+        else
+        {
+            //Debug.Log(String.Format("Update selection: {0} to {1}", p.Name, p2.Name));
+            ObjectBindingProperty.unselect(p2 as IXbimViewModel);
+            selectedItem = p;
         }
 
         ObjectBindingProperty.select(TreeView.SelectedItem as IXbimViewModel);
@@ -90,11 +104,7 @@ public class IFCTreeView : MonoBehaviour
             var id = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
             IIfcObjectDefinition selected = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
             ifcInteract.FillPropertyData(selected);
-            var _properties = ifcInteract.Properties;
-            foreach (var _property in _properties)
-            {
-                Debug.Log(String.Format("{0}: {1}", _property.Name, _property.Value));
-            }
+            ifcPropertyView.writeProperties(ifcInteract.Properties);
         }
     }
 

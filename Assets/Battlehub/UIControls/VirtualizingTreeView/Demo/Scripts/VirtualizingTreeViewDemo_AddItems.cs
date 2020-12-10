@@ -29,7 +29,7 @@ namespace Battlehub.UIControls
     {
         public VirtualizingTreeView TreeView;
 
-        private List<DataItem> m_dataItems;
+        protected List<DataItem> m_dataItems;
 
   
 
@@ -43,7 +43,7 @@ namespace Battlehub.UIControls
 
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             TreeView.ItemDataBinding += OnItemDataBinding;
             TreeView.SelectionChanged += OnSelectionChanged;
@@ -78,7 +78,7 @@ namespace Battlehub.UIControls
             TreeView.ItemEndDrag -= OnItemEndDrag;
         }
 
-        private void OnItemExpanding(object sender, VirtualizingItemExpandingArgs e)
+        protected void OnItemExpanding(object sender, VirtualizingItemExpandingArgs e)
         {
             //get parent data item (game object in our case)
             DataItem dataItem = (DataItem)e.Item;
@@ -96,7 +96,7 @@ namespace Battlehub.UIControls
             }
         }
 
-        private void OnSelectionChanged(object sender, SelectionChangedArgs e)
+        protected void OnSelectionChanged(object sender, SelectionChangedArgs e)
         {
             #if UNITY_EDITOR
             //Do something on selection changed (just syncronized with editor's hierarchy for demo purposes)
@@ -104,7 +104,7 @@ namespace Battlehub.UIControls
             #endif
         }
 
-        private void OnItemsRemoved(object sender, ItemsRemovedArgs e)
+        protected void OnItemsRemoved(object sender, ItemsRemovedArgs e)
         {
             //Destroy removed dataitems
             for (int i = 0; i < e.Items.Length; ++i)
@@ -123,7 +123,7 @@ namespace Battlehub.UIControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnItemDataBinding(object sender, VirtualizingTreeViewItemDataBindingArgs e)
+        protected virtual void OnItemDataBinding(object sender, VirtualizingTreeViewItemDataBindingArgs e)
         {
             DataItem dataItem = e.Item as DataItem;
             if (dataItem != null)

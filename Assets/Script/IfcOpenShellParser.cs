@@ -27,7 +27,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
         foreach (Renderer r in renderers)
         {
-            UnityEngine.Debug.Log(System.String.Format(" X: {0} Y:{1} Z:{2}", r.bounds.size.x, r.bounds.size.y, r.bounds.size.z));
+            //UnityEngine.Debug.Log(System.String.Format(" X: {0} Y:{1} Z:{2}", r.bounds.size.x, r.bounds.size.y, r.bounds.size.z));
             bounds.Encapsulate(r.bounds);
         }
 
@@ -42,9 +42,11 @@ public class IfcOpenShellParser : MonoBehaviour
     {
         //var StlFile = Path.ChangeExtension(file, ".mtl");
         MultiObjectImporter obj = FindObjectOfType<MultiObjectImporter>();
-
-        obj.objectsList.Add(new ModelImportInfo(path: file));
-        obj.loadObj();
+        if(obj != null)
+        {
+            obj.objectsList.Add(new ModelImportInfo(path: file));
+            obj.loadObj();
+        }
 
         FindObjectOfType<ObjectImporterUI>().addLoadEvent(finish_loadEvent);
     }
@@ -93,6 +95,7 @@ public class IfcOpenShellParser : MonoBehaviour
         var root = GameObject.Find(Path.GetFileNameWithoutExtension(filePath));
         checkBound(root);
         GetComponent<IFCTreeView>().openFile(filePath);
+        cloneForShow(root);
     }
 
     // Add in Highlighting feature
@@ -107,6 +110,7 @@ public class IfcOpenShellParser : MonoBehaviour
     private void cloneForShow(GameObject root)
     {
         GameObject duplicate = Instantiate(root);
+        duplicate.name = root.name + "(Duplicate)";
         duplicate.layer = 9;
 
         foreach (Transform child in duplicate.GetComponentsInChildren<Transform>())

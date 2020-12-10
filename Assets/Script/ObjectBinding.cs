@@ -61,6 +61,15 @@ public class ObjectBinding
         else return; 
     }
 
+    public void unselect(IXbimViewModel xm)
+    {
+        //Debug.Log(String.Format("{0}: {1}", xm.EntityLabel, xm.Name));
+        var go = GetValue(xm);
+
+        if (go != null) go.GetComponent<MouseHighlight>().highlight = false;
+        else return;
+    }
+
     public void Register(IXbimViewModel IfcModel)
     {
         GameObject goElement = null;

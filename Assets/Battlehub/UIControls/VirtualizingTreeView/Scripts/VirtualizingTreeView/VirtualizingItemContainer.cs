@@ -196,7 +196,7 @@ namespace Battlehub.UIControls
         {
             StartOverride();
 
-            ItemsControl.UpdateContainerSize(this);
+            if(ItemsControl != null) ItemsControl.UpdateContainerSize(this);
         }
 
         private void OnDestroy()

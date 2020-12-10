@@ -45,7 +45,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 5}
-  m_MinSize: {x: 875, y: 392}
+  m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
   m_Maximized: 1
 --- !u!114 &3
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 121}
   m_MaxSize: {x: 4000, y: 4021}
   vertical: 0
-  controlID: 20
+  controlID: 121
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -167,10 +167,10 @@ MonoBehaviour:
     y: 30
     width: 2560
     height: 1307
-  m_MinSize: {x: 781, y: 221}
-  m_MaxSize: {x: 16006, y: 4021}
+  m_MinSize: {x: 911, y: 271}
+  m_MaxSize: {x: 22006, y: 10021}
   vertical: 0
-  controlID: 78
+  controlID: 80
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -207,9 +207,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1008
+    x: 1130
     y: 0
-    width: 404
+    width: 333
     height: 1307
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
@@ -228,23 +228,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1412
+    x: 1463
     y: 0
-    width: 692
+    width: 641
     height: 1307
-  m_MinSize: {x: 102, y: 121}
-  m_MaxSize: {x: 4002, y: 4021}
-  m_ActualView: {fileID: 15}
+  m_MinSize: {x: 232, y: 271}
+  m_MaxSize: {x: 10002, y: 10021}
+  m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
   - {fileID: 15}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -288,7 +288,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1008
+    width: 1130
     height: 1307
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
@@ -437,9 +437,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1412
+    x: 1463
     y: 73
-    width: 690
+    width: 639
     height: 1286
   m_ViewDataDictionary: {fileID: 0}
 --- !u!114 &16
@@ -463,28 +463,28 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1008
+    x: 1130
     y: 73
-    width: 402
+    width: 331
     height: 1286
   m_ViewDataDictionary: {fileID: 0}
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 2cafffff
-      m_LastClickedID: 0
-      m_ExpandedIDs: 469bffff30afffffc2b3ffff3cbbffffceceffff2ad7ffff80dfffff60f6ffffd6f8ffff6cfbffff
+      m_SelectedIDs: 987bfeff
+      m_LastClickedID: -99432
+      m_ExpandedIDs: a26cfeff14a2feff64a2fefff6a3feff24a4fefff2a5feff70ddfeff7a13fffff447ffff0648ffff1248ffff4e53ffff0654ffff6a89ffff7c89ffffc68fffffda8fffffe68fffff5e9dffff6a9dffff46a3ffff62a3ffff28b7ffff2cb7ffffa8b7ffffaab7ffff8ebdffff0ebeffffd0c1ffff3eceffff6cfbffff72370000904a0000a84a000062960000bc980000d4980000e89800006e9a0000a89a000008f50000e2ff0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: Camera
-        m_OriginalName: Camera
+        m_Name: Cube
+        m_OriginalName: Cube
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 14260
+        m_UserData: 66080
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
         m_OriginalEventType: 0
@@ -556,13 +556,13 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1412
+    x: 1463
     y: 73
-    width: 594
+    width: 639
     height: 1286
   m_ViewDataDictionary: {fileID: 0}
   m_SearchFilter:
-    m_NameFilter: ObjectBinding
+    m_NameFilter: 
     m_ClassNames: []
     m_AssetLabels: []
     m_AssetBundleNames: []
@@ -574,20 +574,20 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Script
+    - Assets/Ifc Sample
   m_ViewMode: 1
   m_StartGridSize: 74
   m_LastFolders:
-  - Assets/Script
+  - Assets/Ifc Sample
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\Jason\BimImport
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 00000000e6380000e8380000ea380000
+    m_SelectedIDs: 004a0000
+    m_LastClickedID: 18944
+    m_ExpandedIDs: 00000000e6380000e8380000ea380000f8490000064a00001a4a0000224a0000264a00002a4a000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -640,10 +640,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 6e460000
-    m_LastClickedInstanceID: 18030
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 0
-    m_ExpandedInstanceIDs: 647d000012c40100bc410000f834000000000000
+    m_ExpandedInstanceIDs: 647d000012c40100bc410000f834000000000000c48a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -694,7 +694,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 73
-    width: 1007
+    width: 1129
     height: 1286
   m_ViewDataDictionary: {fileID: 0}
   m_ShowContextualTools: 0
@@ -707,9 +707,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -300, y: 0, z: 0}
+    m_Target: {x: 0.56519294, y: -0.9240111, z: 1.0121008}
     speed: 2
-    m_Value: {x: -300, y: 0, z: 0}
+    m_Value: {x: 0.56519294, y: -0.9240111, z: 1.0121008}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -755,13 +755,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.014183172, y: 0.6861021, z: -0.013380647, w: -0.7272448}
+    m_Target: {x: -0.12511444, y: 0.43207747, z: 0.060669083, w: 0.89105356}
     speed: 2
-    m_Value: {x: -0.014183164, y: 0.6861017, z: -0.013380638, w: -0.7272444}
+    m_Value: {x: -0.12511434, y: 0.4320771, z: 0.06066903, w: 0.89105284}
   m_Size:
-    m_Target: 10
+    m_Target: 1.8644185
     speed: 2
-    m_Value: 10
+    m_Value: 1.8644185
   m_Ortho:
     m_Target: 0
     speed: 2

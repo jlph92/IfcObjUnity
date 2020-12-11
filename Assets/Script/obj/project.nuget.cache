@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "flXwbvKBvEcnoeaIED94sl0mi6T1mEsld9OcqBpblDWBo2eoVufBQitpD/5kk/BU3eRaKLIMM5H6HTtx7YnSVQ==",
+  "success": true,
+  "projectFilePath": "D:\\Jason\\BimImport\\Assets\\Script\\Project.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

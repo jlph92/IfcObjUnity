@@ -78,9 +78,9 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - g_flCornerAdjust: 1
-    - g_flOutlineWidth: 0.01
+    - g_flCornerAdjust: 0
+    - g_flOutlineWidth: 0.006
     m_Colors:
     - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - g_vOutlineColor: {r: 0, g: 0.5547228, b: 1, a: 1}
+    - g_vOutlineColor: {r: 0.93515706, g: 1, b: 0, a: 1}

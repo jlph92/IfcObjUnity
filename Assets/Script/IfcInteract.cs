@@ -17,7 +17,7 @@ using SFB;
 public class IfcInteract
 {
 
-    private readonly ObservableCollection<PropertyItem> _properties = new ObservableCollection<PropertyItem>();
+    protected readonly List<PropertyItem> _properties = new List<PropertyItem>();
 
     public class PropertyItem
     {
@@ -56,7 +56,7 @@ public class IfcInteract
         }
     }
 
-    public ObservableCollection<PropertyItem> Properties
+    public IEnumerable<PropertyItem> Properties
     {
         get { return _properties; }
     }
@@ -148,7 +148,7 @@ public class IfcInteract
         }
     }
 
-    public void Clear(bool clearHistory = true)
+    public virtual void Clear(bool clearHistory = true)
     {
         _properties.Clear();
 

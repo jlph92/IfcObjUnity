@@ -14,7 +14,6 @@ using UnityEngine.Events;
 public class IfcOpenShellParser : MonoBehaviour
 {
     public string filePath;
-    public Material Edge;
     public float alpha = 0.5f;
     
     private GameObject loadedOBJ;
@@ -95,6 +94,7 @@ public class IfcOpenShellParser : MonoBehaviour
         var root = GameObject.Find(Path.GetFileNameWithoutExtension(filePath));
         checkBound(root);
         GetComponent<IFCTreeView>().openFile(filePath);
+        GetComponent<Damage_TreeView>().openFile(filePath);
         cloneForShow(root);
     }
 

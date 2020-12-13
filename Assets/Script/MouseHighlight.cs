@@ -50,7 +50,7 @@ public class MouseHighlight : MonoBehaviour
     // ...the red fades out to cyan as the mouse is held over...
     void OnMouseOver()
     {
-        m_Renderer.material.color -= new Color(0.1F, 0, 0) * Time.deltaTime;
+        highlight = true;
     }
 
     // ...and the mesh finally turns white when the mouse moves away.

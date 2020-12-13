@@ -16,8 +16,8 @@ public class IFCTreeView : MonoBehaviour
 {
     public TreeView TreeView;
     public IfcPropertyView ifcPropertyView;
-    private string filePath;
-    IEnumerable<IXbimViewModel> dataItems;
+    protected string filePath;
+    protected IEnumerable<IXbimViewModel> dataItems;
     private IfcInteract ifcInteract= new IfcInteract();
     private ObjectBinding ObjectBindingProperty = new ObjectBinding();
 
@@ -65,9 +65,9 @@ public class IFCTreeView : MonoBehaviour
         e.Children = node.Children.Cast<IXbimViewModel>().ToArray();
     }
 
-    private IXbimViewModel selectedItem = null;
+    protected IXbimViewModel selectedItem = null;
 
-    private void OnSelectionChanged(object sender, SelectionChangedArgs e)
+    protected virtual void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
         // get list box item and tranlate to entity
         ifcInteract.Clear();
@@ -196,7 +196,7 @@ public class IFCTreeView : MonoBehaviour
     private IfcStore ModelProperty = null;
 
 
-    private void ViewModel()
+    protected virtual void ViewModel()
     {
         var project = Model.Instances.OfType<IIfcProject>().FirstOrDefault();
         if (project != null)
@@ -210,7 +210,7 @@ public class IFCTreeView : MonoBehaviour
         }
     }
 
-    private void LazyLoadAll(IXbimViewModel parent)
+    protected void LazyLoadAll(IXbimViewModel parent)
     {
         foreach (var child in parent.Children)
         {

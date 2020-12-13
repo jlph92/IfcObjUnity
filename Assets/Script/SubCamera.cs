@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SubCamera : MonoBehaviour
 {
+    public Color color;
     private Camera m_MainCamera;
     private Camera cam;
 
@@ -13,7 +14,7 @@ public class SubCamera : MonoBehaviour
         m_MainCamera = Camera.main;
         cam = GetComponent<Camera>();
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = Color.grey;
+        cam.backgroundColor = color;
     }
 
     void Update()

@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using SFB;
 using UnityEngine.Events;
+using OutlineToolkit;
 
 
 public class IfcOpenShellParser : MonoBehaviour
@@ -18,6 +19,11 @@ public class IfcOpenShellParser : MonoBehaviour
     
     private GameObject loadedOBJ;
     private UnityEvent finish_loadEvent = new UnityEvent();
+
+    void Start()
+    {
+        GetComponent<EdgeDetect>().enabled = false;
+    }
 
     private void checkBound(GameObject model)
     {
@@ -91,6 +97,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
     private void openIfcfile()
     {
+        GetComponent<EdgeDetect>().enabled = true;
         var root = GameObject.Find(Path.GetFileNameWithoutExtension(filePath));
         checkBound(root);
         GetComponent<IFCTreeView>().openFile(filePath);

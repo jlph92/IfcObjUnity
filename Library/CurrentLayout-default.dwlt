@@ -45,7 +45,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 5}
-  m_MinSize: {x: 875, y: 321}
+  m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
   m_Maximized: 1
 --- !u!114 &3
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 121}
   m_MaxSize: {x: 4000, y: 4021}
   vertical: 0
-  controlID: 75
+  controlID: 103
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -167,10 +167,10 @@ MonoBehaviour:
     y: 30
     width: 2560
     height: 1307
-  m_MinSize: {x: 779, y: 221}
-  m_MaxSize: {x: 16004, y: 4021}
+  m_MinSize: {x: 911, y: 271}
+  m_MaxSize: {x: 22006, y: 10021}
   vertical: 0
-  controlID: 147
+  controlID: 16
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -211,8 +211,8 @@ MonoBehaviour:
     y: 0
     width: 477
     height: 1307
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 202, y: 221}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 16}
   m_Panes:
   - {fileID: 16}
@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -237,14 +237,14 @@ MonoBehaviour:
     y: 0
     width: 915
     height: 1307
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_ActualView: {fileID: 15}
+  m_MinSize: {x: 232, y: 271}
+  m_MaxSize: {x: 10002, y: 10021}
+  m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
   - {fileID: 15}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -471,23 +471,23 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 6e830000
-      m_LastClickedID: 33646
-      m_ExpandedIDs: f0eeffffb6f6ffff6cfbffff1483000076830000
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: 6cfbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: Damage_TreeView
-        m_OriginalName: Damage_TreeView
+        m_Name: 
+        m_OriginalName: 
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: -10384
+        m_UserData: 0
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 0
+        m_OriginalEventType: 11
         m_IsRenamingFilename: 0
         m_ClientGUIView: {fileID: 9}
       m_SearchString: 
@@ -556,9 +556,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1370
+    x: 1074
     y: 73
-    width: 617
+    width: 913
     height: 1286
   m_ViewDataDictionary: {fileID: 0}
   m_SearchFilter:
@@ -574,20 +574,20 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Script
+    - Assets/Resources/Materials
   m_ViewMode: 1
   m_StartGridSize: 74
   m_LastFolders:
-  - Assets/Script
+  - Assets/Resources/Materials
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\Jason\BimImport
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 1e380000
-    m_LastClickedID: 14366
-    m_ExpandedIDs: 00000000e2370000e4370000e6370000e8370000ec370000ee370000f0370000f237000000ca9a3b
+    m_SelectedIDs: 323a0000
+    m_LastClickedID: 14898
+    m_ExpandedIDs: 000000000e3a0000103a0000123a0000143a0000163a0000183a00001a3a00001c3a000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -615,7 +615,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000e2370000e4370000e6370000e8370000ea370000ec370000ee370000f0370000f2370000
+    m_ExpandedIDs: 000000000e3a0000103a0000123a0000143a0000163a0000183a00001a3a00001c3a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -640,9 +640,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 3c300000
-    m_LastClickedInstanceID: 12348
-    m_HadKeyboardFocusLastEvent: 1
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: 647d000012c40100bc410000f8340000c48a0000c87b000000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0

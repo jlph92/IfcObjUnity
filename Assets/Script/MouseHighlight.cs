@@ -9,10 +9,13 @@ public class MouseHighlight : MonoBehaviour
 
     private Material original;
     private Material highlighted;
+    private Material Damaged;
     //private List<Material> m_list = new List<Material>();
 
     public bool onHighlight = false;
+    public bool onDamage = false;
     private System.Action HighlightChanged;
+    private System.Action DamageChanged;
 
     public bool highlight
     {
@@ -25,6 +28,18 @@ public class MouseHighlight : MonoBehaviour
         }
     }
 
+    public bool damage
+    {
+        get => onDamage;
+
+        set
+        {
+            onDamage = value;
+            OnDamageChanged();
+        }
+    }
+
+    protected virtual void OnDamageChanged() => DamageChanged?.Invoke();
     protected virtual void OnHighlightChanged() => HighlightChanged?.Invoke();
 
     // Start is called before the first frame update
@@ -62,6 +77,12 @@ public class MouseHighlight : MonoBehaviour
     public void Select()
     {
         if (highlight) m_Renderer.material = highlighted;
+        else m_Renderer.material = original;
+    }
+
+    public void DamageSelect()
+    {
+        if (damage) m_Renderer.material = Damaged;
         else m_Renderer.material = original;
     }
 }

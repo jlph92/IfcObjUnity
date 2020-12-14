@@ -19,7 +19,7 @@ public class IFCTreeView : MonoBehaviour
     protected string filePath;
     protected IEnumerable<IXbimViewModel> dataItems;
     private IfcInteract ifcInteract= new IfcInteract();
-    private ObjectBinding ObjectBindingProperty = new ObjectBinding();
+    protected ObjectBinding ObjectBindingProperty = new ObjectBinding();
 
     private void Start()
     {
@@ -173,17 +173,17 @@ public class IFCTreeView : MonoBehaviour
     //    return null;
     //}
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            TreeView.SelectedItems = TreeView.Items.OfType<object>().Take(5).ToArray();
-        }
-        else if (Input.GetKeyDown(KeyCode.K))
-        {
-            TreeView.SelectedItem = null;
-        }
-    }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.J))
+    //    {
+    //        TreeView.SelectedItems = TreeView.Items.OfType<object>().Take(5).ToArray();
+    //    }
+    //    else if (Input.GetKeyDown(KeyCode.K))
+    //    {
+    //        TreeView.SelectedItem = null;
+    //    }
+    //}
 
   
 

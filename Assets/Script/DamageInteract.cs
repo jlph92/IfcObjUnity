@@ -15,18 +15,26 @@ public class DamageInteract: IfcInteract
     private readonly List<PropertyItem> _typeProperties = new List<PropertyItem>();
     private readonly List<PropertyItem> _objectProperties = new List<PropertyItem>();
 
-    public IEnumerable<PropertyItem> typeProperties
+    public List<PropertyItem> AllProperties
     {
         get
         {
             var _anyProperties = _properties.Concat(_objectProperties);
-            return _typeProperties.Concat(_anyProperties);
+            return _typeProperties.Concat(_anyProperties).ToList();
         }
+    }
+
+    public override void FillData(IPersistEntity _entity)
+    {
+        FillObjectData(_entity);
+        FillTypeData(_entity);
+        FillPropertyData(_entity);
+        _propertiesBindings.Add(new PropertiesBinding(_entity, AllProperties));
+        Clear();
     }
 
     public void FillTypeData(IPersistEntity _entity)
     {
-        FillObjectData(_entity);
         if (_typeProperties.Count > 0)
             return; // only fill once
         var ifcObj = _entity as IIfcObject;
@@ -47,7 +55,6 @@ public class DamageInteract: IfcInteract
             var pi = new PropertyItem { Name = pInfo.Value.PropertyInfo.Name, Value = ((ExpressType)val).ToString() };
             _typeProperties.Add(pi);
         }
-        //FillPropertyData(_entity);
     }
 
     private void FillObjectData(IPersistEntity _entity)

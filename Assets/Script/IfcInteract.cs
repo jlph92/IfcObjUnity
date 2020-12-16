@@ -50,7 +50,7 @@ public class IfcInteract
         }
     }
 
-    public class PropertiesBinding
+    protected class PropertiesBinding
     {
         public IPersistEntity _entity;
         private List<PropertyItem> _properties;
@@ -69,11 +69,24 @@ public class IfcInteract
 
     public IEnumerable<PropertyItem> getProperties(IPersistEntity _entity)
     {
-        if (_propertiesBindings.Count > 0) return _propertiesBindings.Find(x => x._entity.Equals(_entity)).getValue();
+        if (_propertiesBindings.Count > 0)
+        {
+            if (_propertiesBindings.Exists(x => x._entity.Equals(_entity)))
+                return _propertiesBindings.Find(x => x._entity.Equals(_entity)).getValue();
+            else
+                return null;
+        }
         else return null;
     }
 
-    public void FillPropertyData(IPersistEntity _entity)
+    public virtual void FillData(IPersistEntity _entity)
+    {
+        FillPropertyData(_entity);
+        _propertiesBindings.Add(new PropertiesBinding(_entity, _properties));
+        Clear();
+    }
+
+    protected void FillPropertyData(IPersistEntity _entity)
     {
         if (_properties.Any()) //don't try to fill unless empty
             return;
@@ -101,9 +114,6 @@ public class IfcInteract
                 AddPropertySet(pSet);
             }
         }
-
-        _propertiesBindings.Add(new PropertiesBinding(_entity, _properties));
-        Clear();
     }
 
     private void AddPropertySet(IIfcPropertySet pSet)

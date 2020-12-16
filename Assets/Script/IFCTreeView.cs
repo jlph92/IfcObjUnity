@@ -18,8 +18,14 @@ public class IFCTreeView : MonoBehaviour
     public IfcPropertyView ifcPropertyView;
     protected string filePath;
     protected IEnumerable<IXbimViewModel> dataItems;
-    private IfcInteract ifcInteract= new IfcInteract();
+    protected IfcInteract ifcInteract= new IfcInteract();
     protected ObjectBinding ObjectBindingProperty = new ObjectBinding();
+
+
+    protected virtual void Awake()
+    {
+        ifcInteract = new IfcInteract();
+    }
 
     private void Start()
     {
@@ -67,7 +73,7 @@ public class IFCTreeView : MonoBehaviour
 
     protected IXbimViewModel selectedItem = null;
 
-    protected virtual void OnSelectionChanged(object sender, SelectionChangedArgs e)
+    private void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
         // get list box item and tranlate to entity
 
@@ -207,13 +213,12 @@ public class IFCTreeView : MonoBehaviour
 
     protected void LazyLoadAll(IXbimViewModel parent)
     {
-        ifcInteract.FillPropertyData(parent.Entity);
-
         foreach (var child in parent.Children)
         {
             ObjectBindingProperty.Register(child);
             LazyLoadAll(child);
         }
+        ifcInteract.FillData(parent.Entity);
     }
 }
 

@@ -122,6 +122,7 @@ public class IfcOpenShellParser : MonoBehaviour
 
         foreach (Transform child in duplicate.GetComponentsInChildren<Transform>())
         {
+            child.name = child.name + "(Duplicate)";
             child.gameObject.layer = 9;  // change to the Damage layer. 
         }
 

@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-
-using UnityEngine;
-using Xbim.Ifc;
-using Xbim.Ifc4.ProductExtension;
 using Xbim.Ifc4.Interfaces;
-using Xbim.Ifc4.Kernel;
 using Xbim.Common;
-using Xbim.Ifc.ViewModels;
+using UnityEngine;
 using SFB;
 
 
@@ -19,6 +12,7 @@ public class IfcInteract
 
     protected readonly List<PropertyItem> _properties = new List<PropertyItem>();
 
+    protected readonly List<PropertiesBinding> _propertiesBindings = new List<PropertiesBinding>();
     public class PropertyItem
     {
         public string Units { get; set; }
@@ -56,17 +50,30 @@ public class IfcInteract
         }
     }
 
-    public IEnumerable<PropertyItem> Properties
+    public class PropertiesBinding
     {
-        get { return _properties; }
+        public IPersistEntity _entity;
+        private List<PropertyItem> _properties;
+
+        public PropertiesBinding(IPersistEntity _entity, List<PropertyItem> _properties)
+        {
+            this._entity = _entity;
+            this._properties = _properties.ToList();
+        }
+
+        public IEnumerable<PropertyItem> getValue()
+        {
+            return this._properties;
+        }
     }
 
-    static void properties_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    public IEnumerable<PropertyItem> getProperties(IPersistEntity _entity)
     {
-        
+        if (_propertiesBindings.Count > 0) return _propertiesBindings.Find(x => x._entity.Equals(_entity)).getValue();
+        else return null;
     }
 
-    public void FillPropertyData(IIfcObjectDefinition _entity)
+    public void FillPropertyData(IPersistEntity _entity)
     {
         if (_properties.Any()) //don't try to fill unless empty
             return;
@@ -74,12 +81,15 @@ public class IfcInteract
         if (_entity is IIfcObject)
         {
             var asIfcObject = _entity as IIfcObject;
+            //Debug.Log(System.String.Format("{0} :{1}", asIfcObject.Name, asIfcObject.EntityLabel));
             foreach (
                 var pSet in
                     asIfcObject.IsDefinedBy.Select(
                         relDef => relDef.RelatingPropertyDefinition as IIfcPropertySet)
                 )
+            {
                 AddPropertySet(pSet);
+            }
         }
         else if (_entity is IIfcTypeObject)
         {
@@ -91,6 +101,9 @@ public class IfcInteract
                 AddPropertySet(pSet);
             }
         }
+
+        _propertiesBindings.Add(new PropertiesBinding(_entity, _properties));
+        Clear();
     }
 
     private void AddPropertySet(IIfcPropertySet pSet)
@@ -148,18 +161,9 @@ public class IfcInteract
         }
     }
 
-    public virtual void Clear(bool clearHistory = true)
+    protected virtual void Clear(bool clearHistory = true)
     {
         _properties.Clear();
-
-        NotifyPropertyChanged("Properties");
-        NotifyPropertyChanged("PropertySets");
     }
 
-    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-    private void NotifyPropertyChanged(string info)
-    {
-        PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(info));
-    }
 }

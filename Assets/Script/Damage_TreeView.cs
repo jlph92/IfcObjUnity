@@ -7,6 +7,7 @@ using Xbim.Ifc;
 using Xbim.Ifc.ViewModels;
 using Xbim.Ifc4.Interfaces;
 using Battlehub.UIControls;
+using Xbim.ModelGeometry.Scene;
 
 public class Damage_TreeView : IFCTreeView
 {
@@ -14,7 +15,6 @@ public class Damage_TreeView : IFCTreeView
     protected override void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
         // get list box item and tranlate to entity
-        DamageInteract.Clear();
 
         if (e.NewItems.Length <= 0)
             return;
@@ -39,16 +39,18 @@ public class Damage_TreeView : IFCTreeView
             //Debug.Log(String.Format("Update selection: {0} to {1}", p.Name, p2.Name));
             selectedItem = p;
         }
-
         ObjectBindingProperty.damageSelect(TreeView.SelectedItem as IXbimViewModel);
 
-        using (var model = IfcStore.Open(filePath))
-        {
-            var id = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
-            IIfcObjectDefinition selected = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
-            DamageInteract.FillTypeData(model, selected);
-            ifcPropertyView.writeProperties(DamageInteract.typeProperties);
-        }
+        var selected = TreeView.SelectedItem as IXbimViewModel;
+        DamageInteract.FillTypeData(selected.Entity);
+        ifcPropertyView.writeProperties(DamageInteract.typeProperties);
+        //using (var model = IfcStore.Open(filePath))
+        //{
+        //    var id = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
+        //    IIfcObjectDefinition selected = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
+        //    DamageInteract.FillTypeData(model, selected);
+        //    ifcPropertyView.writeProperties(DamageInteract.typeProperties);
+        //}
     }
 
 
@@ -56,7 +58,8 @@ public class Damage_TreeView : IFCTreeView
     {
         Debug.Log("Damage Tree View start");
         var DamageModel = Model.Instances.OfType<IIfcProduct>()
-            .Where (itm => typeof(IIfcProxy).IsInstanceOfType(itm) || typeof(IIfcAnnotation).IsInstanceOfType(itm) || typeof(IIfcVoidingFeature).IsInstanceOfType(itm))
+            //.Where (itm => typeof(IIfcProxy).IsInstanceOfType(itm) || typeof(IIfcAnnotation).IsInstanceOfType(itm) || typeof(IIfcVoidingFeature).IsInstanceOfType(itm))
+            .Where(itm => itm is IIfcProxy || itm is IIfcAnnotation || itm is IIfcVoidingFeature)
             .Select(itm => itm.GetType());
 
         var DamageList = DamageModel.Select(type => new TypeViewModel(type, Model)).Cast<IXbimViewModel>().ToList();
@@ -71,5 +74,11 @@ public class Damage_TreeView : IFCTreeView
         {
             Debug.Log("None");
         }
+    }
+
+    private void createDamageLocalPoint()
+    {
+        XbimPlacementTree tree = new XbimPlacementTree(Model);
+
     }
 }

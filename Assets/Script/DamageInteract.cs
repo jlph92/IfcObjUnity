@@ -7,13 +7,14 @@ using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 using Xbim.Common;
 using Xbim.Common.Metadata;
+using Xbim.Common.Geometry;
+using Xbim.ModelGeometry.Scene;
 
 public class DamageInteract: IfcInteract
 {
     private readonly List<PropertyItem> _typeProperties = new List<PropertyItem>();
     private readonly List<PropertyItem> _objectProperties = new List<PropertyItem>();
 
-    private IfcStore model;
     public IEnumerable<PropertyItem> typeProperties
     {
         get
@@ -23,9 +24,8 @@ public class DamageInteract: IfcInteract
         }
     }
 
-    public void FillTypeData(IfcStore model, IIfcObjectDefinition _entity)
+    public void FillTypeData(IPersistEntity _entity)
     {
-        this.model = model;
         FillObjectData(_entity);
         if (_typeProperties.Count > 0)
             return; // only fill once
@@ -35,22 +35,6 @@ public class DamageInteract: IfcInteract
             return;
         var ifcType = typeEntity?.ExpressType;
 
-        //_typeProperties.Add(new PropertyItem { Name = "Type", Value = ifcType.Type.Name });
-        //_typeProperties.Add(new PropertyItem { Name = "Ifc Label", Value = "#" + typeEntity.EntityLabel });
-
-        //_typeProperties.Add(new PropertyItem { Name = "Name", Value = typeEntity.Name });
-        //_typeProperties.Add(new PropertyItem { Name = "Description", Value = typeEntity.Description });
-        //_typeProperties.Add(new PropertyItem { Name = "GUID", Value = typeEntity.GlobalId });
-        //if (typeEntity.OwnerHistory != null)
-        //{
-        //    _typeProperties.Add(new PropertyItem
-        //    {
-        //        Name = "Ownership",
-        //        Value =
-        //           typeEntity.OwnerHistory.OwningUser + " using " +
-        //           typeEntity.OwnerHistory.OwningApplication.ApplicationIdentifier
-        //    });
-        //}
         //now do properties in further specialisations that are text labels
         foreach (var pInfo in ifcType.Properties.Where
             (p => p.Value.EntityAttribute.Order > 4
@@ -63,10 +47,10 @@ public class DamageInteract: IfcInteract
             var pi = new PropertyItem { Name = pInfo.Value.PropertyInfo.Name, Value = ((ExpressType)val).ToString() };
             _typeProperties.Add(pi);
         }
-        FillPropertyData(_entity);
+        //FillPropertyData(_entity);
     }
 
-    private void FillObjectData(IIfcObjectDefinition _entity)
+    private void FillObjectData(IPersistEntity _entity)
     {
 
         if (_objectProperties.Count > 0)
@@ -107,7 +91,7 @@ public class DamageInteract: IfcInteract
         }
     }
 
-    private void ReportProp(IIfcObjectDefinition entity, ExpressMetaProperty prop, bool verbose)
+    private void ReportProp(IPersistEntity entity, ExpressMetaProperty prop, bool verbose)
     {
         var propVal = prop.PropertyInfo.GetValue(entity, null);
         if (propVal == null)
@@ -187,16 +171,17 @@ public class DamageInteract: IfcInteract
             ret = propVal.GetType().Name;
         }
 
-        if (typeof(IIfcRelAssociatesDocument).IsInstanceOfType(propVal))
+        if (propVal is IIfcRelAssociatesDocument)
         {
-            IIfcRelAssociatesDocument doc = model.Instances.FirstOrDefault<IIfcRelAssociatesDocument>(d => d.EntityLabel == propLabel);
-            var doc_info = doc.RelatingDocument;
-            IIfcDocumentReference doc_content = model.Instances.FirstOrDefault<IIfcDocumentReference>(d => d.EntityLabel == doc_info.EntityLabel);
-            //var doc_content = doc_info.HasDocumentReferences;
-            _objectProperties.Add(new PropertyItem { Name = "Document Name", Value = doc_content.Name});
-            _objectProperties.Add(new PropertyItem { Name = "Description", Value = doc_content.Description});
-            _objectProperties.Add(new PropertyItem { Name = "Location", Value = doc_content.Location});
-            to_add = false;
+            var doc = (IIfcRelAssociatesDocument)pe;
+            var doc_content = doc.RelatingDocument as IIfcDocumentReference;
+            if (doc_content != null)
+            {
+                _objectProperties.Add(new PropertyItem { Name = "Document Name", Value = doc_content.Name });
+                _objectProperties.Add(new PropertyItem { Name = "Description", Value = doc_content.Description });
+                _objectProperties.Add(new PropertyItem { Name = "Location", Value = doc_content.Location });
+                to_add = false;
+            }
         }
 
         if (pe is IIfcRepresentation)
@@ -222,7 +207,7 @@ public class DamageInteract: IfcInteract
         return retItem;
     }
 
-    public override void Clear(bool clearHistory = true)
+    protected override void Clear(bool clearHistory = true)
     {
         _objectProperties.Clear();
         _properties.Clear();

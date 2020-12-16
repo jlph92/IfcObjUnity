@@ -259,16 +259,24 @@ namespace Battlehub.UIControls
         {
             get
             {
-                if (m_mode == VirtualizingMode.Horizontal)
+                if (ContainerPrefab)
                 {
-                    return Mathf.Max(0, ContainerPrefab.rect.width + (m_useGrid ? m_gridSpacing.x : 0));
-                }
-                else if (m_mode == VirtualizingMode.Vertical)
-                {
-                    return Mathf.Max(0, ContainerPrefab.rect.height + (m_useGrid ? m_gridSpacing.y : 0));
-                }
+                    if (m_mode == VirtualizingMode.Horizontal)
+                    {
+                        return Mathf.Max(0, ContainerPrefab.rect.width + (m_useGrid ? m_gridSpacing.x : 0));
+                    }
+                    else if (m_mode == VirtualizingMode.Vertical)
+                    {
+                        return Mathf.Max(0, ContainerPrefab.rect.height + (m_useGrid ? m_gridSpacing.y : 0));
+                    }
+                    throw new System.InvalidOperationException("Unable to eval container size in non-virtualizing mode");
 
-                throw new System.InvalidOperationException("Unable to eval container size in non-virtualizing mode");
+                }
+                else
+                {
+                    return 0.0f;
+                    throw new System.InvalidOperationException("Unable to eval container size in non-virtualizing mode");
+                }
             }
         }
 

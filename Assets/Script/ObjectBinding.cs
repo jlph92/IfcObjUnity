@@ -66,7 +66,13 @@ public class ObjectBinding
         //Debug.Log(String.Format("{0}: {1}", xm.EntityLabel, xm.Name));
         var go = GetValue(xm);
 
-        if (go != null) go.GetComponent<MouseHighlight>().damage = true;
+        if (go != null)
+        {
+            //go.GetComponent<MouseHighlight>().damage = true;
+            var go_duplicate = GameObject.Find(go.name + "(Duplicate)");
+            go_duplicate.GetComponent<MouseHighlight>().damage = true;
+            //Debug.Log(String.Format("{0}: {1}", go.name, "Set Damage"));
+        } 
         else return;
     }
 

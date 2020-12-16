@@ -46,6 +46,7 @@ public class MouseHighlight : MonoBehaviour
     void Start()
     {
         HighlightChanged += () => { Select(); };
+        DamageChanged += () => { DamageSelect(); };
         //Fetch the mesh renderer component from the GameObject
         m_Renderer = GetComponent<MeshRenderer>();
 
@@ -54,6 +55,11 @@ public class MouseHighlight : MonoBehaviour
             Debug.Log("No Path found");
         else
             highlighted = Resources.Load<Material>("Materials/Highlighted");
+
+        if (Resources.Load<Material>("Materials/Damage") == null)
+            Debug.Log("No Path found");
+        else
+            Damaged = Resources.Load<Material>("Materials/Damage");
     }
 
     // The mesh goes red when the mouse is over it...

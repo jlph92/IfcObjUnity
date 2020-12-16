@@ -70,7 +70,6 @@ public class IFCTreeView : MonoBehaviour
     protected virtual void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
         // get list box item and tranlate to entity
-        ifcInteract.Clear();
 
         if (e.NewItems.Length <= 0)
             return;
@@ -99,13 +98,9 @@ public class IFCTreeView : MonoBehaviour
 
         ObjectBindingProperty.select(TreeView.SelectedItem as IXbimViewModel);
 
-        using (var model = IfcStore.Open(filePath))
-        {
-            var id = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
-            IIfcObjectDefinition selected = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
-            ifcInteract.FillPropertyData(selected);
-            ifcPropertyView.writeProperties(ifcInteract.Properties);
-        }
+        var selected = TreeView.SelectedItem as IXbimViewModel;
+        var prop = ifcInteract.getProperties(selected.Entity);
+        ifcPropertyView.writeProperties(prop);
     }
 
 
@@ -212,9 +207,11 @@ public class IFCTreeView : MonoBehaviour
 
     protected void LazyLoadAll(IXbimViewModel parent)
     {
+        ifcInteract.FillPropertyData(parent.Entity);
+
         foreach (var child in parent.Children)
         {
-            ObjectBindingProperty.Register(child as IXbimViewModel);
+            ObjectBindingProperty.Register(child);
             LazyLoadAll(child);
         }
     }

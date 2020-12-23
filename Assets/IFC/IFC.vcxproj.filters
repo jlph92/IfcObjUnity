@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Script\Arrow_Ctrl.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\CameraControl.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\Damage_TreeView.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DamageInteract.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DamagePropertyTreeView.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DragMouseOrbit.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\EdgeRT.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IFCData.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IfcInteract.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IfcOpenShellParser.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IfcPropertyView.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IFCTreeView.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\MouseHighlight.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\NativeWindowsAlert.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ObjectBinding.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\SelectHandler.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\StlImport.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\STLManipulator.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\SubCamera.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\surfaceBuider.cs">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

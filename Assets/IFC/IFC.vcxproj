@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -117,7 +117,9 @@
   <ItemGroup>
     <None Include="..\Script\Arrow_Ctrl.cs" />
     <None Include="..\Script\CameraControl.cs" />
+    <None Include="..\Script\Damage.cs" />
     <None Include="..\Script\DamageInteract.cs" />
+    <None Include="..\Script\DamageProperty.cs" />
     <None Include="..\Script\DamagePropertyTreeView.cs" />
     <None Include="..\Script\Damage_TreeView.cs" />
     <None Include="..\Script\DragMouseOrbit.cs" />
@@ -127,9 +129,11 @@
     <None Include="..\Script\IfcOpenShellParser.cs" />
     <None Include="..\Script\IfcPropertyView.cs" />
     <None Include="..\Script\IFCTreeView.cs" />
+    <None Include="..\Script\ImageProjector.cs" />
     <None Include="..\Script\MouseHighlight.cs" />
     <None Include="..\Script\NativeWindowsAlert.cs" />
     <None Include="..\Script\ObjectBinding.cs" />
+    <None Include="..\Script\ScrollViewContent.cs" />
     <None Include="..\Script\SelectHandler.cs" />
     <None Include="..\Script\StlImport.cs" />
     <None Include="..\Script\STLManipulator.cs" />

@@ -62,23 +62,23 @@ public class MouseHighlight : MonoBehaviour
             Damaged = Resources.Load<Material>("Materials/Damage");
     }
 
-    // The mesh goes red when the mouse is over it...
-    void OnMouseEnter()
-    {
-        highlight = true;
-    }
+    //// The mesh goes red when the mouse is over it...
+    //void OnMouseEnter()
+    //{
+    //    highlight = true;
+    //}
 
-    // ...the red fades out to cyan as the mouse is held over...
-    void OnMouseOver()
-    {
-        highlight = true;
-    }
+    //// ...the red fades out to cyan as the mouse is held over...
+    //void OnMouseOver()
+    //{
+    //    highlight = true;
+    //}
 
-    // ...and the mesh finally turns white when the mouse moves away.
-    void OnMouseExit()
-    {
-        highlight = false;
-    }
+    //// ...and the mesh finally turns white when the mouse moves away.
+    //void OnMouseExit()
+    //{
+    //    highlight = false;
+    //}
 
     public void Select()
     {

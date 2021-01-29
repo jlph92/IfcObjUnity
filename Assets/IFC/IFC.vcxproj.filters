@@ -75,5 +75,17 @@
     <None Include="..\Script\surfaceBuider.cs">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\Script\ImageProjector.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\Damage.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DamageProperty.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ScrollViewContent.cs">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

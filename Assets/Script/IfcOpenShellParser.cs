@@ -57,43 +57,6 @@ public class IfcOpenShellParser : MonoBehaviour
     }
     #endregion
 
-    #region XML
-    /// <summary>
-    /// Load XML files
-    /// </summary>
-    private void LoadXML(string file)
-    {
-        var loadedXML = new XmlDocument();
-        loadedXML.Load(file);
-
-        // basepath
-        string basePath = @"//ifc/decomposition";
-        GameObject root = new GameObject();
-        root.layer = 8;
-        root.name = Path.GetFileNameWithoutExtension(filePath) + " (IFC)";
-        root.transform.SetParent(transform.parent);
-        root.transform.localPosition = Vector3.zero;
-        root.transform.localRotation = Quaternion.identity;
-
-        foreach (XmlNode node in loadedXML.SelectNodes(basePath + "/IfcProject"))
-            AddElements(node, root);
-
-        GameObject ToBeDeleted = GameObject.Find(Path.GetFileNameWithoutExtension(filePath));
-        //UnityEngine.Debug.Log(ToBeDeleted.name + "to be deleted");
-
-        if (Application.isEditor)
-            DestroyImmediate(ToBeDeleted);
-        else
-            Destroy(ToBeDeleted);
-
-        GroupElements();
-        checkBound(root);
-        cloneForShow(root);
-        addMouseHighlight(root);
-
-        //root.AddComponent<SelectHandler>();
-        openIfcfile();
-    }
 
     private void openIfcfile()
     {
@@ -120,6 +83,11 @@ public class IfcOpenShellParser : MonoBehaviour
         duplicate.name = root.name + "(Duplicate)";
         duplicate.layer = 9;
 
+        foreach (Transform child in root.GetComponentsInChildren<Transform>())
+        {
+            child.gameObject.layer = 8;  // change to the Actual layer. 
+        }
+
         foreach (Transform child in duplicate.GetComponentsInChildren<Transform>())
         {
             child.name = child.name + "(Duplicate)";
@@ -145,114 +113,6 @@ public class IfcOpenShellParser : MonoBehaviour
             m_renderer.material = m_material;
         }
     }
-
-    private void AddElements(XmlNode node, GameObject parent)
-    {
-        if (node.Attributes.GetNamedItem("id") != null)
-        {
-            string searchPath = node.Attributes.GetNamedItem("id").Value;
-            GameObject goElement = null;
-            goElement = GameObject.Find(searchPath);
-            if (goElement != null) 
-            {
-                goElement.AddComponent<MeshCollider>();
-            }
-
-            // What if we can't find any? We need to create
-            // a new empty object
-            if (goElement == null)
-                goElement = new GameObject();
-
-            if (goElement != null)
-            {
-                goElement.layer = 8;
-                // Set name from the IFC Name field
-                if (node.Attributes.GetNamedItem("Name") != null)
-                {
-                    goElement.name = node.Attributes.GetNamedItem("Name").Value;
-                }
-                else if(node.Name.Contains("Building"))
-                {
-                    goElement.name = "Building";
-                }
-                else
-                {
-                    goElement.name = "Unkonown";
-                }
-                // Link the object to the parent we received
-                if (parent != null)
-                    goElement.transform.SetParent(parent.transform);
-
-                // Add properties
-                IFCData.AddProperties(node, goElement);
-
-                // Go through children (recursively)
-                foreach (XmlNode child in node.ChildNodes)
-                    AddElements(child, goElement);
-            }
-        }// end if "id" attribute
-
-    }
-
-    private string gameTag(GameObject g)
-    {
-        IFCData ifcData = g.GetComponent(typeof(IFCData)) as IFCData;
-        return ifcData.IFCClass;
-    }
-
-    private GameObject[] getBuilding()
-    {
-        List<GameObject> elements = new List<GameObject>();
-        IFCData[] allObjects = FindObjectsOfType<IFCData>();
-        foreach (IFCData go in allObjects)
-        {
-            if (go.IFCClass == "IfcBuildingStorey")
-            {
-                //UnityEngine.Debug.Log(go.attachedObj.name);
-                elements.Add(go.attachedObj);
-            }
-        }
-
-        return elements.ToArray();
-    }
-
-    private void GroupElements()
-    {
-        GameObject[] BuildingStoreys = getBuilding();
-        Dictionary<GameObject, Transform> GroupParents = new Dictionary<GameObject, Transform>();
-        Dictionary<GameObject, Transform> GroupChildren = new Dictionary<GameObject, Transform>();
-
-        foreach (GameObject BuildingStorey in BuildingStoreys)
-        {
-            Dictionary<string, GameObject> Groups = new Dictionary<string, GameObject>();
-
-            foreach (Transform child in BuildingStorey.transform)
-            {
-                if (gameTag(child.gameObject).Length > 0)
-                {
-                    if (!Groups.ContainsKey(gameTag(child.gameObject)))
-                    {
-                        Groups.Add(gameTag(child.gameObject), new GameObject(gameTag(child.gameObject)));
-                        GroupParents.Add(Groups[gameTag(child.gameObject)], BuildingStorey.transform);
-                    }
-
-                    GroupChildren.Add(child.gameObject, Groups[gameTag(child.gameObject)].transform);
-                }
-            }
-        }
-
-        foreach (KeyValuePair<GameObject, Transform> group in GroupChildren)
-        {
-            group.Key.transform.SetParent(group.Value);
-        }
-
-        foreach (KeyValuePair<GameObject, Transform> group in GroupParents)
-        {
-            group.Key.transform.SetParent(group.Value);
-        }
-    }
-
-    #endregion
 
     #region LoadFile
     /// <summary>
@@ -285,8 +145,7 @@ public class IfcOpenShellParser : MonoBehaviour
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
             string outputFile_obj = file_directory + OutputFileName + ".obj";
-            //UnityEngine.Debug.Log(outputFile_obj);
-            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_obj + '"' + " --use-element-guids";
+            startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_obj + '"' + "  --use-element-numeric-ids";
 
             try
             {
@@ -300,22 +159,6 @@ public class IfcOpenShellParser : MonoBehaviour
                 UnityEngine.Debug.Log("Converting Error!");
             }
 
-            //string outputFile_xml = file_directory + OutputFileName + ".xml";
-            //UnityEngine.Debug.Log(outputFile_xml);
-            //startInfo.Arguments = "/c IfcConvert " + '"' + filePath + '"' + " " + '"' + outputFile_xml + '"' + " --use-element-guids";
-
-            //try
-            //{
-            //    using (Process exeProcess = Process.Start(startInfo))
-            //    {
-            //        exeProcess.WaitForExit();
-            //    }
-            //}
-            //catch
-            //{
-            //    UnityEngine.Debug.Log("Converting Error!");
-            //}
-
             if (File.Exists(outputFile_obj)) LoadOBJ(outputFile_obj);
             else
             {
@@ -323,44 +166,6 @@ public class IfcOpenShellParser : MonoBehaviour
                 ObjFail = true;
             }
             finish_loadEvent.AddListener(() => openIfcfile());
-            //if (File.Exists(outputFile_xml))
-            //{
-            //    finish_loadEvent.AddListener(() => LoadXML(outputFile_xml));
-            //}
-            //else
-            //{
-            //    UnityEngine.Debug.Log("Converting xml file fails!");
-            //    XmlFail = true;
-            //}
-        }
-    }
-    #endregion
-
-    #region LoadXMLFile
-    /// <summary>
-    /// Open files
-    /// </summary>
-    [EasyButtons.Button]
-    private void openXMLFile()
-    {
-        var extensions = new[] {
-            new ExtensionFilter("XML files", "xml"),
-            new ExtensionFilter("All Files", "*" ),
-        };
-
-        var path = StandaloneFileBrowser.OpenFilePanel("Open Settings File", "", extensions, false);
-        string xmlFilePath = path[0];
-        //filePath = EditorUtility.OpenFilePanel("Open with ifc", "", "ifc");
-        if (xmlFilePath.Length != 0)
-        {
-            if (File.Exists(xmlFilePath))
-            {
-                LoadXML(xmlFilePath);
-            }
-            else
-            {
-                UnityEngine.Debug.Log("Loading xml file fails!");
-            }
         }
     }
     #endregion

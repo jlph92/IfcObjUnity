@@ -10,7 +10,6 @@ using System.Linq;
 public class ObjectBinding
 {
     private Dictionary<IXbimViewModel, GameObject> relatedObjects = new Dictionary<IXbimViewModel, GameObject>();
-    private IfcStore model;
 
     public IEnumerable attachedObjects
     {
@@ -18,11 +17,6 @@ public class ObjectBinding
         {
             return relatedObjects;
         }
-    }
-
-    public void setModel(IfcStore model)
-    {
-        this.model = model;
     }
 
     public GameObject GetValue(IXbimViewModel xm)
@@ -52,13 +46,17 @@ public class ObjectBinding
         }
     }
 
-    public void select(IXbimViewModel xm)
+    public bool select(IXbimViewModel xm)
     {
         //Debug.Log(String.Format("{0}: {1}", xm.EntityLabel, xm.Name));
         var go = GetValue(xm);
 
-        if (go != null) go.GetComponent<MouseHighlight>().highlight = true;
-        else return; 
+        if (go != null)
+        {
+            go.GetComponent<MouseHighlight>().highlight = true;
+            return true;
+        }
+        else return false; 
     }
 
     public void damageSelect(IXbimViewModel xm)
@@ -100,8 +98,6 @@ public class ObjectBinding
 
     private string checkGuid(IXbimViewModel IfcModel)
     {
-        var id = IfcModel.EntityLabel;
-        IIfcObjectDefinition specificObject = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == id);
-        return String.Format("{0}",specificObject.GlobalId);
+        return String.Format("id-{0}", IfcModel.EntityLabel);
     }
 }

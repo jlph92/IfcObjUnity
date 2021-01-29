@@ -16,11 +16,15 @@ public class IFCTreeView : MonoBehaviour
 {
     public TreeView TreeView;
     public IfcPropertyView ifcPropertyView;
+    public Text SelectedText;
+    public GameObject AnnotateButton;
     protected string filePath;
     protected IEnumerable<IXbimViewModel> dataItems;
     protected IfcInteract ifcInteract= new IfcInteract();
     protected ObjectBinding ObjectBindingProperty = new ObjectBinding();
 
+    // The selected attached Product Label
+    private int ProductLabel;
 
     protected virtual void Awake()
     {
@@ -29,6 +33,13 @@ public class IFCTreeView : MonoBehaviour
 
     private void Start()
     {
+        if(AnnotateButton != null)
+        {
+            // deActivate Annotate Button
+            AnnotateButton.SetActive(false);
+            AnnotateButton.GetComponent<Button>().onClick.AddListener(AddProxy);
+        }
+
         if (!TreeView)
         {
             Debug.LogError("Set TreeView field");
@@ -43,7 +54,7 @@ public class IFCTreeView : MonoBehaviour
         {
             using (var model = IfcStore.Open(filePath))
             {
-                ObjectBindingProperty.setModel(model);
+                //PlacementTree.BuildTree(model);
                 setup(model);
             }
         }
@@ -75,6 +86,9 @@ public class IFCTreeView : MonoBehaviour
 
     private void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
+        // deActivate Annotate Button
+        AnnotateButton.SetActive(false);
+
         // get list box item and tranlate to entity
 
         if (e.NewItems.Length <= 0)
@@ -102,11 +116,18 @@ public class IFCTreeView : MonoBehaviour
             selectedItem = p;
         }
 
-        ObjectBindingProperty.select(TreeView.SelectedItem as IXbimViewModel);
+        if (ObjectBindingProperty.select(TreeView.SelectedItem as IXbimViewModel))
+        {
+            ProductLabel = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
+            AnnotateButton.SetActive(true);
+        } 
 
         var selected = TreeView.SelectedItem as IXbimViewModel;
         var prop = ifcInteract.getProperties(selected.Entity);
         ifcPropertyView.writeProperties(prop);
+
+        if (TreeView.SelectedItem is null) SelectedText.text = "null";
+        else SelectedText.text = (TreeView.SelectedItem as IXbimViewModel).Name;
     }
 
 
@@ -135,57 +156,6 @@ public class IFCTreeView : MonoBehaviour
             e.HasChildren = dataItem.Children.Count() > 0;
         }
     }
-
-    //private IXbimViewModel FindUnderContainingSpace(TreeViewItemDataBindingArgs newVal, IIfcProduct p)
-    //{
-    //    var containingSpace = p.IsContainedIn;
-    //    if (containingSpace != null)
-    //    {
-    //        var containingSpaceView = FindItemBreadthFirst(containingSpace);
-    //        if (containingSpaceView != null)
-    //        {
-    //            var found = FindItemDepthFirst(containingSpaceView, newVal);
-    //            if (found != null)
-    //            {
-    //                return found;
-    //            }
-    //        }
-    //    }
-    //    return null;
-    //}
-
-    //private IXbimViewModel FindItemDepthFirst(IXbimViewModel node, TreeViewItemDataBindingArgs entity)
-    //{
-    //    if (IsMatch(node, entity.Item))
-    //    {
-    //        // node.IsExpanded = true; // commented because of new Highlighting mechanisms
-    //        return node;
-    //    }
-
-    //    foreach (var child in node.Children)
-    //    {
-    //        IXbimViewModel res = FindItemDepthFirst(child, entity);
-    //        if (res != null)
-    //        {
-    //            // node.IsExpanded = true; //commented because of new Highlighting mechanisms
-    //            return res;
-    //        }
-    //    }
-    //    return null;
-    //}
-
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.J))
-    //    {
-    //        TreeView.SelectedItems = TreeView.Items.OfType<object>().Take(5).ToArray();
-    //    }
-    //    else if (Input.GetKeyDown(KeyCode.K))
-    //    {
-    //        TreeView.SelectedItem = null;
-    //    }
-    //}
-
   
 
     public IfcStore Model
@@ -215,10 +185,229 @@ public class IFCTreeView : MonoBehaviour
     {
         foreach (var child in parent.Children)
         {
-            ObjectBindingProperty.Register(child);
+            if (typeof(IIfcElement).IsAssignableFrom(child.Entity.ExpressType.Type))
+                ObjectBindingProperty.Register(child);
             LazyLoadAll(child);
         }
         ifcInteract.FillData(parent.Entity);
+    }
+
+    // Sample code how to write in IFC file
+    //
+    //private void writeData()
+    //{
+    //    string file = System.IO.Path.GetFileNameWithoutExtension(filePath);
+    //    string NewPath = filePath.Replace(file, file + "-Edit");
+
+    //    var editor = new XbimEditorCredentials
+    //    {
+    //        ApplicationDevelopersName = "Jason Viewer",
+    //        ApplicationFullName = "xbim toolkit",
+    //        ApplicationIdentifier = "xbim",
+    //        ApplicationVersion = "4.0",
+    //        EditorsFamilyName = "Lai",
+    //        EditorsGivenName = "Jason Poh Hwa",
+    //        EditorsOrganisationName = "ITD"
+    //    };
+
+    //    using (var model = IfcStore.Open(filePath, editor))
+    //    {
+    //        using (var txn = model.BeginTransaction("Add in Proxy"))
+    //        {
+    //            //create semantic proxy with correspondant attribute
+    //            var pProxy = model.Instances.New<Xbim.Ifc4.Kernel.IfcProxy>(r =>
+    //            {
+    //                r.GlobalId = Guid.NewGuid();
+    //                r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("New Damage");
+    //                r.Description = new Xbim.Ifc4.MeasureResource.IfcText("New Damage is done to the product");
+    //                r.ObjectType = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect");
+    //            });
+
+    //            //create relationship between proxy and ifcProduct
+    //            var pRelAggregates = model.Instances.New<Xbim.Ifc4.Kernel.IfcRelAggregates>(r =>
+    //            {
+    //                r.GlobalId = Guid.NewGuid();
+    //                r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage to product");
+    //                r.Description = new Xbim.Ifc4.MeasureResource.IfcText("The related product is damaged");
+    //                //r.RelatingObject.Add("Defect");
+    //                r.RelatedObjects.Add(pProxy);
+    //            });
+
+    //            //create relationship between proxy and ObjectType
+    //            var pRelDefinesByType = model.Instances.New<Xbim.Ifc4.Kernel.IfcRelDefinesByType>(r =>
+    //            {
+    //                r.GlobalId = Guid.NewGuid();
+    //                r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage type");
+    //                r.Description = new Xbim.Ifc4.MeasureResource.IfcText("Typification of a defect");
+    //                r.RelatedObjects.Add(pProxy);
+    //                r.RelatingType = model.Instances.New<Xbim.Ifc4.Kernel.IfcTypeObject>(p =>
+    //                {
+    //                    p.GlobalId = Guid.NewGuid();
+    //                    p.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage type Spalling");
+    //                    p.ApplicableOccurrence = new Xbim.Ifc4.MeasureResource.IfcIdentifier("IfcProxy/Defect");
+    //                });
+    //            });
+
+    //            //set a few basic properties
+    //            model.Instances.New<Xbim.Ifc4.Kernel.IfcRelDefinesByProperties>(rel =>
+    //            {
+    //                rel.GlobalId = Guid.NewGuid();
+    //                rel.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect Measurements");
+    //                rel.Description = new Xbim.Ifc4.MeasureResource.IfcText("Property parameters for Defect");
+
+    //                rel.RelatedObjects.Add(pProxy);
+    //                rel.RelatingPropertyDefinition = model.Instances.New<Xbim.Ifc4.Kernel.IfcPropertySet>(pset =>
+    //                {
+    //                    pset.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Pset_Condition");
+    //                    pset.HasProperties.AddRange(new[] {
+    //                        model.Instances.New<Xbim.Ifc4.PropertyResource.IfcPropertySingleValue>(p =>
+    //                        {
+    //                            p.Name = new Xbim.Ifc4.MeasureResource.IfcIdentifier("Condition Rating");
+    //                            p.NominalValue = new Xbim.Ifc4.MeasureResource.IfcReal(2.4);
+    //                        }),
+    //                        model.Instances.New<Xbim.Ifc4.PropertyResource.IfcPropertySingleValue>(p =>
+    //                        {
+    //                            p.Name = new Xbim.Ifc4.MeasureResource.IfcIdentifier("AssessmentDate");
+    //                            p.NominalValue = new Xbim.Ifc4.DateTimeResource.IfcDate("2020-11-30");
+    //                        })
+    //                    });
+    //                });
+    //            });
+
+    //            //commit changes
+    //            txn.Commit();
+    //        }
+    //        model.SaveAs(NewPath);
+    //    }
+    //}
+
+    private void writeIFCData(Damage dmg)
+    {
+        string file = System.IO.Path.GetFileNameWithoutExtension(filePath);
+        string NewPath = filePath.Replace(file, file + "-Edit");
+
+        var editor = new XbimEditorCredentials
+        {
+            ApplicationDevelopersName = "Jason Viewer",
+            ApplicationFullName = "xbim toolkit",
+            ApplicationIdentifier = "xbim",
+            ApplicationVersion = "4.0",
+            EditorsFamilyName = "Lai",
+            EditorsGivenName = "Jason Poh Hwa",
+            EditorsOrganisationName = "ITD"
+        };
+
+        using (var model = IfcStore.Open(filePath, editor))
+        {
+            using (var txn = model.BeginTransaction("Add in Proxy"))
+            {
+                //create semantic proxy with correspondant attribute
+                var pProxy = model.Instances.New<Xbim.Ifc4.Kernel.IfcProxy>(r =>
+                {
+                    r.GlobalId = Guid.NewGuid();
+                    r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel(dmg.getProxyName());
+                    r.Description = new Xbim.Ifc4.MeasureResource.IfcText(dmg.getProxyDescription());
+                    r.ObjectType = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect");
+                });
+
+                //create relationship between proxy and ifcProduct
+                var pRelAggregates = model.Instances.New<Xbim.Ifc4.Kernel.IfcRelAggregates>(r =>
+                {
+                    r.GlobalId = Guid.NewGuid();
+                    r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage to product");
+                    r.Description = new Xbim.Ifc4.MeasureResource.IfcText("The related product is damaged");
+                    r.RelatingObject = getAttachedProduct(model, dmg.getProductLabel());
+                    r.RelatedObjects.Add(pProxy);
+                });
+
+                //create relationship between proxy and ObjectType
+                var pRelDefinesByType = model.Instances.New<Xbim.Ifc4.Kernel.IfcRelDefinesByType>(r =>
+                {
+                    r.GlobalId = Guid.NewGuid();
+                    r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage type");
+                    r.Description = new Xbim.Ifc4.MeasureResource.IfcText("Typification of a defect");
+                    r.RelatedObjects.Add(pProxy);
+                    r.RelatingType = model.Instances.New<Xbim.Ifc4.Kernel.IfcTypeObject>(p =>
+                    {
+                        p.GlobalId = Guid.NewGuid();
+                        p.Name = new Xbim.Ifc4.MeasureResource.IfcLabel(dmg.getDamageType());
+                        p.ApplicableOccurrence = new Xbim.Ifc4.MeasureResource.IfcIdentifier("IfcProxy/Defect");
+                    });
+                });
+
+                //set a few basic properties
+                model.Instances.New<Xbim.Ifc4.Kernel.IfcRelDefinesByProperties>(rel =>
+                {
+                    rel.GlobalId = Guid.NewGuid();
+                    rel.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect Measurements");
+                    rel.Description = new Xbim.Ifc4.MeasureResource.IfcText("Property parameters for Defect");
+
+                    rel.RelatedObjects.Add(pProxy);
+                    rel.RelatingPropertyDefinition = model.Instances.New<Xbim.Ifc4.Kernel.IfcPropertySet>(pset =>
+                    {
+                        pset.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Pset_Condition");
+                        pset.HasProperties.AddRange(createProperties(model, dmg));
+                    });
+                });
+
+                //commit changes
+                txn.Commit();
+            }
+            model.SaveAs(NewPath);
+        }
+    }
+
+    Xbim.Ifc4.Kernel.IfcObjectDefinition getAttachedProduct(IfcStore model, int ProductLabel)
+    {
+        var AttachedProduct = model.Instances.FirstOrDefault<Xbim.Ifc4.Kernel.IfcObjectDefinition>(d => d.EntityLabel == ProductLabel);
+        Debug.Log(AttachedProduct.Name);
+        return AttachedProduct;
+    }
+
+    List<Xbim.Ifc4.PropertyResource.IfcPropertySingleValue> createProperties(IfcStore model, Damage dmg)
+    {
+        List < Xbim.Ifc4.PropertyResource.IfcPropertySingleValue > properties = new List <Xbim.Ifc4.PropertyResource.IfcPropertySingleValue>();
+        foreach (DamageProperty measurement in dmg.getMeasurements())
+        {
+            properties.Add(
+                model.Instances.New<Xbim.Ifc4.PropertyResource.IfcPropertySingleValue>(p =>
+                {
+                    p.Name = new Xbim.Ifc4.MeasureResource.IfcIdentifier(measurement.Property_Name);
+                    p.NominalValue = measurement.getIFCUnit();
+                })
+            );
+        }
+
+        return properties;
+    }
+
+    public void AddProxy()
+    {
+        Debug.Log("Dialog Box called.");
+        buildDamage();
+    }
+
+    private void buildDamage()
+    {
+        GameObject dmgBox = Instantiate(Resources.Load<GameObject>("Prefabs/DialogBox"), GameObject.Find("UI").transform);
+        Damage dmg = new Damage(dmgBox, ProductLabel);
+
+        // register with an event
+        dmg.EndCalled += End_DialogBox;
+        dmg.AbortionCalled += Abort_DialogBox; 
+    }
+
+    // Abort Dialog Box event handler
+    private void Abort_DialogBox(object sender, EventArgs e)
+    {
+        Destroy((sender as Damage).getGameObject());
+    }
+
+    // End Dialog Box event handler
+    private void End_DialogBox(object sender, EventArgs e)
+    {
+        writeIFCData(sender as Damage);
+        Destroy((sender as Damage).getGameObject());
     }
 }
 

@@ -40,7 +40,7 @@ namespace AsImpL
             {
                 return;
             }
-            for (int i = 0; i < modelsInfo.Length; i++)
+            for (int i = 1; i < modelsInfo.Length; i++)
             {
                 if (modelsInfo[i].skip) continue;
                 string objName = modelsInfo[i].name;

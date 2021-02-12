@@ -69,7 +69,7 @@ public class IfcInteract
 
     public IEnumerable<PropertyItem> getProperties(IPersistEntity _entity)
     {
-        if (_propertiesBindings.Count > 0)
+        if (_propertiesBindings.Count > 0 && _entity != null)
         {
             if (_propertiesBindings.Exists(x => x._entity.Equals(_entity)))
                 return _propertiesBindings.Find(x => x._entity.Equals(_entity)).getValue();

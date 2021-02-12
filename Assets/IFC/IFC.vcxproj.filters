@@ -87,5 +87,14 @@
     <None Include="..\Script\ScrollViewContent.cs">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\Script\ExternalFile.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\Placement Tree.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\BIMPlacement.cs">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

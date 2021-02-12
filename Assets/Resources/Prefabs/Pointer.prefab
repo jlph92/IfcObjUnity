@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4920042244317748596}
   - component: {fileID: 4920042244317748599}
   - component: {fileID: 4920042244317748598}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103,7 +103,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2323515314774971018}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Pointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}

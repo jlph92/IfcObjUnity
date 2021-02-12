@@ -8,7 +8,13 @@ public class surfaceBuider : MonoBehaviour
     Surface possible_surface;
     private bool error = false;
 
-    void Start()
+    public event PointObtained OnPointObtained; // event
+
+    public delegate void PointObtained(object sender, Vector3 intersectionPoint);
+
+    public GameObject Point3D;
+
+    public void plot3D()
     {
         StartCoroutine(CreateSurfaces());
     }
@@ -33,7 +39,10 @@ public class surfaceBuider : MonoBehaviour
 
         Vector3 intersectionPoint;
         if (planesIntersectAtSinglePoint(p0 : p0, p1: p1, p2: p2, out intersectionPoint))
-            Instantiate(Resources.Load<GameObject>("Prefabs/Pointer"), intersectionPoint, Quaternion.identity);
+        {
+            Point3D = Instantiate(Resources.Load<GameObject>("Prefabs/Pointer"), intersectionPoint, Quaternion.identity);
+            OnPointObtained(this, intersectionPoint);
+        } 
 
         yield return null;
     }
@@ -78,14 +87,17 @@ public class surfaceBuider : MonoBehaviour
         yield return null;
     }
 
+    // Reference: https://gist.github.com/StagPoint/2eaa878f151555f9f96ae7190f80352e
+    // A small fix that the dot product might be negative due to direction
     private static bool planesIntersectAtSinglePoint(Plane p0, Plane p1, Plane p2, out Vector3 intersectionPoint)
     {
         const float EPSILON = 1e-4f;
 
         var det = Vector3.Dot(Vector3.Cross(p0.normal, p1.normal), p2.normal);
-        if (det < EPSILON)
+        if (System.Math.Abs(det) < EPSILON)
         {
             intersectionPoint = Vector3.zero;
+            Debug.Log("No point found.");
             return false;
         }
 
@@ -138,7 +150,7 @@ public class surfaceBuider : MonoBehaviour
     {
         GameObject object1 = new GameObject();
         SurfaceVariable sv = object1.AddComponent<SurfaceVariable>() as SurfaceVariable;
-        sv.OnSurfaceBuilt += TermianteObject;
+        sv.OnSurfaceBuilt += TerminateObject;
 
         while (object1)
         {
@@ -146,13 +158,13 @@ public class surfaceBuider : MonoBehaviour
         }
     }
 
-    void TermianteObject(object sender, Surface surface)
+    void TerminateObject(object sender, Surface surface)
     {
         if (error) surfaces[surfaces.Count - 1] = surface;
         else surfaces.Add(surface);
 
         SurfaceVariable sv = sender as SurfaceVariable;
-        sv.OnSurfaceBuilt -= TermianteObject;
+        sv.OnSurfaceBuilt -= TerminateObject;
         Destroy(sv.gameObject);
     }
 
@@ -195,6 +207,11 @@ public struct Surface
         this.position += distance * this.normal.normalized;
         this.plane = new Plane(this.normal, this.position);
     }
+
+    public void flipSide()
+    {
+        this.normal = -1 * this.normal;
+    }
 }
 
 public class SurfaceVariable : MonoBehaviour
@@ -220,7 +237,7 @@ public class SurfaceVariable : MonoBehaviour
         arrow_ctrl.OnDragged += calculate;
     }
 
-
+    // Check only the designated layer for surface normal
     private void getSurface()
     {
         RaycastHit hit;
@@ -271,7 +288,15 @@ public class SurfaceVariable : MonoBehaviour
 
     void calculate(object sender, Vector3 position)
     {
-        depth_Value = Vector3.Distance(surface.getPosition(), position);
+        float distance = Vector3.Distance(surface.getPosition(), position);
+
+        if (!((position - surface.getPosition()).normalized == surface.getNormal().normalized))
+        {
+            plane.transform.SetPositionAndRotation(position, Quaternion.FromToRotation(Vector3.up, -1 * surface.getNormal()));
+            surface.flipSide();
+        }
+
+        depth_Value = distance;
     }
 
     void OnGUI()

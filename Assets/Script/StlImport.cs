@@ -7,23 +7,62 @@ using SFB;
 
 public class StlImport : MonoBehaviour
 {
-    
-    public string filePath;
     public float alpha = 0.5f;
-    public Unit unit;
+    //public Unit unit;
     public bool smooth = false;
     private Color default_color;
+    private bool showOrigin = true;
 
-    [EasyButtons.Button]
+
+    public void offOrigin()
+    {
+        showOrigin = false;
+    }
+
+    public void openSTL(string filePath, Unit unit)
+    {
+        GameObject root = new GameObject(Path.GetFileNameWithoutExtension(filePath));
+        root.layer = 9;
+        root.transform.parent = transform;
+        root.transform.localPosition = Vector3.zero;
+        root.transform.localRotation = Quaternion.identity;
+
+        if (showOrigin) Instantiate(Resources.Load<GameObject>("Prefabs/Axis_Arrow"), root.transform);
+        
+
+        Mesh[] meshes = Importer.Import(filePath, smooth: smooth, unit: unit);
+
+        foreach (Mesh mesh in meshes)
+        {
+            GameObject child = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            child.transform.parent = root.transform;
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localRotation = Quaternion.identity;
+            child.name = "Element";
+            child.layer = 9;
+
+            //default_color = child.GetComponent<MeshRenderer>().material.color;
+            child.GetComponent<MeshRenderer>().material.color = Color.red;
+            setTransparent(child.GetComponent<MeshRenderer>());
+            if (child.GetComponent<BoxCollider>()) Destroy(child.GetComponent<BoxCollider>());
+
+            MeshFilter m = child.GetComponent<MeshFilter>();
+            m.mesh = mesh;
+            m.mesh.RecalculateNormals();
+        }
+    }
+
     private void importSTL()
     {
+        Unit unit = Unit.Milimeter;
+
         var extensions = new[] {
             new ExtensionFilter("STL files", "stl"),
             new ExtensionFilter("All Files", "*" ),
         };
 
         var path = StandaloneFileBrowser.OpenFilePanel("Open Settings File", "", extensions, false);
-        filePath = path[0];
+        string filePath = path[0];
         if (filePath.Length != 0)
         {
             GameObject root = Instantiate(Resources.Load<GameObject>("Prefabs/Axis_Arrow"), Vector3.zero, Quaternion.identity) as GameObject;
@@ -102,11 +141,11 @@ public class StlImport : MonoBehaviour
         m_renderer.material = m_material;
     }
 
-    void OnGUI()
-    {
-        if (GUI.Button(new Rect(120, 10, 150, 30), "Load damage file"))
-        {
-            importSTL();
-        }
-    }
+    //void OnGUI()
+    //{
+    //    if (GUI.Button(new Rect(120, 10, 150, 30), "Load damage file"))
+    //    {
+    //        importSTL();
+    //    }
+    //}
 }

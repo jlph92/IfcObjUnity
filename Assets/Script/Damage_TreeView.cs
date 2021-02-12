@@ -19,29 +19,62 @@ public class Damage_TreeView : IFCTreeView
     protected override void ViewModel()
     {
         Debug.Log("Damage Tree View start");
-        var DamageModel = Model.Instances.OfType<IIfcProduct>()
-            .Where(itm => itm is IIfcProxy || itm is IIfcAnnotation || itm is IIfcVoidingFeature)
-            .Select(itm => itm.GetType())
+        var DamageModel = Model.Instances.OfType<IIfcProxy>()
+            //Model.Instances.OfType<IIfcProduct>()
+            //.Where(itm => itm is IIfcProxy || itm is IIfcAnnotation || itm is IIfcVoidingFeature)
+            .Select(itm => new TypeViewModel(itm.GetType(), Model))
+            .Cast<IXbimViewModel>()
             .ToArray();
 
-        var DamageList = DamageModel.Select(type => new TypeViewModel(type, Model)).Cast<IXbimViewModel>().ToList();
-        if (DamageList != null)
+        //var DamageList = DamageModel.Select(type => new TypeViewModel(type, Model)).Cast<IXbimViewModel>().ToList();
+        if (DamageModel != null)
         {
-            dataItems = DamageList;
+            //dataItems = DamageList;
+            ObservableCollection<IXbimViewModel> svList = new ObservableCollection<IXbimViewModel>();
+            svList.Add(DamageModel[0]);
+            dataItems = svList;
 
-            foreach (var child in DamageList)
-                //Debug.Log(child.Entity);
+            foreach (var child in DamageModel)
+            {
+                //Debug.Log(child.Name);
                 LazyLoadAll(child);
+            }
+               
         }
         else
         {
             Debug.Log("None");
         }
+
+        checkDocument(Model);
     }
 
-    private void createDamageLocalPoint()
+    private void checkDocument(IfcStore Model)
     {
-        XbimPlacementTree tree = new XbimPlacementTree(Model);
+        var RelAssociatesDocument = Model.Instances.OfType<IIfcRelAssociatesDocument>()
+            .Where(itm => itm.RelatedObjects.Any(obj => obj is IIfcProxy))
+            .ToArray();
 
+        if (RelAssociatesDocument != null)
+        {
+            foreach (var child in RelAssociatesDocument)
+            {
+                var DocumentRef = child.RelatingDocument as IIfcDocumentReference;
+                if (DocumentRef.ReferencedDocument.ElectronicFormat.Value.Equals("Stl"))
+                {
+                    //Debug.Log("Is Stl file");
+                    var pProxy = child.RelatedObjects.FirstOrDefault(p => p is IIfcProxy);
+                    Vector3 originPoint = getAttachedLocation(Model, pProxy.EntityLabel, showOrigin : false);
+
+                    GameObject StlGeometryImport = new GameObject();
+                    StlGeometryImport.transform.localPosition = originPoint;
+                    var StlHandler = StlGeometryImport.AddComponent<StlImport>();
+
+                    StlHandler.offOrigin();
+                    StlHandler.openSTL(DocumentRef.Location, Parabox.Stl.Unit.Milimeter);
+
+                }
+            }
+        }
     }
 }

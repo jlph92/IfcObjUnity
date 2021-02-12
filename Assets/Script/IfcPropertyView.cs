@@ -51,9 +51,16 @@ public class PropertyItems
     {
         List <PropertyItems> registered_properties = new List<PropertyItems>();
 
-        foreach (var property in _properties)
-            registered_properties.Add(new PropertyItems(property));
+        if(_properties != null)
+        {
+            foreach (var property in _properties)
+                registered_properties.Add(new PropertyItems(property));
 
-        return registered_properties;
+            return registered_properties;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

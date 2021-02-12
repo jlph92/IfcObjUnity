@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using Xbim.Ifc4.Interfaces;
 using System.Linq;
+using SFB;
 
 
 public class Damage
@@ -11,6 +13,25 @@ public class Damage
     // Kill switch
     public event System.EventHandler AbortionCalled; // event
     public event System.EventHandler EndCalled; // event
+    public event System.EventHandler TriggerSurfaceBuilder; // event
+    public event System.EventHandler EndExternalFile; // event
+
+    // Action Pack
+    private UnityAction<string> m_AssignProxyName;
+    private UnityAction<string> m_AssignProxyDescription;
+    private UnityAction<int> m_AssignDamageType;
+
+    private UnityAction<string> m_AssignPropertyName;
+    private UnityAction<string> m_AssignPropertyDescription;
+    private UnityAction<int> m_AssignPropertyUnit;
+
+    private UnityAction<string> m_AssignExternalFileName;
+    private UnityAction<string> m_AssignExternalFileDescription;
+    private UnityAction<int> m_AssignExternalFileType;
+    private UnityAction m_AssignURL;
+
+    // Store items going to be destroy after reference
+    private List<GameObject> afterReference = new List<GameObject>();
 
     protected virtual void OnAbortionCalled(System.EventArgs e) //protected virtual method
     {
@@ -20,6 +41,27 @@ public class Damage
     protected virtual void OnEndCalled(System.EventArgs e) //protected virtual method
     {
         EndCalled?.Invoke(this, e);
+    }
+
+    protected virtual void OnTriggerSurfaceBuilder(System.EventArgs e) //protected virtual method
+    {
+        TriggerSurfaceBuilder?.Invoke(this, e);
+    }
+
+    protected virtual void OnEndExternalFile(System.EventArgs e) //protected virtual method
+    {
+        EndExternalFile?.Invoke(this, e);
+    }
+
+    // Set the origin of external file
+    public void SetOrigin(Vector3 Point)
+    {
+        externalFile.SetOrigin(Point);
+    }
+
+    public bool getRelativePlacement(out Vector3 Result)
+    {
+        return externalFile.getRelativePlacement(out Result);
     }
 
     // Semantic options
@@ -36,6 +78,7 @@ public class Damage
     bool Property_Set = false;
 
     private GameObject DialogBox;
+    public GameObject surfaceBuilder;
 
     public GameObject getGameObject() { return DialogBox; }
 
@@ -71,11 +114,19 @@ public class Damage
         {
             targetField.Add(child.gameObject.name, child.gameObject);
         }
+
+        Transform url = ElementsList.Find("URLField");
+
+        foreach (Transform child in url)
+        {
+            targetField.Add(child.gameObject.name, child.gameObject);
+        }
     }
 
     void setProxy()
     {
         ActivateObj(true); //Activate all UI Elements
+        targetField["URLField"].SetActive(false);
         targetField["InputField-3"].SetActive(false);
         targetField["ScrollView"].SetActive(false);
         targetField["ListOptions"].SetActive(false);
@@ -99,14 +150,21 @@ public class Damage
         // Set button label
         changeBtnText(targetField["OK"], "Next");
 
+        // Map in the accurate Actions
+        m_AssignProxyName = delegate { writeData(input1, out Proxy_Name); };
+        m_AssignProxyDescription = delegate { writeData(input2, out Proxy_Description); };
+        m_AssignDamageType = delegate { writeType(m_Dropdown.value, out Damage_Type); };
+
         // Map in Actions to the UI elements
-        input1.onEndEdit.AddListener(delegate { writeData(input1, out Proxy_Name); });
-        input2.onEndEdit.AddListener(delegate { writeData(input2, out Proxy_Description); });
+        input1.onEndEdit.AddListener(m_AssignProxyName);
+        input2.onEndEdit.AddListener(m_AssignProxyDescription);
+
         writeOption(step_option, out Step_file);
         writeOption(mea_option, out Measurement);
+
         step_option.onValueChanged.AddListener(delegate { writeOption(step_option, out Step_file); });
         mea_option.onValueChanged.AddListener(delegate { writeOption(mea_option, out Measurement); });
-        m_Dropdown.onValueChanged.AddListener(delegate { writeType(m_Dropdown.value, out Damage_Type); });
+        m_Dropdown.onValueChanged.AddListener(m_AssignDamageType);
 
         Btn_OK.onClick.AddListener(nextSequence);
         Btn_Cancel.onClick.AddListener(cancelSequence);
@@ -183,10 +241,15 @@ public class Damage
         // Set Unit Type
         setUnitType(targetField["Dropdown"]);
 
+        // Map action with method
+        m_AssignPropertyName = delegate { writePropertyName(input1); };
+        m_AssignPropertyDescription = delegate { writePropertyValue(input3); };
+        m_AssignPropertyUnit = delegate { writePropertyUnit(m_Dropdown.value); };
+
         // Map in Actions to the UI elements
-        input1.onEndEdit.AddListener(delegate { writePropertyName(input1); });
-        input3.onEndEdit.AddListener(delegate { writePropertyValue(input3); });
-        m_Dropdown.onValueChanged.AddListener(delegate { writePropertyUnit(m_Dropdown.value); });
+        input1.onEndEdit.AddListener(m_AssignPropertyName);
+        input3.onEndEdit.AddListener(m_AssignPropertyDescription);
+        m_Dropdown.onValueChanged.AddListener(m_AssignPropertyUnit);
         Btn_OK.onClick.AddListener(backSequence);
 
         // Lock the Ok button with certain condition
@@ -194,24 +257,133 @@ public class Damage
         dmgProp.dataImcomplete += hideAddButton;
     }
 
+    void setStlFile()
+    {
+        deRegisterProxy();
+
+        //Trigger the surface builder gameobject
+        OnTriggerSurfaceBuilder(System.EventArgs.Empty);
+
+        //Find out the coordinate for attachment
+        setCoordinate();
+    }
+
+    void setCoordinate()
+    {
+        if (surfaceBuilder != null)
+        {
+            DialogBox.SetActive(false);
+
+            surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
+            sBuilder.OnPointObtained += setProxyCoordinate;
+            sBuilder.plot3D();
+        }
+    }
+
+    // Return in the 3D point
+    void setProxyCoordinate(object sender, Vector3 intersectionPoint)
+    {
+        externalFile.SetPoint(intersectionPoint);
+        (sender as surfaceBuider).OnPointObtained -= setProxyCoordinate;
+        DialogBox.SetActive(true);
+        addExternalFileSequence();
+    }
+
+    void assignURL()
+    {
+        //Proxy status filled
+        Proxy_Set = true;
+
+        Debug.Log("The assign URL sequence is called.");
+
+        ActivateObj(false);  //Deactivate all UI Elements
+        targetField["Title"].SetActive(true);
+        targetField["InputField-1"].SetActive(true);
+        targetField["InputField-2"].SetActive(true);
+        targetField["Dropdown"].SetActive(true);
+
+        targetField["URLField"].SetActive(true);
+        targetField["Background"].SetActive(true);
+        targetField["Browse"].SetActive(true);
+
+        targetField["Options"].SetActive(true);
+        targetField["OK"].SetActive(true);
+        targetField["Cancel"].SetActive(true);
+
+        // Map in variables for the UI elements
+        InputField input1 = getField(targetField["InputField-1"]);
+        InputField input2 = getField(targetField["InputField-2"]);
+        Dropdown m_Dropdown = getDropDown(targetField["Dropdown"]);
+        Button Btn_Browse = getButton(targetField["Browse"]);
+        Button Btn_OK = getButton(targetField["OK"]);
+
+        // Map Unity Action with method
+        m_AssignExternalFileName = delegate { writeExternalFileName(input1); };
+        m_AssignExternalFileDescription = delegate { writeExternalFileDescription(input1); };
+        m_AssignExternalFileType = delegate { writeExternalFileType(m_Dropdown.value); };
+
+        // Set Title
+        getText(targetField["Title"]).text = "Step File Attachment";
+
+        // Insert Unit Type
+        setExternalFileType(targetField["Dropdown"]);
+
+        // Set button label
+        changeBtnText(targetField["OK"], "Finish");  
+
+        // Map in Actions to the UI elements
+        input1.onEndEdit.AddListener(m_AssignExternalFileName);
+        input2.onEndEdit.AddListener(m_AssignExternalFileDescription);
+        m_Dropdown.onValueChanged.AddListener(m_AssignExternalFileType);
+
+        Btn_Browse.onClick.AddListener(browseURL);
+        Btn_OK.onClick.AddListener(finishSequence);
+    }
+    void browseURL()
+    {
+        var extensions = new[] {
+            new ExtensionFilter("IFC files", "stl"),
+            new ExtensionFilter("All Files", "*" ),
+        };
+
+        var path = StandaloneFileBrowser.OpenFilePanel("Open Settings File", "", extensions, false);
+        string filePath = path[0];
+
+        if (filePath.Length != 0)
+        {
+            writeExternalFileURL(filePath);
+
+            targetField["Background"].GetComponentInChildren<Text>().text = filePath;
+            surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
+            StlImport stlImport = sBuilder.Point3D.AddComponent<StlImport>();
+            stlImport.openSTL(filePath, externalFile.getStlUnit());
+        }
+    }
+
     void deRegisterProxy()
     {
         // Map in variables for the UI elements
         InputField input1 = getField(targetField["InputField-1"]);
+        InputField input2 = getField(targetField["InputField-2"]);
         Dropdown m_Dropdown = getDropDown(targetField["Dropdown"]);
         Button Btn_OK = getButton(targetField["OK"]);
 
         // DeRegistered Action from Event
-        input1.onEndEdit.RemoveListener(delegate { writeData(input1, out Proxy_Name); });
-        m_Dropdown.onValueChanged.RemoveListener(delegate { writeType(m_Dropdown.value, out Damage_Type); });
+        input1.onEndEdit.RemoveListener(m_AssignProxyName);
+        input2.onEndEdit.RemoveListener(m_AssignProxyDescription);
+        m_Dropdown.onValueChanged.RemoveListener(m_AssignDamageType);
         Btn_OK.onClick.RemoveListener(nextSequence);
+
+        // Clear text field
+        input1.text = "";
+        input2.text = "";
     }
 
     void deRegisterMeasurement()
     {
         // Map in variables for the UI elements
         InputField input1 = getField(targetField["InputField-1"]);
-        InputField input3 = getField(targetField["InputField-3"]);
+        InputField input3 = getField(targetField["InputField-2"]);
         Button Btn_Add = getButton(targetField["Add"]);
         Button Btn_Remove = getButton(targetField["Remove"]);
 
@@ -289,6 +461,7 @@ public class Damage
     {
         // Map in variables for the UI elements
         ScrollViewContent scrollViewItem = getScrollView(targetField["ScrollView"]);
+
         foreach (DamageProperty dmgProp in scrollViewItem.ToRemove())
         {
             Measurements.Remove(dmgProp);
@@ -309,14 +482,40 @@ public class Damage
     {
         Debug.Log("called the Next");
         deRegisterProxy();
-        if (Measurement)
+        if (!Proxy_Set)
         {
-            if (!Proxy_Set) setMeasurement();
+            if (Measurement) setMeasurement();
+            else if (Step_file) setStlFile();
         }
+    }
+
+    void addExternalFileSequence()
+    {
+        Debug.Log("called the Add External File");
+        
+        if (!Proxy_Set)
+        {
+            if (Step_file) assignURL();
+        }
+    }
+
+    void endExternalFileSequence()
+    {
+        surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
+        GameObject point = sBuilder.Point3D;
+        GameObject sphere = point.transform.Find("Sphere").gameObject;
+        GameObject arrow = GameObject.Find("Axis_Arrow(Clone)");
+
+        afterReference.Add(surfaceBuilder);
+        afterReference.Add(sphere);
+        afterReference.Add(arrow);
+
+        OnEndExternalFile(System.EventArgs.Empty);
     }
 
     void finishSequence()
     {
+        if (externalFile != null) endExternalFileSequence();
         OnEndCalled(System.EventArgs.Empty);
     }
 
@@ -360,6 +559,38 @@ public class Damage
         this.dmgProp.selectedType = DamageProperty.getType(index);
     }
 
+    void writeExternalFileName(InputField input)
+    {
+        if (externalFile != null) externalFile.SetFileName(input.text);
+    }
+
+    void writeExternalFileDescription(InputField input)
+    {
+        if (externalFile != null) externalFile.SetFileDescription(input.text);
+    }
+
+    void writeExternalFileURL(string url)
+    {
+        if (externalFile != null) externalFile.SetURL(url);
+    }
+
+    void writeExternalFileType(int index)
+    {
+        if (externalFile != null) externalFile.SetUnit(index);
+    }
+
+    void setExternalFileType(GameObject gmObj)
+    {
+        List<string> unitTypes = ExternalFile.getUnitList();
+
+        //Fetch the Dropdown GameObject the script is attached to
+        Dropdown m_Dropdown = getDropDown(gmObj);
+        //Clear the old options of the Dropdown menu
+        m_Dropdown.ClearOptions();
+        //Add the options created in the List above
+        m_Dropdown.AddOptions(unitTypes);
+    }
+
     void setUnitType(GameObject gmObj)
     {
         List<string> unitTypes = DamageProperty.getUnitType();
@@ -389,6 +620,8 @@ public class Damage
 
     void ActivateObj(bool active)
     {
+        Debug.LogFormat("All items in UI is {0}.", active);
+
         List<GameObject> allObjects = getAllObjects();
 
         foreach (GameObject gmObj in allObjects)
@@ -435,6 +668,10 @@ public class Damage
         return gmObj.GetComponent<InputField>();
     }
 
+    public bool is_StepFile() { return this.Step_file; }
+
+    public bool is_Measurement() { return this.Measurement; }
+
     public string getProxyName()
     {
         return Proxy_Name;
@@ -455,9 +692,38 @@ public class Damage
         return attachedProduct;
     }
 
+    public string getExternalFileName()
+    {
+        if (externalFile != null) return externalFile.getFileName();
+        else return System.String.Empty;
+    }
+
+    public string getExternalFileDescription()
+    {
+        if (externalFile != null) return externalFile.getFileDescription();
+        else return System.String.Empty;
+    }
+
+    public string getExternalFileType()
+    {
+        if (externalFile != null) return externalFile.getUnit();
+        else return System.String.Empty;
+    }
+
+    public string getExternalFileURL()
+    {
+        if (externalFile != null) return externalFile.getURL();
+        else return System.String.Empty;
+    }
+
     public IEnumerable<DamageProperty> getMeasurements()
     {
         return Measurements;
+    }
+
+    public List<GameObject> getReferenceObjects()
+    {
+        return afterReference;
     }
 
     // Proxy item
@@ -475,7 +741,7 @@ public class Damage
     DamageProperty dmgProp;
 
     // The storage data
-    string Step_URL;
+    ExternalFile externalFile = new ExternalFile();
     List<DamageProperty> Measurements = new List<DamageProperty>();
 }
 

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8767104106125121248}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: instance_51 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23,14 +23,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8767104106125121279}
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.5, y: 0, z: -0}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.5, y: 0, z: -0}
   m_LocalScale: {x: 0.00006897002, y: 0.00006897, z: 0.00013794}
   m_Children:
   - {fileID: 8767104106657029030}
   m_Father: {fileID: 8767104107249909073}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &8767104106459962609
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8767104106459962610}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: instance_53 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 8767104106657029030}
   - component: {fileID: 8767104106657029032}
   - component: {fileID: 8767104106657029031}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 8767104106837669182}
   - component: {fileID: 8767104106837669152}
   - component: {fileID: 8767104106837669183}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ID395 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -232,7 +232,7 @@ GameObject:
   - component: {fileID: 8767104107023625121}
   - component: {fileID: 8767104107023625123}
   - component: {fileID: 8767104107023625122}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ID427 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 8767104107087165991}
   - component: {fileID: 8767104107087165993}
   - component: {fileID: 8767104107087165992}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cone 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -389,8 +389,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8767104107249909073}
-  - component: {fileID: 8876069466072309234}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Axis_Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -418,20 +417,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8876069466072309234
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8767104107249909072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07a00542f64c1d840b14a89d2d94b7b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coordinateSpace: 0
-  upAxis: 1
 --- !u!1 &8767104107425091621
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,7 +428,7 @@ GameObject:
   - component: {fileID: 8767104107425091622}
   - component: {fileID: 8767104107425091624}
   - component: {fileID: 8767104107425091623}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ID411 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -458,7 +443,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8767104107425091621}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.25, y: 0, z: 0}
+  m_LocalPosition: {x: 0.25, y: 0, z: 0}
   m_LocalScale: {x: 0.001, y: 0.01, z: 0.01}
   m_Children: []
   m_Father: {fileID: 8767104107249909073}
@@ -521,7 +506,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8767104107426910240}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: instance_52 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -555,7 +540,7 @@ GameObject:
   - component: {fileID: 8767104107749872743}
   - component: {fileID: 8767104107749872742}
   - component: {fileID: 8767104107749872741}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,7 +632,7 @@ GameObject:
   - component: {fileID: 8767104107977451312}
   - component: {fileID: 8767104107977451314}
   - component: {fileID: 8767104107977451313}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cone 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

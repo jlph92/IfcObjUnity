@@ -137,7 +137,7 @@ public class Damage
         // Map in variables for the UI elements
         InputField input1 = getField(targetField["InputField-1"]);
         InputField input2 = getField(targetField["InputField-2"]);
-        Toggle step_option = getToggle(targetField["Toggle-STEP"]);
+        Toggle step_option = getToggle(targetField["Toggle-3D"]);
         Toggle mea_option = getToggle(targetField["Toggle-Measurement"]);
         Dropdown m_Dropdown = getDropDown(targetField["Dropdown"]);
 
@@ -339,6 +339,7 @@ public class Damage
         Btn_Browse.onClick.AddListener(browseURL);
         Btn_OK.onClick.AddListener(finishSequence);
     }
+
     void browseURL()
     {
         var extensions = new[] {
@@ -351,13 +352,27 @@ public class Damage
 
         if (filePath.Length != 0)
         {
-            writeExternalFileURL(filePath);
+            //ExternalDocumentLoaderFactory.Create(filePath);
 
             targetField["Background"].GetComponentInChildren<Text>().text = filePath;
             surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
-            StlImport stlImport = sBuilder.Point3D.AddComponent<StlImport>();
-            stlImport.openSTL(filePath, externalFile.getStlUnit());
+            Transform objectPoint = sBuilder.Point3D.transform;
         }
+    }
+
+    void controlBoxCalled(object sender, GameObject controlBox)
+    {
+        DialogBox.SetActive(false);
+        StlControlBox stlCtrlBox = controlBox.GetComponent<StlControlBox>();
+
+        stlCtrlBox.OnEndControlBox += writeMatrix;
+    }
+
+    // need to write in data
+    void writeMatrix(object sender, Matrix4x4 matrix)
+    {
+        DialogBox.SetActive(true);
+        //stlDocData.writeData();
     }
 
     void deRegisterProxy()
@@ -745,7 +760,7 @@ public class Damage
     List<DamageProperty> Measurements = new List<DamageProperty>();
 }
 
-enum DamageTypes
+public enum DamageTypes
 {
     Crack,
     Spalling,

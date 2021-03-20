@@ -19,6 +19,9 @@ namespace AsImpL
         [Tooltip("Default import options")]
         public ImportOptions defaultImportOptions = new ImportOptions();
 
+        [Tooltip("Pair under a parent gameObject")]
+        public Transform parentTransform;
+
         [SerializeField]
         private PathSettings pathSettings = null;
 
@@ -58,7 +61,7 @@ namespace AsImpL
                 {
                     options = defaultImportOptions;
                 }
-                ImportModelAsync(objName, filePath, transform, options);
+                ImportModelAsync(objName, filePath, parentTransform, options);
             }
         }
 

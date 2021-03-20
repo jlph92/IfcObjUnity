@@ -36,9 +36,6 @@
     <None Include="..\Script\EdgeRT.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\IFCData.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\IfcInteract.cs">
       <Filter>Source Files</Filter>
     </None>
@@ -58,9 +55,6 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\ObjectBinding.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\SelectHandler.cs">
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\StlImport.cs">
@@ -94,6 +88,96 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\BIMPlacement.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ExternalDocumentLoaderFactory.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\StlFileLoader.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DataExternalDocument.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ExternalMetaData.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IExternalDocumentProvider.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\STLMetaData.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\STLDocumentData.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IExternalDataVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\STLDataVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\StlControlBox.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ColorControl.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\CoreApplication.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\CoreElement.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IDimView.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IDimController.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IDimModel.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IFCDataProperty.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DimNotification.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IFCProvider.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ObjFileLoader.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\OBJDocumentData.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\OBJMetaData.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\OBJDataVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DimLocalDataVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\ILocalDataVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\GUIHandler.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\DimLocalDataController.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IIFCDataVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IFCTreeVisualization.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\IFCDataEntity.cs">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

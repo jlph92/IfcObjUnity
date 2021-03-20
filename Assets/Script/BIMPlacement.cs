@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class BIMPlacement
 {
+    public Matrix4x4 parentMatrix { get; set; }
+
     /// <summary>
     /// This function centralises the extraction of a product placement, but it needs the support of XbimPlacementTree and an XbimGeometryEngine
     /// We should probably find a conceptual place for it somewhere in the scene, where these are cached.
@@ -131,16 +133,14 @@ public class BIMPlacement
     public Vector3 getProductOrigin(IIfcProduct AttachedProduct)
     {
         XbimMatrix3D placementTransform = BIMPlacement.GetTransform(AttachedProduct, this);
-        Matrix4x4 matrix = BIMPlacement.translateUnityMatrix(placementTransform);
+        parentMatrix = BIMPlacement.translateUnityMatrix(placementTransform);
+        Vector3 point = parentMatrix.MultiplyPoint3x4(Vector3.zero);
 
-        Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
-        Matrix4x4 rotateMatrix = Matrix4x4.Rotate(rotation);
+        Debug.LogFormat("BIM Coordinate Read : {0}", point);
+        
+        Vector3 result = new Vector3(point.x, point.z, point.y);
 
-        Vector3 scale = new Vector3(1, 1, -1);
-        Matrix4x4 scaleMatrix = Matrix4x4.Scale(scale);
-
-        matrix = scaleMatrix * (rotateMatrix * matrix);
-
-        return matrix.MultiplyPoint3x4(Vector3.zero);
+        return result;
     }
+
 }

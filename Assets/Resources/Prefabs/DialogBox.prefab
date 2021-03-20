@@ -119,7 +119,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2795875070085039977}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9799926
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2048,7 +2048,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Attach STEP?
+  m_Text: Attach External File?
 --- !u!1 &3379879711736719974
 GameObject:
   m_ObjectHideFlags: 0
@@ -2842,7 +2842,7 @@ GameObject:
   - component: {fileID: 3379879712231859265}
   - component: {fileID: 3379879712231859264}
   m_Layer: 5
-  m_Name: Toggle-STEP
+  m_Name: Toggle-3D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3862,7 +3862,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 10, y: 0.00060074776}
+  m_AnchoredPosition: {x: 0, y: 0.000054454715}
   m_SizeDelta: {x: -10, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7147602182431968942

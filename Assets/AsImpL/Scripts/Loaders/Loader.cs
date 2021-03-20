@@ -175,9 +175,9 @@ namespace AsImpL
                 {
                     yield return null;
                 }
-
-
+                
                 GameObject newObj = Instantiate(loadedModels[absolutePath]);
+                Debug.LogFormat("{0} be instantiated.", newObj.name);
                 yield return newObj;
                 OnCreated(newObj, absolutePath);
                 newObj.name = objName;
@@ -224,6 +224,7 @@ namespace AsImpL
             OnLoaded(loadedModels[absolutePath], absolutePath);
         }
 
+       
 
         /// <summary>
         /// Parse the model to get a list of the paths of all used textures
@@ -356,6 +357,7 @@ namespace AsImpL
             objLoadingProgress.message = "Building scene objects...";
 
             GameObject newObj = new GameObject(objName);
+            newObj.transform.parent = parentTransform;
             if (buildOptions.hideWhileLoading)
             {
                 newObj.SetActive(false);

@@ -9,8 +9,25 @@ using Xbim.Ifc4.Interfaces;
 using Battlehub.UIControls;
 using Xbim.ModelGeometry.Scene;
 
+// Update in new added Object into the Tree
+
+
 public class Damage_TreeView : IFCTreeView
 {
+    public void reloadFile(string filename)
+    {
+        filePath = filename;
+        if (filePath.Length != 0)
+        {
+            using (var model = IfcStore.Open(filePath))
+            {
+                //PlacementTree.BuildTree(model);
+                Debug.Log("Open the file: " + filePath);
+                ViewModel();
+            }
+        }
+    }
+
     protected override void Awake()
     {
         ifcInteract = new DamageInteract();
@@ -27,7 +44,7 @@ public class Damage_TreeView : IFCTreeView
             .ToArray();
 
         //var DamageList = DamageModel.Select(type => new TypeViewModel(type, Model)).Cast<IXbimViewModel>().ToList();
-        if (DamageModel != null)
+        if (DamageModel != null && DamageModel.Length > 0)
         {
             //dataItems = DamageList;
             ObservableCollection<IXbimViewModel> svList = new ObservableCollection<IXbimViewModel>();
@@ -36,10 +53,9 @@ public class Damage_TreeView : IFCTreeView
 
             foreach (var child in DamageModel)
             {
-                //Debug.Log(child.Name);
+                Debug.Log(child.Name);
                 LazyLoadAll(child);
             }
-               
         }
         else
         {
@@ -71,7 +87,11 @@ public class Damage_TreeView : IFCTreeView
                     var StlHandler = StlGeometryImport.AddComponent<StlImport>();
 
                     StlHandler.offOrigin();
-                    StlHandler.openSTL(DocumentRef.Location, Parabox.Stl.Unit.Milimeter);
+                    //STLDocumentData stlDocData = new STLDocumentData();
+                    //stlDocData.readData();
+                    //Debug.Log(stlDocData.getStlColor());
+                    //StlHandler.readSTL(DocumentRef.Location, stlDocData.getLengthUnit(), stlDocData.getStlColor());
+                    //StlGeometryImport.transform.localRotation = stlDocData.getLocalTransformation();
 
                 }
             }

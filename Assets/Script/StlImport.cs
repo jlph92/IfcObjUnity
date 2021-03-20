@@ -8,18 +8,45 @@ using SFB;
 public class StlImport : MonoBehaviour
 {
     public float alpha = 0.5f;
-    //public Unit unit;
+    public Unit Test_unit = Unit.Milimeter;
     public bool smooth = false;
+
+    private Color mainColor = Color.red;
     private Color default_color;
     private bool showOrigin = true;
 
+    public delegate void createControlBox(object sender, GameObject ControlBox);
+
+    public event createControlBox OncreateControlBox;
+
+    [EasyButtons.Button]
+    public void testButton()
+    {
+        string testpath = UnityEditor.EditorUtility.OpenFilePanel("STL files", "", "stl");
+        if (testpath.Length != 0)
+        {
+            openSTL(testpath, Test_unit, Color.red);
+        }
+    }
 
     public void offOrigin()
     {
         showOrigin = false;
     }
 
-    public void openSTL(string filePath, Unit unit)
+    public GameObject openSTL(string filePath, Unit unit, Color color)
+    {
+        GameObject root = readSTL(filePath, unit, color);
+
+        Transform UI_transform = GameObject.Find("UI").transform;
+        Debug.Log("Control Box created");
+        GameObject ControlBox = Instantiate(Resources.Load<GameObject>("Prefabs/OrientationControl"), UI_transform);
+        OncreateControlBox(this, ControlBox);
+
+        return root;
+    }
+
+    public GameObject readSTL(string filePath, Unit unit, Color color)
     {
         GameObject root = new GameObject(Path.GetFileNameWithoutExtension(filePath));
         root.layer = 9;
@@ -27,8 +54,10 @@ public class StlImport : MonoBehaviour
         root.transform.localPosition = Vector3.zero;
         root.transform.localRotation = Quaternion.identity;
 
+        mainColor = color;
+
         if (showOrigin) Instantiate(Resources.Load<GameObject>("Prefabs/Axis_Arrow"), root.transform);
-        
+
 
         Mesh[] meshes = Importer.Import(filePath, smooth: smooth, unit: unit);
 
@@ -42,7 +71,7 @@ public class StlImport : MonoBehaviour
             child.layer = 9;
 
             //default_color = child.GetComponent<MeshRenderer>().material.color;
-            child.GetComponent<MeshRenderer>().material.color = Color.red;
+            child.GetComponent<MeshRenderer>().material.color = mainColor;
             setTransparent(child.GetComponent<MeshRenderer>());
             if (child.GetComponent<BoxCollider>()) Destroy(child.GetComponent<BoxCollider>());
 
@@ -50,8 +79,13 @@ public class StlImport : MonoBehaviour
             m.mesh = mesh;
             m.mesh.RecalculateNormals();
         }
+
+        return root;
     }
 
+    /// <summary>
+    /// Path to the external reference document
+    /// </summary>
     private void importSTL()
     {
         Unit unit = Unit.Milimeter;
@@ -87,7 +121,7 @@ public class StlImport : MonoBehaviour
 
             root.layer = 9;
 
-            //cloneForShow(root);
+            cloneForShow(root);
         }
         
     }

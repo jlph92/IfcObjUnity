@@ -167,9 +167,8 @@ namespace AsImpL
                 progressImage.fillAmount = 1f;
                 progressImage.gameObject.SetActive(false);
             }
-
+            
             if (finish_loadEvent != null) finish_loadEvent.Invoke();
         }
-
     }
 }

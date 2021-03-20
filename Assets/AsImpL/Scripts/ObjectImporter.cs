@@ -407,6 +407,7 @@ namespace AsImpL
                 objName = Path.GetFileNameWithoutExtension(absolutePath);
             }
             allLoaded = false;
+            Debug.LogFormat("The Obj parent set: {0}", parentObj.gameObject.name);
             StartCoroutine(loader.Load(objName, absolutePath, parentObj));
         }
 

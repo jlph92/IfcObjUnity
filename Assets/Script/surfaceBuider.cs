@@ -38,9 +38,10 @@ public class surfaceBuider : MonoBehaviour
         Plane p2 = surfaces[2].getPlane();
 
         Vector3 intersectionPoint;
-        if (planesIntersectAtSinglePoint(p0 : p0, p1: p1, p2: p2, out intersectionPoint))
+        if (planesIntersectAtSinglePoint(p0: p0, p1: p1, p2: p2, out intersectionPoint))
         {
             Point3D = Instantiate(Resources.Load<GameObject>("Prefabs/Pointer"), intersectionPoint, Quaternion.identity);
+            Point3D.name = System.Guid.NewGuid().ToString("D");
             OnPointObtained(this, intersectionPoint);
         } 
 

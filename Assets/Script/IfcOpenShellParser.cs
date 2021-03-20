@@ -50,6 +50,7 @@ public class IfcOpenShellParser : MonoBehaviour
         if(obj != null)
         {
             obj.objectsList.Add(new ModelImportInfo(path: file));
+            obj.parentTransform = new GameObject().transform;
             obj.loadObj();
         }
 
@@ -80,7 +81,7 @@ public class IfcOpenShellParser : MonoBehaviour
     private void cloneForShow(GameObject root)
     {
         GameObject duplicate = Instantiate(root);
-        duplicate.name = root.name + "(Duplicate)";
+        duplicate.name = root.name;
         duplicate.layer = 9;
 
         foreach (Transform child in root.GetComponentsInChildren<Transform>())

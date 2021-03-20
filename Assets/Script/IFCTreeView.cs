@@ -370,41 +370,55 @@ public class IFCTreeView : MonoBehaviour
             }
             model.SaveAs(NewPath);
         }
+
+        refreshDamageTree(NewPath);
+    }
+
+    void refreshDamageTree(string PathName)
+    {
+        var damageTree = FindObjectOfType<Damage_TreeView>();
+        damageTree.reloadFile(PathName);
     }
 
     void addPlacement(IfcStore model, IIfcProxy pProxy, Damage dmg)
     {
         IIfcCartesianPoint cartesianPoint;
 
-        try
+        var placement = new BIMPlacement(model);
+        var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == dmg.getProductLabel());
+
+        Vector3 referenceOrigin = placement.getProductOrigin(AttachedProduct);
+        Vector3 relativeWorldPoint;
+
+        if (dmg.getRelativePlacement(out relativeWorldPoint))
         {
-            cartesianPoint = model.Instances.New<Xbim.Ifc4.GeometryResource.IfcCartesianPoint>(r =>
+            Debug.LogFormat("World Vector: {0}", relativeWorldPoint);
+            Vector3 relativePoint = placement.parentMatrix.inverse.MultiplyPoint3x4(relativeWorldPoint);
+
+            try
             {
-                Vector3 relativePoint;
-                if (dmg.getRelativePlacement(out relativePoint))
+                cartesianPoint = model.Instances.New<Xbim.Ifc4.GeometryResource.IfcCartesianPoint>(r =>
                 {
                     r.X = relativePoint.x;
                     r.Y = relativePoint.y;
                     r.Z = relativePoint.z;
-                }
-                else return;
-            });
-        }
-        catch
-        {
-            cartesianPoint = model.Instances.New<Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint>(r =>
+                });
+            }
+            catch
             {
-                Vector3 relativePoint;
-                if (dmg.getRelativePlacement(out relativePoint))
+                cartesianPoint = model.Instances.New<Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint>(r =>
                 {
                     r.X = relativePoint.x;
                     r.Y = relativePoint.y;
                     r.Z = relativePoint.z;
-                }
-                else return;
-            });
+                });
+            }
+
+            Debug.LogFormat("BIM Vector written: {0}", relativePoint);
         }
-        
+
+        else return;
+
         var axis2Placement3D = new Create(model).Axis2Placement3D(r =>
         {
             r.Location = cartesianPoint;
@@ -417,6 +431,9 @@ public class IFCTreeView : MonoBehaviour
         });
 
         pProxy.ObjectPlacement = localPlacement;
+
+        //Vector3 referenceOrigin = placement.getProductOrigin(pProxy as IIfcProduct);
+        //Debug.LogFormat("Vector Point of {0} written in : {1}", pProxy.Name, referenceOrigin);
     }
 
     protected Vector3 getAttachedLocation(IfcStore model, int ProductLabel, bool showOrigin = true)
@@ -425,6 +442,7 @@ public class IFCTreeView : MonoBehaviour
         var placement = new BIMPlacement(model);
 
         Vector3 referenceOrigin = placement.getProductOrigin(AttachedProduct);
+        Debug.LogFormat("Vector Point of {0} : {1}", AttachedProduct.Name, referenceOrigin);
         //referenceOrigin = m.MultiplyPoint3x4(referenceOrigin);
         //referenceOrigin = scaleMatrix.MultiplyPoint3x4(referenceOrigin);
 
@@ -442,6 +460,7 @@ public class IFCTreeView : MonoBehaviour
     {
         var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == ProductLabel);
         Debug.Log(AttachedProduct.Name);
+
         return AttachedProduct.ObjectPlacement;
     }
 
@@ -449,6 +468,7 @@ public class IFCTreeView : MonoBehaviour
     {
         var AttachedProduct = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == ProductLabel);
         Debug.Log(AttachedProduct.Name);
+
         return AttachedProduct;
     }
 

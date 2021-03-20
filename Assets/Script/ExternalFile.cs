@@ -78,7 +78,8 @@ public class ExternalFile
     {
         if (CartesianPoint != null && Origin != null)
         {
-            result = translateBIMCoordinate(CartesianPoint - Origin);
+            result = translateBIMCoordinate(CartesianPoint);
+            Debug.LogFormat("Vector Point Write: {0}, BIM Coordinate Write: {1}", CartesianPoint, result);
             return true;
         }
         else
@@ -100,14 +101,7 @@ public class ExternalFile
 
     Vector3 translateBIMCoordinate(Vector3 point)
     {
-        Quaternion rotation = Quaternion.Euler( 90.0f, 0.0f, 0.0f);
-        Matrix4x4 rotateMatrix = Matrix4x4.Rotate(rotation);
-
-        Vector3 scale = new Vector3(1, 1, -1);
-        Matrix4x4 scaleMatrix = Matrix4x4.Scale(scale);
-
-        Matrix4x4 matrix = rotateMatrix * scaleMatrix;
-
-        return matrix.MultiplyPoint3x4(point);
+        Vector3 BimWorldCoordinate = new Vector3(point.x, point.z, point.y);
+        return BimWorldCoordinate;
     }
 }

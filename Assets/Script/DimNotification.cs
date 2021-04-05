@@ -9,6 +9,7 @@ public class DimNotification
     public const string LoadIFCFile = "Load.IFC.File";
     public const string LoadIFCData = "Load.IFC.Data";
     public const string IfcLoaded = "IFC.Data.Loaded";
+    public const string ObjectDataBinding = "Object.Data.Binded";
     public const string OverwriteIFCFile = "Overwrite.IFC.FIle";
     public const string LoadIFCProperty = "Load.IFC.Property";
 

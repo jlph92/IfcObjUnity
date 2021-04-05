@@ -7,7 +7,7 @@ using Xbim.Ifc.ViewModels;
 using Xbim.Ifc4.Interfaces;
 using System.Linq;
 
-public class ObjectBinding : DimModel
+public class ObjectBinding
 {
     private Dictionary<IXbimViewModel, GameObject> relatedObjects = new Dictionary<IXbimViewModel, GameObject>();
 

@@ -30,6 +30,10 @@ public class IFCProvider : DimController
                 updateTreeView(parameters[0] as IEnumerable<IXbimViewModel>);
                 break;
 
+            case DimNotification.ObjectDataBinding:
+                //LoadObjFile(parameters[0] as ObjectBinding);
+                break;
+
             case DimNotification.LoadIFCProperty:
                 //LoadObjFile(parameters[0] as System.String);
                 break;
@@ -54,5 +58,10 @@ public class IFCProvider : DimController
     void updateTreeView(IEnumerable<IXbimViewModel> ifcItems)
     {
         (view as IFCTreeVisualization).insertIfcData2Tree(ifcItems);
+    }
+
+    void objectBindingTreeView(ObjectBinding ObjectBindingList)
+    {
+        (view as IFCTreeVisualization).assignObjectBinding(ObjectBindingList);
     }
 }

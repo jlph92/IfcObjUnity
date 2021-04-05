@@ -8,6 +8,8 @@ using Xbim.Ifc4.Interfaces;
 
 public class IFCDataEntity : DimModel
 {
+    ObjectBinding ObjectBindingProperty = new ObjectBinding();
+
     public IFCDataEntity(CoreApplication app, DimController controller) : base(app, controller)
     {
 
@@ -21,6 +23,7 @@ public class IFCDataEntity : DimModel
             {
                 IEnumerable<IXbimViewModel> ifcItems = setup(model);
                 this.app.Notify(controller: controller, message: DimNotification.IfcLoaded, parameters: ifcItems);
+                this.app.Notify(controller: controller, message: DimNotification.ObjectDataBinding, parameters: ObjectBindingProperty);
             }
         }
     }
@@ -47,8 +50,9 @@ public class IFCDataEntity : DimModel
     {
         foreach (var child in parent.Children)
         {
-            //if (typeof(IIfcElement).IsAssignableFrom(child.Entity.ExpressType.Type))
-            //    ObjectBindingProperty.Register(child);
+            if (typeof(IIfcElement).IsAssignableFrom(child.Entity.ExpressType.Type))
+                ObjectBindingProperty.Register(child);
+
             LazyLoadAll(child);
         }
         //ifcInteract.FillData(parent.Entity);

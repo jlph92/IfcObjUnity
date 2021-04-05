@@ -8,6 +8,7 @@ using Battlehub.UIControls;
 public class IFCTreeVisualization : DimView, IIFCDataVisualization
 {
     private GameObject AnnotateButton;
+    private ObjectBinding ObjectBindingList;
 
     protected TreeView treeView;
 
@@ -37,6 +38,11 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
         assignAnnotateBtn();
         assignTreeView();
         LoadIfcItem();
+    }
+
+    public void assignObjectBinding(ObjectBinding ObjectBindingList)
+    {
+        this.ObjectBindingList = ObjectBindingList;
     }
 
     void assignAnnotateBtn()
@@ -122,11 +128,14 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
             selectedItem = p;
         }
 
-        //if (ObjectBindingProperty.select(TreeView.SelectedItem as IXbimViewModel))
-        //{
-        //    ProductLabel = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
-        //    AnnotateButton.SetActive(true);
-        //}
+        if (ObjectBindingList != null)
+        {
+            if (ObjectBindingList.select(treeView.SelectedItem as IXbimViewModel))
+            {
+                //ProductLabel = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
+                AnnotateButton.SetActive(true);
+            }
+        }
 
         var selected = treeView.SelectedItem as IXbimViewModel;
         //var prop = ifcInteract.getProperties(selected.Entity);

@@ -115,6 +115,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\DLL\ifcengine.dll" />
+    <None Include="..\Plugins\IfcEngineWrapper.dll" />
     <None Include="..\Script\Arrow_Ctrl.cs" />
     <None Include="..\Script\BIMPlacement.cs" />
     <None Include="..\Script\CameraControl.cs" />
@@ -141,14 +143,20 @@
     <None Include="..\Script\IDimView.cs" />
     <None Include="..\Script\IExternalDataVisualization.cs" />
     <None Include="..\Script\IExternalDocumentProvider.cs" />
+    <None Include="..\Script\IFC2X3-Settings.xml" />
+    <None Include="..\Script\IFC2X3_TC1.exp" />
+    <None Include="..\Script\IFC4-Settings.xml" />
+    <None Include="..\Script\IFC4.exp" />
     <None Include="..\Script\IFCDataEntity.cs" />
     <None Include="..\Script\IFCDataProperty.cs" />
+    <None Include="..\Script\IfcEngine.cs" />
     <None Include="..\Script\IfcInteract.cs" />
     <None Include="..\Script\IfcOpenShellParser.cs" />
     <None Include="..\Script\IfcPropertyView.cs" />
     <None Include="..\Script\IFCProvider.cs" />
     <None Include="..\Script\IFCTreeView.cs" />
     <None Include="..\Script\IFCTreeVisualization.cs" />
+    <None Include="..\Script\IfcWrapper.cs" />
     <None Include="..\Script\IIFCDataVisualization.cs" />
     <None Include="..\Script\ILocalDataVisualization.cs" />
     <None Include="..\Script\ImageProjector.cs" />
@@ -170,6 +178,7 @@
     <None Include="..\Script\STLMetaData.cs" />
     <None Include="..\Script\SubCamera.cs" />
     <None Include="..\Script\surfaceBuider.cs" />
+    <None Include="..\TestIfcEngine.cs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

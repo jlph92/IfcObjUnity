@@ -13,6 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Ifc">
+      <UniqueIdentifier>{716adc8e-7601-4737-bf4d-c3b903e48377}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interface">
+      <UniqueIdentifier>{568387a4-48b3-47e4-956c-84c14bb12462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation">
+      <UniqueIdentifier>{8ca35f57-33bd-4c93-8cd5-6891f5b7a690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Controller">
+      <UniqueIdentifier>{348dbdf7-1cb9-4bea-b3ab-0a82dad547eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataModel">
+      <UniqueIdentifier>{a6075bb9-0872-4bde-b311-24f54c385ced}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Script\Arrow_Ctrl.cs">
@@ -123,9 +138,6 @@
     <None Include="..\Script\ColorControl.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\CoreApplication.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\CoreElement.cs">
       <Filter>Source Files</Filter>
     </None>
@@ -144,9 +156,6 @@
     <None Include="..\Script\DimNotification.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\IFCProvider.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\ObjFileLoader.cs">
       <Filter>Source Files</Filter>
     </None>
@@ -156,29 +165,62 @@
     <None Include="..\Script\OBJMetaData.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\OBJDataVisualization.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\DimLocalDataVisualization.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\ILocalDataVisualization.cs">
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\GUIHandler.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\DimLocalDataController.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\IIFCDataVisualization.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\IFCTreeVisualization.cs">
+    <None Include="..\Script\IfcEngine.cs">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Script\IfcWrapper.cs">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Script\CoreApplication.cs">
+      <Filter>Source Files\Interface</Filter>
+    </None>
+    <None Include="..\Script\DimLocalDataController.cs">
+      <Filter>Source Files\Controller</Filter>
+    </None>
+    <None Include="..\Script\IFC2X3_TC1.exp">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Script\IFC2X3-Settings.xml">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Script\IFC4.exp">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Script\IFC4-Settings.xml">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\TestIfcEngine.cs">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\DLL\ifcengine.dll">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Plugins\IfcEngineWrapper.dll">
+      <Filter>Source Files\Ifc</Filter>
+    </None>
+    <None Include="..\Script\DimLocalDataVisualization.cs">
+      <Filter>Source Files\Visualisation</Filter>
+    </None>
+    <None Include="..\Script\IFCTreeVisualization.cs">
+      <Filter>Source Files\Visualisation</Filter>
+    </None>
+    <None Include="..\Script\OBJDataVisualization.cs">
+      <Filter>Source Files\Visualisation</Filter>
+    </None>
+    <None Include="..\Script\IFCProvider.cs">
+      <Filter>Source Files\DataModel</Filter>
+    </None>
     <None Include="..\Script\IFCDataEntity.cs">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\DataModel</Filter>
     </None>
   </ItemGroup>
 </Project>

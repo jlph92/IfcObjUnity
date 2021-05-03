@@ -15,6 +15,7 @@ MonoBehaviour:
   dragSpeed: 10
   Highlight: {fileID: 1871416958150750132}
   Single_Axis_Control: {fileID: 9007967338205347791}
+  Plane: {fileID: 9007967338727320723}
 --- !u!1 &9007967338205347791
 GameObject:
   m_ObjectHideFlags: 0

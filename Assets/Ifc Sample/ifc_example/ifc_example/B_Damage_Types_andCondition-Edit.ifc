@@ -164,7 +164,7 @@ DATA;
 #9023=IFCPROPERTYSINGLEVALUE('AssessmentDate',$,IFCDATE('2020-11-30'),$);
 #9010=IFCRELDEFINESBYTYPE('8c69df895c2040a691e48a3344675919',#42,'Damage type','Typification of a defect',(#9000),#9011);
 #9011=IFCTYPEOBJECT('9e76a8811cd447578d690f2ae51f7473',#42,'Damage type Spalling',$,'IfcProxy/Defect',$);
-#9024=IFCPROXY('1md9mkTcT6AuIFeN3hr5sA',#9025,'dsds','ds','Defect',#9035,$,.PRODUCT.,$);
+#9024=IFCPROXY('1md9mkTcT6AuIFeN3hr5sA',#9025,'Defect1','Sample Defect','Defect',#9035,$,.PRODUCT.,$);
 #9025=IFCOWNERHISTORY(#9028,#9029,$,.ADDED.,1615290380,$,$,0);
 #9026=IFCPERSON($,'Lai','Jason Poh Hwa',$,$,$,$,$);
 #9027=IFCORGANIZATION($,'ITD',$,$,$);

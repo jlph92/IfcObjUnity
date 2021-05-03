@@ -8,6 +8,7 @@ public class OBJDataVisualization : DimView, IExternalDataVisualization
 {
     GameObject visualItem;
     private UnityEvent finish_loadEvent;
+    public bool is_IFC_Model = false;
 
     private const float alpha = 0.5f;
 
@@ -19,18 +20,18 @@ public class OBJDataVisualization : DimView, IExternalDataVisualization
     void finishLoading()
     {
         Debug.Log("OBJ Finish Loading.");
-        this.app.Notify(controller: controller, message: DimNotification.FinishLoadObjFile, parameters: this);
+        this.app.Notify(controller: controller, message: DimNotification.FinishLoadIFC2Obj, parameters: this);
     }
 
     void Start()
     {
-        GetComponent<OutlineToolkit.EdgeDetect>().enabled = false;
+        //GetComponent<OutlineToolkit.EdgeDetect>().enabled = false;
 
         if (finish_loadEvent == null)
             finish_loadEvent = new UnityEvent();
 
         //Call finish loading with finish load event
-        finish_loadEvent.AddListener(finishLoading);
+        if(is_IFC_Model) finish_loadEvent.AddListener(finishLoading);
 
         //Create finish Loading Object event
         FindObjectOfType<ObjectImporterUI>().addLoadEvent(finish_loadEvent);
@@ -54,7 +55,7 @@ public class OBJDataVisualization : DimView, IExternalDataVisualization
 
     public void adjustView()
     {
-        GetComponent<OutlineToolkit.EdgeDetect>().enabled = true;
+        //GetComponent<OutlineToolkit.EdgeDetect>().enabled = true;
         checkBound();
         //GetComponent<IFCTreeView>().openFile(filePath);
         //GetComponent<Damage_TreeView>().openFile(filePath);

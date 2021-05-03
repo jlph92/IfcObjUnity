@@ -62,39 +62,39 @@ public class Damage_TreeView : IFCTreeView
             Debug.Log("None");
         }
 
-        checkDocument(Model);
+        //checkDocument(Model);
     }
 
-    private void checkDocument(IfcStore Model)
-    {
-        var RelAssociatesDocument = Model.Instances.OfType<IIfcRelAssociatesDocument>()
-            .Where(itm => itm.RelatedObjects.Any(obj => obj is IIfcProxy))
-            .ToArray();
+    //private void checkDocument(IfcStore Model)
+    //{
+    //    var RelAssociatesDocument = Model.Instances.OfType<IIfcRelAssociatesDocument>()
+    //        .Where(itm => itm.RelatedObjects.Any(obj => obj is IIfcProxy))
+    //        .ToArray();
 
-        if (RelAssociatesDocument != null)
-        {
-            foreach (var child in RelAssociatesDocument)
-            {
-                var DocumentRef = child.RelatingDocument as IIfcDocumentReference;
-                if (DocumentRef.ReferencedDocument.ElectronicFormat.Value.Equals("Stl"))
-                {
-                    //Debug.Log("Is Stl file");
-                    var pProxy = child.RelatedObjects.FirstOrDefault(p => p is IIfcProxy);
-                    Vector3 originPoint = getAttachedLocation(Model, pProxy.EntityLabel, showOrigin : false);
+    //    if (RelAssociatesDocument != null)
+    //    {
+    //        foreach (var child in RelAssociatesDocument)
+    //        {
+    //            var DocumentRef = child.RelatingDocument as IIfcDocumentReference;
+    //            if (DocumentRef.ReferencedDocument.ElectronicFormat.Value.Equals("Stl"))
+    //            {
+    //                //Debug.Log("Is Stl file");
+    //                var pProxy = child.RelatedObjects.FirstOrDefault(p => p is IIfcProxy);
+    //                //Vector3 originPoint = getAttachedLocation(Model, pProxy.EntityLabel, showOrigin : false);
 
-                    GameObject StlGeometryImport = new GameObject();
-                    StlGeometryImport.transform.localPosition = originPoint;
-                    var StlHandler = StlGeometryImport.AddComponent<StlImport>();
+    //                GameObject StlGeometryImport = new GameObject();
+    //                //StlGeometryImport.transform.localPosition = originPoint;
+    //                var StlHandler = StlGeometryImport.AddComponent<StlImport>();
 
-                    StlHandler.offOrigin();
-                    //STLDocumentData stlDocData = new STLDocumentData();
-                    //stlDocData.readData();
-                    //Debug.Log(stlDocData.getStlColor());
-                    //StlHandler.readSTL(DocumentRef.Location, stlDocData.getLengthUnit(), stlDocData.getStlColor());
-                    //StlGeometryImport.transform.localRotation = stlDocData.getLocalTransformation();
+    //                StlHandler.offOrigin();
+    //                //STLDocumentData stlDocData = new STLDocumentData();
+    //                //stlDocData.readData();
+    //                //Debug.Log(stlDocData.getStlColor());
+    //                //StlHandler.readSTL(DocumentRef.Location, stlDocData.getLengthUnit(), stlDocData.getStlColor());
+    //                //StlGeometryImport.transform.localRotation = stlDocData.getLocalTransformation();
 
-                }
-            }
-        }
-    }
+    //            }
+    //        }
+    //    }
+    //}
 }

@@ -8,7 +8,10 @@ public class Arrow_Ctrl : MonoBehaviour
     public float dragSpeed = 10.0f;
     public GameObject Highlight;
     public GameObject Single_Axis_Control;
+    public GameObject Plane;
+
     private Vector3 prev_pos;
+    private MeshFilter meshFilter;
 
     public delegate void Dragged(object sender, Vector3 position);
 
@@ -16,7 +19,23 @@ public class Arrow_Ctrl : MonoBehaviour
 
     void Start()
     {
+        if (Plane != null) meshFilter = Plane.GetComponent<MeshFilter>();
         Highlight.SetActive(false);
+    }
+
+    public void updateMesh(Mesh mesh)
+    {
+        meshFilter.mesh = mesh;
+        Plane.transform.position = Vector3.zero;
+        Plane.transform.rotation = Quaternion.identity;
+        Plane.transform.localScale = Vector3.one;
+
+        //var parentPosition = Plane.transform.parent.position;
+        //var parentRotation = Plane.transform.parent.rotation;
+
+        //Debug.LogFormat("Parent position: {0}, Parent Rotation: {1}", parentPosition, parentRotation);
+        //Debug.LogFormat("Local position: {0}, Local Rotation: {1}", Plane.transform.position, Plane.transform.rotation);
+        //Debug.LogFormat("Local position: {0}, Local Rotation: {1}", Plane.transform.position, Plane.transform.rotation);
     }
 
     public void Activate(bool active)

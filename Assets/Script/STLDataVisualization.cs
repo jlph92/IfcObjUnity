@@ -26,11 +26,12 @@ public class STLDataVisualization : DimView, IExternalDataVisualization
     {
         visualItem = createMeshes(externalDocumentData);
 
-        Quaternion LocalMatrix = (externalDocumentData as STLDocumentData).getLocalTransformation();
-        Color stlColor = (externalDocumentData as STLDocumentData).getStlColor();
+        //Quaternion LocalMatrix = (externalDocumentData as STLDocumentData).getLocalTransformation();
+        //Color stlColor = (externalDocumentData as STLDocumentData).getStlColor();
+        
 
-        visualItem.transform.localPosition = position;
-        visualItem.transform.localRotation = rotation;
+        //visualItem.transform.localPosition = position;
+        //visualItem.transform.localRotation = rotation;
 
         return visualItem;
     }
@@ -43,7 +44,8 @@ public class STLDataVisualization : DimView, IExternalDataVisualization
         root.transform.localPosition = Vector3.zero;
         root.transform.localRotation = Quaternion.identity;
 
-        Color stlColor = (externalDocumentData as STLDocumentData).getStlColor();
+        //Color stlColor = (externalDocumentData as STLDocumentData).getStlColor();
+        Color stlColor = Color.red;
 
         foreach (Mesh mesh in getMeshes(externalDocumentData))
         {
@@ -55,7 +57,7 @@ public class STLDataVisualization : DimView, IExternalDataVisualization
             child.layer = 9;
 
             child.GetComponent<MeshRenderer>().material.color = stlColor;
-            setTransparent(child.GetComponent<MeshRenderer>());
+            //setTransparent(child.GetComponent<MeshRenderer>());
             if (child.GetComponent<BoxCollider>()) Destroy(child.GetComponent<BoxCollider>());
 
             MeshFilter m = child.GetComponent<MeshFilter>();

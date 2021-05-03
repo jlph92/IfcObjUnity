@@ -29,4 +29,14 @@ public class DimView : MonoBehaviour, CoreElement, IDimView
 
         return _DimView;
     }
+
+    public static DimView InsertGUI(GameObject gmObj, CoreApplication app, DimController controller)
+    {
+        GameObject gui_Creator = Instantiate(Resources.Load<GameObject>("Prefabs/GUI_Creator"), gmObj.transform);
+        DimView _DimView = gui_Creator.GetComponent<DamageGUI>();
+        _DimView.app = app;
+        _DimView.controller = controller;
+
+        return _DimView;
+    }
 }

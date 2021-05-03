@@ -5,24 +5,27 @@ using UnityEngine.UI;
 
 public class ScrollViewContent : MonoBehaviour
 {
-    public GameObject damagePropertyList;
+    public GameObject ListItem;
     public Transform contentBox;
 
-    private Dictionary<DamageProperty, GameObject> targetField = new Dictionary<DamageProperty, GameObject>();
+    private DamageModel _DamageInstance;
+    private List<GameObject> ListObjects = new List<GameObject>();
 
     public void clearList()
     {
-        targetField.Clear();
+        ListObjects.Clear();
     }
 
-    public void Add(DamageProperty dmgProp, string contentText)
+    public void AddList(DamageModel _DamageInstance)
     {
-        if (targetField.ContainsKey(dmgProp)) return;
+        this._DamageInstance = _DamageInstance;
 
-        GameObject listItem = Instantiate(damagePropertyList, contentBox);
-        listItem.GetComponentInChildren<Text>().text = contentText;
-        
-        targetField.Add(dmgProp, listItem);
+        foreach (var property in _DamageInstance.NewProperties)
+        {
+            GameObject listItem = Instantiate(ListItem, contentBox);
+            listItem.GetComponentInChildren<Text>().text = property.ToString();
+            ListObjects.Add(listItem);
+        }
     }
 
     private void Remove(GameObject removedObject)
@@ -30,21 +33,21 @@ public class ScrollViewContent : MonoBehaviour
         Destroy(removedObject);
     }
 
-    public IEnumerable<DamageProperty> ToRemove()
-    {
-        List<DamageProperty> RemovableItems = new List<DamageProperty>();
-        foreach (DamageProperty removeItem in targetField.Keys)
-        {
-            if (targetField[removeItem].GetComponent<Toggle>().isOn)
-                RemovableItems.Add(removeItem);
-        }
+    //public IEnumerable<DamageProperty> ToRemove()
+    //{
+    //    List<DamageProperty> RemovableItems = new List<DamageProperty>();
+    //    foreach (DamageProperty removeItem in targetField.Keys)
+    //    {
+    //        if (targetField[removeItem].GetComponent<Toggle>().isOn)
+    //            RemovableItems.Add(removeItem);
+    //    }
 
-        foreach (DamageProperty removeItem in RemovableItems)
-        {
-            Remove(targetField[removeItem]);
-            targetField.Remove(removeItem);
-        }
+    //    foreach (DamageProperty removeItem in RemovableItems)
+    //    {
+    //        Remove(targetField[removeItem]);
+    //        targetField.Remove(removeItem);
+    //    }
 
-        return RemovableItems;
-    }
+    //    return RemovableItems;
+    //}
 }

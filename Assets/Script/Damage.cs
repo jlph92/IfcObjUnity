@@ -274,9 +274,9 @@ public class Damage
         {
             DialogBox.SetActive(false);
 
-            surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
-            sBuilder.OnPointObtained += setProxyCoordinate;
-            sBuilder.plot3D();
+            //surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
+            //sBuilder.OnPointObtained += setProxyCoordinate;
+            //sBuilder.plot3D();
         }
     }
 
@@ -284,7 +284,7 @@ public class Damage
     void setProxyCoordinate(object sender, Vector3 intersectionPoint)
     {
         externalFile.SetPoint(intersectionPoint);
-        (sender as surfaceBuider).OnPointObtained -= setProxyCoordinate;
+        //(sender as surfaceBuider).OnPointObtained -= setProxyCoordinate;
         DialogBox.SetActive(true);
         addExternalFileSequence();
     }
@@ -355,8 +355,8 @@ public class Damage
             //ExternalDocumentLoaderFactory.Create(filePath);
 
             targetField["Background"].GetComponentInChildren<Text>().text = filePath;
-            surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
-            Transform objectPoint = sBuilder.Point3D.transform;
+            //surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
+            //Transform objectPoint = sBuilder.Point3D.transform;
         }
     }
 
@@ -435,15 +435,15 @@ public class Damage
 
     void updateList()
     {
-        // Map in variables for the UI elements
-        ScrollViewContent scrollViewItem = getScrollView(targetField["ScrollView"]);
-        //scrollViewItem.clearList();
+        //// Map in variables for the UI elements
+        //ScrollViewContent scrollViewItem = getScrollView(targetField["ScrollView"]);
+        ////scrollViewItem.clearList();
 
-        foreach (DamageProperty dmgProp in Measurements)
-        {
-            string contentText = dmgProp.getDataText();
-            scrollViewItem.Add(dmgProp, contentText);
-        }
+        //foreach (DamageProperty dmgProp in Measurements)
+        //{
+        //    string contentText = dmgProp.getDataText();
+        //    scrollViewItem.Add(dmgProp, contentText);
+        //}
 
         //Debug.Log(Measurements.Count);
 
@@ -477,10 +477,10 @@ public class Damage
         // Map in variables for the UI elements
         ScrollViewContent scrollViewItem = getScrollView(targetField["ScrollView"]);
 
-        foreach (DamageProperty dmgProp in scrollViewItem.ToRemove())
-        {
-            Measurements.Remove(dmgProp);
-        }
+        //foreach (DamageProperty dmgProp in scrollViewItem.ToRemove())
+        //{
+        //    Measurements.Remove(dmgProp);
+        //}
     }
 
     void backSequence()
@@ -516,8 +516,9 @@ public class Damage
 
     void endExternalFileSequence()
     {
-        surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
-        GameObject point = sBuilder.Point3D;
+        //surfaceBuider sBuilder = surfaceBuilder.GetComponent<surfaceBuider>();
+        //GameObject point = sBuilder.Point3D;
+        GameObject point = new GameObject();
         GameObject sphere = point.transform.Find("Sphere").gameObject;
         GameObject arrow = GameObject.Find("Axis_Arrow(Clone)");
 
@@ -758,13 +759,4 @@ public class Damage
     // The storage data
     ExternalFile externalFile = new ExternalFile();
     List<DamageProperty> Measurements = new List<DamageProperty>();
-}
-
-public enum DamageTypes
-{
-    Crack,
-    Spalling,
-    Rusting,
-    Decolorisation,
-    Vegetation
 }

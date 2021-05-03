@@ -28,6 +28,45 @@
     <Filter Include="Source Files\DataModel">
       <UniqueIdentifier>{a6075bb9-0872-4bde-b311-24f54c385ced}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\DataModel\IFC">
+      <UniqueIdentifier>{19daf356-a54b-455e-8817-bd8905eb2c74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation\IFC">
+      <UniqueIdentifier>{2ce9524d-7837-40ff-ab7c-3bdf829b445d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation\External3D">
+      <UniqueIdentifier>{0ebfc28d-42c1-48db-ab5d-4b31b57aef20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Controller\IFC">
+      <UniqueIdentifier>{1c52a21c-acf6-4138-8707-39584e06ef74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataModel\Damage">
+      <UniqueIdentifier>{b24fd9ea-4948-4bba-a308-778dc0f176ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation\Damage">
+      <UniqueIdentifier>{722780d6-6552-4c50-afd6-55999aebb82e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation\GUI">
+      <UniqueIdentifier>{6e9d5e15-e2c3-4dcb-9a5b-77de94850bfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Controller\GUI">
+      <UniqueIdentifier>{8c0d2b2e-f7d7-448d-8fb4-bc658717a2a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation\GUI\GUI_Item">
+      <UniqueIdentifier>{8147315d-c2b5-49ff-a04c-8a6f4af7438e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataModel\ExternalDocument">
+      <UniqueIdentifier>{23415a9e-420a-46c8-8726-874e432ca6ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataModel\ExternalDocument\STL">
+      <UniqueIdentifier>{f70e70fc-29e7-4242-927a-1bab42a0160e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataModel\ExternalDocument\OBJ">
+      <UniqueIdentifier>{418a76fe-d27f-4b14-8611-dee6977e2d0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visualisation\SupportClass">
+      <UniqueIdentifier>{cb27708c-bda3-47c2-8957-170a4adee88a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Script\Arrow_Ctrl.cs">
@@ -81,9 +120,6 @@
     <None Include="..\Script\SubCamera.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\surfaceBuider.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\ImageProjector.cs">
       <Filter>Source Files</Filter>
     </None>
@@ -91,9 +127,6 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\DamageProperty.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\ScrollViewContent.cs">
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\ExternalFile.cs">
@@ -105,31 +138,10 @@
     <None Include="..\Script\BIMPlacement.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\ExternalDocumentLoaderFactory.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\StlFileLoader.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\DataExternalDocument.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\ExternalMetaData.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IExternalDocumentProvider.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\STLMetaData.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\STLDocumentData.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IExternalDataVisualization.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\STLDataVisualization.cs">
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\StlControlBox.cs">
@@ -138,40 +150,10 @@
     <None Include="..\Script\ColorControl.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\CoreElement.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IDimView.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IDimController.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IDimModel.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IFCDataProperty.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\DimNotification.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\ObjFileLoader.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\OBJDocumentData.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\OBJMetaData.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\ILocalDataVisualization.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\GUIHandler.cs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\Script\IIFCDataVisualization.cs">
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\Script\IfcEngine.cs">
@@ -210,17 +192,119 @@
     <None Include="..\Script\DimLocalDataVisualization.cs">
       <Filter>Source Files\Visualisation</Filter>
     </None>
-    <None Include="..\Script\IFCTreeVisualization.cs">
-      <Filter>Source Files\Visualisation</Filter>
+    <None Include="..\Script\IDimController.cs">
+      <Filter>Source Files\Interface</Filter>
     </None>
-    <None Include="..\Script\OBJDataVisualization.cs">
-      <Filter>Source Files\Visualisation</Filter>
+    <None Include="..\Script\IDimModel.cs">
+      <Filter>Source Files\Interface</Filter>
     </None>
-    <None Include="..\Script\IFCProvider.cs">
-      <Filter>Source Files\DataModel</Filter>
+    <None Include="..\Script\IDimView.cs">
+      <Filter>Source Files\Interface</Filter>
     </None>
     <None Include="..\Script\IFCDataEntity.cs">
-      <Filter>Source Files\DataModel</Filter>
+      <Filter>Source Files\DataModel\IFC</Filter>
+    </None>
+    <None Include="..\Script\IFCTreeVisualization.cs">
+      <Filter>Source Files\Visualisation\IFC</Filter>
+    </None>
+    <None Include="..\Script\OBJDataVisualization.cs">
+      <Filter>Source Files\Visualisation\External3D</Filter>
+    </None>
+    <None Include="..\Script\STLDataVisualization.cs">
+      <Filter>Source Files\Visualisation\External3D</Filter>
+    </None>
+    <None Include="..\Script\IFCProvider.cs">
+      <Filter>Source Files\Controller\IFC</Filter>
+    </None>
+    <None Include="..\Script\IfcPropertyVisualization.cs">
+      <Filter>Source Files\Visualisation\IFC</Filter>
+    </None>
+    <None Include="..\Script\IFCDataProperty.cs">
+      <Filter>Source Files\DataModel\IFC</Filter>
+    </None>
+    <None Include="..\Script\DimNotification.cs">
+      <Filter>Source Files\Interface</Filter>
+    </None>
+    <None Include="..\Script\DamageTreeVisualization.cs">
+      <Filter>Source Files\Visualisation\Damage</Filter>
+    </None>
+    <None Include="..\Script\DamagePropertyVisualization.cs">
+      <Filter>Source Files\Visualisation\Damage</Filter>
+    </None>
+    <None Include="..\Script\DamageDataEntity.cs">
+      <Filter>Source Files\DataModel\Damage</Filter>
+    </None>
+    <None Include="..\Script\GUIHandler.cs">
+      <Filter>Source Files\Controller\GUI</Filter>
+    </None>
+    <None Include="..\Script\DamageGUI.cs">
+      <Filter>Source Files\Visualisation\GUI</Filter>
+    </None>
+    <None Include="..\Script\GeneralDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\ImageDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\DialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\TextDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\InputTextDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\InputImageDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\OrientationDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\CoreElement.cs">
+      <Filter>Source Files\Interface</Filter>
+    </None>
+    <None Include="..\Script\ILocalDataVisualization.cs">
+      <Filter>Source Files\Visualisation</Filter>
+    </None>
+    <None Include="..\Script\IIFCDataVisualization.cs">
+      <Filter>Source Files\Visualisation</Filter>
+    </None>
+    <None Include="..\Script\ExternalDocumentLoaderFactory.cs">
+      <Filter>Source Files\DataModel\ExternalDocument</Filter>
+    </None>
+    <None Include="..\Script\DataExternalDocument.cs">
+      <Filter>Source Files\DataModel\ExternalDocument</Filter>
+    </None>
+    <None Include="..\Script\IExternalDataVisualization.cs">
+      <Filter>Source Files\Visualisation</Filter>
+    </None>
+    <None Include="..\Script\IExternalDocumentProvider.cs">
+      <Filter>Source Files\Interface</Filter>
+    </None>
+    <None Include="..\Script\STLDocumentData.cs">
+      <Filter>Source Files\DataModel\ExternalDocument\STL</Filter>
+    </None>
+    <None Include="..\Script\OBJDocumentData.cs">
+      <Filter>Source Files\DataModel\ExternalDocument\OBJ</Filter>
+    </None>
+    <None Include="..\Script\ExternalMetaData.cs">
+      <Filter>Source Files\Interface</Filter>
+    </None>
+    <None Include="..\Script\Camera3DPreview.cs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\Script\RefLoacationDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\DamageLabel.cs">
+      <Filter>Source Files\Visualisation\SupportClass</Filter>
+    </None>
+    <None Include="..\Script\ScrollViewContent.cs">
+      <Filter>Source Files\Visualisation\SupportClass</Filter>
+    </None>
+    <None Include="..\Script\PlaneOrientationDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
     </None>
   </ItemGroup>
 </Project>

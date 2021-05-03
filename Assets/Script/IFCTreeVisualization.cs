@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 using UnityEngine.UI;
 using Xbim.Ifc.ViewModels;
@@ -7,13 +8,11 @@ using Battlehub.UIControls;
 
 public class IFCTreeVisualization : DimView, IIFCDataVisualization
 {
-    private GameObject AnnotateButton;
-    private ObjectBinding ObjectBindingList;
-
     protected TreeView treeView;
+    protected Text SelectedText;
 
     // Temporary store selectedItem
-    protected IXbimViewModel selectedItem = null;
+    protected IfcModel selectedItem = null;
 
     public IFCTreeVisualization(CoreApplication app, DimController controller) : base(app, controller)
     {
@@ -23,38 +22,30 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
     // Start is called before the first frame update
     void Start()
     {
-        (controller as IFCProvider).setView(this);
+        (controller as IFCProvider).setTreeView(this);
         setupView();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     protected virtual void setupView()
     {
         assignAnnotateBtn();
         assignTreeView();
-        LoadIfcItem();
-    }
-
-    public void assignObjectBinding(ObjectBinding ObjectBindingList)
-    {
-        this.ObjectBindingList = ObjectBindingList;
     }
 
     void assignAnnotateBtn()
     {
-        AnnotateButton = GameObject.Find("/UI/Annotate");
-        AnnotateButton.SetActive(false);
+        this.app.Notify(controller: controller, message: DimNotification.ShowAnnotateButton, parameters: null);
+        GameObject AnnotateButton = GameObject.Find("/UI/Annotate");
         Button annotateLoadBtn = AnnotateButton.GetComponent<Button>();
         annotateLoadBtn.onClick.AddListener(AddDamageData);
+        this.app.Notify(controller: controller, message: DimNotification.HideAnnotateButton, parameters: null);
     }
 
     protected virtual void assignTreeView()
     {
+        GameObject EntityText = GameObject.Find("/UI/Entity");
+        SelectedText = EntityText.GetComponent<Text>();
+
         GameObject TreeViewObject = GameObject.Find("/UI/IFC_TreeView");
         treeView = TreeViewObject.GetComponent<TreeView>();
 
@@ -72,7 +63,9 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
     /// <param name="e"></param>
     private void OnItemDataBinding(object sender, TreeViewItemDataBindingArgs e)
     {
-        IXbimViewModel dataItem = e.Item as IXbimViewModel;
+        IfcModel dataItem = e.Item as IfcModel;
+        dataItem.OnSelectChanged += selectItem;
+
         if (dataItem != null)
         {
             //We display dataItem.name using UI.Text 
@@ -86,7 +79,7 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
             //Debug.Log(dataItem.Name + ": " + dataItem.Children.Count());
 
             //And specify whether data item has children (to display expander arrow if needed)
-            e.HasChildren = dataItem.Children.Count() > 0;
+            e.HasChildren = dataItem.Children.Length > 0;
         }
     }
 
@@ -98,51 +91,50 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
     /// <param name="e"></param>
     private void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
-        // deActivate Annotate Button
-        if (AnnotateButton != null) AnnotateButton.SetActive(false);
-
-        // get list box item and tranlate to entity
 
         if (e.NewItems.Length <= 0)
             return;
 
-        var p = treeView.SelectedItem as IXbimViewModel;
+        var p = treeView.SelectedItem as IfcModel;
         var p2 = selectedItem;
 
-        //Debug.Log(String.Format("Selected Items: {0}", (TreeView.SelectedItem as IXbimViewModel).Name));
-
+        
+        // Comparing if current_selected and prev_selected is similar
         if (p2 == null)
         {
-            //Debug.Log(String.Format("No Selected Item Before: {0}", p.Name));
+            // If no prev_selected, set prev_select to current_select
             selectedItem = p;
         }
         else if (p.EntityLabel == p2.EntityLabel)
         {
-            //Debug.Log(String.Format("Same Items: {0}, {1}", p.Name, p2.Name));
+            // If prev_select similar to current_select
+            // exit process
             return;
         }
         else
         {
-            //Debug.Log(String.Format("Update selection: {0} to {1}", p.Name, p2.Name));
-            //ObjectBindingProperty.unselect(p2 as IXbimViewModel);
+            // If prev_select not equal to current_select
+            // set prev_select to current_select
+            if (selectedItem.is_Annotatable) selectedItem.Selected = false;
             selectedItem = p;
         }
 
-        if (ObjectBindingList != null)
+        if (selectedItem.is_Annotatable) selectedItem.Selected = true;
+
+        // Check if selected is annotable with defect
+        if (selectedItem.is_Annotatable)
         {
-            if (ObjectBindingList.select(treeView.SelectedItem as IXbimViewModel))
-            {
-                //ProductLabel = (TreeView.SelectedItem as IXbimViewModel).EntityLabel;
-                AnnotateButton.SetActive(true);
-            }
+            this.app.Notify(controller: controller, message: DimNotification.ShowAnnotateButton, parameters: null);
+        }
+        else
+        {
+            this.app.Notify(controller: controller, message: DimNotification.HideAnnotateButton, parameters: null);
         }
 
-        var selected = treeView.SelectedItem as IXbimViewModel;
-        //var prop = ifcInteract.getProperties(selected.Entity);
-        //ifcPropertyView.writeProperties(prop);
+        // Retrieve property of selected
+        getProperty();
 
-        //if (TreeView.SelectedItem is null) SelectedText.text = "null";
-        //else SelectedText.text = (TreeView.SelectedItem as IXbimViewModel).Name;
+        SelectedText.text = selectedItem.Name;
     }
 
     /// <summary>
@@ -154,28 +146,35 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
     private void OnItemExpanding(object sender, ItemExpandingArgs e)
     {
         //Explore children node
-        IXbimViewModel node = e.Item as IXbimViewModel;
-        e.Children = node.Children.Cast<IXbimViewModel>().ToArray();
+        IfcModel node = e.Item as IfcModel;
+        e.Children = node.Children;
     }
 
-    void LoadIfcItem()
+    private void selectItem(object sender, System.EventArgs e)
     {
-        this.app.Notify(controller: controller, message: DimNotification.LoadIFCData);
+        var selectIfcModel = sender as IfcModel;
+        Debug.LogFormat("{0} is selected.", selectIfcModel.Name);
+        if (treeView != null) treeView.SelectedItem = selectIfcModel;
     }
 
     void AddDamageData()
     {
-        this.app.Notify(controller: controller, message: DimNotification.AddDim, parameters: selectedItem.EntityLabel);
+        this.app.Notify(controller: controller, message: DimNotification.AddDim, parameters: selectedItem);
     }
 
-    public void insertIfcData2Tree(IEnumerable<IXbimViewModel> ifcItems)
+    public void insertIfcData2Tree(IfcModel ifcItem)
     {
+        // Debug.Log(ifcItem.Name);
+
+        List<IfcModel> ifcItems = new List<IfcModel>();
+        ifcItems.Add(ifcItem);
+
         //Bind data items
         treeView.Items = ifcItems;
     }
 
-    void getProperty(IXbimViewModel selected)
+    void getProperty()
     {
-        this.app.Notify(controller: controller, message: DimNotification.LoadIFCProperty, parameters: selected.Entity);
+        this.app.Notify(controller: controller, message: DimNotification.LoadIFCProperty, parameters: selectedItem);
     }
 }

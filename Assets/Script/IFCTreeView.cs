@@ -361,7 +361,7 @@ public class IFCTreeView : MonoBehaviour
                 
                 if (dmg.is_StepFile())
                 {
-                    addPlacement(model, pProxy, dmg);
+                    //addPlacement(model, pProxy, dmg);
                     AddExternalFile(model, pProxy, dmg);
                 }
                 
@@ -380,81 +380,81 @@ public class IFCTreeView : MonoBehaviour
         damageTree.reloadFile(PathName);
     }
 
-    void addPlacement(IfcStore model, IIfcProxy pProxy, Damage dmg)
-    {
-        IIfcCartesianPoint cartesianPoint;
+    //void addPlacement(IfcStore model, IIfcProxy pProxy, Damage dmg)
+    //{
+    //    IIfcCartesianPoint cartesianPoint;
 
-        var placement = new BIMPlacement(model);
-        var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == dmg.getProductLabel());
+    //    //var placement = new BIMPlacement(model);
+    //    var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == dmg.getProductLabel());
 
-        Vector3 referenceOrigin = placement.getProductOrigin(AttachedProduct);
-        Vector3 relativeWorldPoint;
+    //    //Vector3 referenceOrigin = placement.getProductOrigin(AttachedProduct);
+    //    Vector3 relativeWorldPoint;
 
-        if (dmg.getRelativePlacement(out relativeWorldPoint))
-        {
-            Debug.LogFormat("World Vector: {0}", relativeWorldPoint);
-            Vector3 relativePoint = placement.parentMatrix.inverse.MultiplyPoint3x4(relativeWorldPoint);
+    //    if (dmg.getRelativePlacement(out relativeWorldPoint))
+    //    {
+    //        Debug.LogFormat("World Vector: {0}", relativeWorldPoint);
+    //        Vector3 relativePoint = placement.parentMatrix.inverse.MultiplyPoint3x4(relativeWorldPoint);
 
-            try
-            {
-                cartesianPoint = model.Instances.New<Xbim.Ifc4.GeometryResource.IfcCartesianPoint>(r =>
-                {
-                    r.X = relativePoint.x;
-                    r.Y = relativePoint.y;
-                    r.Z = relativePoint.z;
-                });
-            }
-            catch
-            {
-                cartesianPoint = model.Instances.New<Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint>(r =>
-                {
-                    r.X = relativePoint.x;
-                    r.Y = relativePoint.y;
-                    r.Z = relativePoint.z;
-                });
-            }
+    //        try
+    //        {
+    //            cartesianPoint = model.Instances.New<Xbim.Ifc4.GeometryResource.IfcCartesianPoint>(r =>
+    //            {
+    //                r.X = relativePoint.x;
+    //                r.Y = relativePoint.y;
+    //                r.Z = relativePoint.z;
+    //            });
+    //        }
+    //        catch
+    //        {
+    //            cartesianPoint = model.Instances.New<Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint>(r =>
+    //            {
+    //                r.X = relativePoint.x;
+    //                r.Y = relativePoint.y;
+    //                r.Z = relativePoint.z;
+    //            });
+    //        }
 
-            Debug.LogFormat("BIM Vector written: {0}", relativePoint);
-        }
+    //        Debug.LogFormat("BIM Vector written: {0}", relativePoint);
+    //    }
 
-        else return;
+    //    else return;
 
-        var axis2Placement3D = new Create(model).Axis2Placement3D(r =>
-        {
-            r.Location = cartesianPoint;
-        });
+    //    var axis2Placement3D = new Create(model).Axis2Placement3D(r =>
+    //    {
+    //        r.Location = cartesianPoint;
+    //    });
 
-        var localPlacement = new Create(model).LocalPlacement(r =>
-        {
-            r.PlacementRelTo = pProxy.ObjectPlacement;
-            r.RelativePlacement = axis2Placement3D;
-        });
+    //    var localPlacement = new Create(model).LocalPlacement(r =>
+    //    {
+    //        r.PlacementRelTo = pProxy.ObjectPlacement;
+    //        r.RelativePlacement = axis2Placement3D;
+    //    });
 
-        pProxy.ObjectPlacement = localPlacement;
+    //    pProxy.ObjectPlacement = localPlacement;
 
-        //Vector3 referenceOrigin = placement.getProductOrigin(pProxy as IIfcProduct);
-        //Debug.LogFormat("Vector Point of {0} written in : {1}", pProxy.Name, referenceOrigin);
-    }
+    //    //Vector3 referenceOrigin = placement.getProductOrigin(pProxy as IIfcProduct);
+    //    //Debug.LogFormat("Vector Point of {0} written in : {1}", pProxy.Name, referenceOrigin);
+    //}
 
-    protected Vector3 getAttachedLocation(IfcStore model, int ProductLabel, bool showOrigin = true)
-    {
-        var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == ProductLabel);
-        var placement = new BIMPlacement(model);
+    //protected Vector3 getAttachedLocation(IfcStore model, int ProductLabel, bool showOrigin = true)
+    //{
+    //    var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == ProductLabel);
+    //    var placement = new BIMPlacement(model);
 
-        Vector3 referenceOrigin = placement.getProductOrigin(AttachedProduct);
-        Debug.LogFormat("Vector Point of {0} : {1}", AttachedProduct.Name, referenceOrigin);
-        //referenceOrigin = m.MultiplyPoint3x4(referenceOrigin);
-        //referenceOrigin = scaleMatrix.MultiplyPoint3x4(referenceOrigin);
+    //    Vector3 referenceOrigin = placement.getProductOrigin(AttachedProduct);
+    //    Debug.LogFormat("Vector Point of {0} : {1}", AttachedProduct.Name, referenceOrigin);
+    //    //referenceOrigin = m.MultiplyPoint3x4(referenceOrigin);
+    //    //referenceOrigin = scaleMatrix.MultiplyPoint3x4(referenceOrigin);
 
-        if (showOrigin) Instantiate(Resources.Load<GameObject>("Prefabs/Origin"), referenceOrigin, Quaternion.identity);
-        //XbimMatrix3D.Identity;
-        //var AttachedProductLocation = model.Instances.FirstOrDefault<Xbim.Ifc4.Kernel.IfcProduct>(d => d.EntityLabel == ProductLabel);
-        //Debug.Log(AttachedProductLocation.ObjectPlacement.ToString());
-        //var placement = AttachedProductLocation.ObjectPlacement;
-        //return AttachedProductLocation.ObjectPlacement as IfcLocalPlacement;
+    //    if (showOrigin) Instantiate(Resources.Load<GameObject>("Prefabs/Origin"), referenceOrigin, Quaternion.identity);
+    //    //XbimMatrix3D.Identity;
+    //    //var AttachedProductLocation = model.Instances.FirstOrDefault<Xbim.Ifc4.Kernel.IfcProduct>(d => d.EntityLabel == ProductLabel);
+    //    //Debug.Log(AttachedProductLocation.ObjectPlacement.ToString());
+    //    //var placement = AttachedProductLocation.ObjectPlacement;
+    //    //return AttachedProductLocation.ObjectPlacement as IfcLocalPlacement;
 
-        return referenceOrigin;
-    }
+    //    return referenceOrigin;
+    //}
 
     IIfcObjectPlacement getAttachedPlacement(IfcStore model, int ProductLabel)
     {
@@ -566,7 +566,7 @@ public class IFCTreeView : MonoBehaviour
     {
         using (var model = IfcStore.Open(filePath))
         {
-            dmg.SetOrigin(getAttachedLocation(model, dmg.getProductLabel()));
+            //dmg.SetOrigin(getAttachedLocation(model, dmg.getProductLabel()));
         }
     }
 
@@ -576,9 +576,9 @@ public class IFCTreeView : MonoBehaviour
         showOrigin(sender as Damage);
 
         GameObject surfaceBuilder = new GameObject("3D Point");
-        surfaceBuilder.AddComponent<surfaceBuider>();
+        //surfaceBuilder.AddComponent<surfaceBuider>();
 
-        (sender as Damage).surfaceBuilder = surfaceBuilder;
+        //(sender as Damage).surfaceBuilder = surfaceBuilder;
     }
 
     // End External Reference process

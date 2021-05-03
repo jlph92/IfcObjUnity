@@ -10,43 +10,37 @@ public class MouseHighlight : MonoBehaviour
     private Material original;
     private Material highlighted;
     private Material Damaged;
-    //private List<Material> m_list = new List<Material>();
+    private IfcModel ifcModel;
 
-    public bool onHighlight = false;
-    public bool onDamage = false;
-    private System.Action HighlightChanged;
-    private System.Action DamageChanged;
+    // Triger signal for selection
+    private bool selected = false;
+    private bool damaged = false;
 
     public bool highlight
     {
-        get => onHighlight;
+        get => selected;
 
         set
         {
-            onHighlight = value;
-            OnHighlightChanged();
+            selected = value;
+            Select();
         }
     }
 
     public bool damage
     {
-        get => onDamage;
+        get => damaged;
 
         set
         {
-            onDamage = value;
-            OnDamageChanged();
+            damaged = value;
+            DamageSelect();
         }
     }
-
-    protected virtual void OnDamageChanged() => DamageChanged?.Invoke();
-    protected virtual void OnHighlightChanged() => HighlightChanged?.Invoke();
 
     // Start is called before the first frame update
     void Start()
     {
-        HighlightChanged += () => { Select(); };
-        DamageChanged += () => { DamageSelect(); };
         //Fetch the mesh renderer component from the GameObject
         m_Renderer = GetComponent<MeshRenderer>();
 
@@ -60,25 +54,32 @@ public class MouseHighlight : MonoBehaviour
             Debug.Log("No Path found");
         else
             Damaged = Resources.Load<Material>("Materials/Damage");
+
+        gameObject.AddComponent<MeshCollider>();
     }
 
-    //// The mesh goes red when the mouse is over it...
-    //void OnMouseEnter()
-    //{
-    //    highlight = true;
-    //}
+    public void setIfcModel(IfcModel ifcModel)
+    {
+        this.ifcModel = ifcModel;
+    }
 
-    //// ...the red fades out to cyan as the mouse is held over...
+    void OnMouseUpAsButton()
+    {
+        if (!selected) ifcModel.OnSelected(System.EventArgs.Empty);
+    }
+
+    //// ...highlight as the mouse is held over...
     //void OnMouseOver()
     //{
-    //    highlight = true;
+    //    m_Renderer.material = highlighted;
     //}
 
-    //// ...and the mesh finally turns white when the mouse moves away.
+    //// ...and the mesh finally turns original when the mouse moves away.
     //void OnMouseExit()
     //{
-    //    highlight = false;
+    //    m_Renderer.material = original;
     //}
+
 
     public void Select()
     {

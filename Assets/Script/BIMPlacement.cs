@@ -8,22 +8,6 @@ using UnityEngine;
 
 public class BIMPlacement
 {
-    public Matrix4x4 parentMatrix { get; set; }
-
-    /// <summary>
-    /// This function centralises the extraction of a product placement, but it needs the support of XbimPlacementTree and an XbimGeometryEngine
-    /// We should probably find a conceptual place for it somewhere in the scene, where these are cached.
-    /// </summary>
-    public static XbimMatrix3D GetTransform(IIfcProduct product, BIMPlacement tree)
-    {
-        XbimMatrix3D placementTransform = XbimMatrix3D.Identity;
-        if (product.ObjectPlacement is IIfcLocalPlacement)
-            placementTransform = tree[product.ObjectPlacement.EntityLabel];
-        //else if (product.ObjectPlacement is IIfcGridPlacement)
-        //    placementTransform = Xbim.Ifc4.GeometricConstraintResource.IfcObjectPlacement.ToMatrix3D(product as IIfcGridPlacement);
-        return placementTransform;
-    }
-
     /// <summary>
     ///     Builds a placement tree of all ifcLocalPlacements
     /// </summary>
@@ -32,92 +16,90 @@ public class BIMPlacement
     ///     If there is a single root displacement, this is removed from the tree and added to the World
     ///     Coordinate System. Useful for models where the site has been located into a geographical context
     /// </param>
-    public BIMPlacement(IModel model, bool adjustWcs = true)
+    public static void extractLocation(IfcModel ifcModel)
     {
-        var rootNodes = new List<XbimPlacementNode>();
-        var localPlacements = model.Instances.OfType<IIfcLocalPlacement>(true).ToList();
-        Nodes = new Dictionary<int, XbimPlacementNode>();
-        foreach (var placement in localPlacements)
-        {
-            //Debug.Log("Added: " + placement.EntityLabel);
-            Nodes.Add(placement.EntityLabel, new XbimPlacementNode(placement));
-        }
-        foreach (var localPlacement in localPlacements)
-        {
-            if (localPlacement.PlacementRelTo != null) //resolve parent
-            {
-                var xbimPlacement = Nodes[localPlacement.EntityLabel];
-                var xbimPlacementParent = Nodes[localPlacement.PlacementRelTo.EntityLabel];
-                xbimPlacement.Parent = xbimPlacementParent;
-                xbimPlacementParent.Children.Add(xbimPlacement);
-            }
-            else
-                rootNodes.Add(Nodes[localPlacement.EntityLabel]);
-        }
-        if (adjustWcs && rootNodes.Count == 1)
-        {
-            var root = rootNodes[0];
-            WorldCoordinateSystem = root.Matrix;
-            //make the children parentless
-            foreach (var node in Nodes.Values.Where(node => node.Parent == root)) node.Parent = null;
-            root.Matrix = new XbimMatrix3D(); //set the matrix to identity
-        }
-        //muliply out the matrices
-        foreach (var node in Nodes.Values) node.ToGlobalMatrix();
+        // Extract Local Placement Node
+        var localPlacements = ifcModel.Entity.Model.Instances.OfType<IIfcLocalPlacement>(true)
+            .Select(node => new XbimPlacementNode(node, ifcModel));
+    }
+}
+
+/// <summary>
+/// This function centralises the extraction of a product placement, but it needs the support of XbimPlacementTree and an XbimGeometryEngine
+/// We should probably find a conceptual place for it somewhere in the scene, where these are cached.
+/// </summary>
+public class XbimPlacementNode
+{
+    public IfcModel ifcModel { get; private set; }
+    XbimMatrix3D LocalMatrix { get; set; }
+    XbimMatrix3D GlobalMatrix { get; set; }
+
+    // Construct XbimPlacementNode to IfcModel
+    public XbimPlacementNode(IIfcLocalPlacement placement, IfcModel rootModel)
+    {
+        ifcModel = IfcModel.getIfcModel(rootModel, placement.EntityLabel);
+        ifcModel.placementNode = this;
+        LocalMatrix = placement.RelativePlacement.ToMatrix3D();
+
+        // Insert Location for IfcModel
+        ifcModel.localPosition = getUnityLocalPosition();
+        ifcModel.position = getUnityGlobalPosition();
     }
 
-    public XbimMatrix3D WorldCoordinateSystem { get; private set; }
-
-    private Dictionary<int, XbimPlacementNode> Nodes { get; set; }
-
-    public XbimMatrix3D this[int placementLabel]
+    // Return World Coordinate / Or so called Absolute Coordinate
+    internal void ToGlobalMatrix()
     {
-        get
+        var Parent = ifcModel.Parent.placementNode;
+        if (!GlobalMatrix.IsIdentity && Parent != null)
         {
-            return Nodes[placementLabel].Matrix;
+            if (!Parent.GlobalMatrix.IsIdentity) Parent.ToGlobalMatrix();
+            GlobalMatrix = LocalMatrix * Parent.GlobalMatrix;
         }
+        else return;
     }
 
-    public class XbimPlacementNode
+    // Extract global placement from Entity
+    Vector3 getUnityGlobalPosition()
     {
-        private List<XbimPlacementNode> _children;
-        private bool _isAdjustedToGlobal;
+        if (GlobalMatrix.IsIdentity) ToGlobalMatrix();
 
-        public XbimPlacementNode(IIfcLocalPlacement placement)
+        if (!GlobalMatrix.IsIdentity)
         {
-            PlacementLabel = placement.EntityLabel;
-            Matrix = placement.RelativePlacement.ToMatrix3D();
-            _isAdjustedToGlobal = false;
+            // Convert to Unity Matrix
+            var globalMatrix = translateUnityMatrix(this.GlobalMatrix);
+            // Move point under Matrix
+            Vector3 point = globalMatrix.MultiplyPoint3x4(Vector3.zero);
+
+            //Debug.LogFormat("BIM World Coordinate Read : {0}", point);
+
+            Vector3 result = new Vector3(point.x, point.z, point.y);
+
+            return result;
         }
 
-        public int PlacementLabel { get; private set; }
-        public XbimMatrix3D Matrix { get; protected internal set; }
-
-        public List<XbimPlacementNode> Children
-        {
-            get { return _children ?? (_children = new List<XbimPlacementNode>()); }
-        }
-
-        public XbimPlacementNode Parent { get; set; }
-
-        internal void ToGlobalMatrix()
-        {
-            if (!_isAdjustedToGlobal && Parent != null)
-            {
-                Parent.ToGlobalMatrix();
-                Matrix = Matrix * Parent.Matrix;
-            }
-            _isAdjustedToGlobal = true;
-        }
+        else return Vector3.zero;
     }
 
-    public static Matrix4x4 translateUnityMatrix(XbimMatrix3D xBIM_Matrix)
+    // Extract local placement from Entity
+    Vector3 getUnityLocalPosition()
+    {
+        // Convert to Unity Matrix
+        var localMatrix = translateUnityMatrix(this.LocalMatrix);
+        // Move point under Matrix
+        Vector3 point = localMatrix.MultiplyPoint3x4(Vector3.zero);
+
+        //Debug.LogFormat("BIM World Coordinate Read : {0}", point);
+
+        Vector3 result = new Vector3(point.x, point.z, point.y);
+
+        return result;
+    }
+
+    Matrix4x4 translateUnityMatrix(XbimMatrix3D xBIM_Matrix)
     {
         Matrix4x4 matrix = Matrix4x4.identity;
 
-        //Debug.Log(xBIM_Matrix.ToString());
-
-        Vector4 Row_1 = new Vector4((float) xBIM_Matrix.M11, (float)xBIM_Matrix.M12, (float)xBIM_Matrix.M13, (float)xBIM_Matrix.M14);
+        Vector4 Row_1 = new Vector4((float)xBIM_Matrix.M11, (float)xBIM_Matrix.M12, (float)xBIM_Matrix.M13, (float)xBIM_Matrix.M14);
         Vector4 Row_2 = new Vector4((float)xBIM_Matrix.M21, (float)xBIM_Matrix.M22, (float)xBIM_Matrix.M23, (float)xBIM_Matrix.M24);
         Vector4 Row_3 = new Vector4((float)xBIM_Matrix.M31, (float)xBIM_Matrix.M32, (float)xBIM_Matrix.M33, (float)xBIM_Matrix.M34);
         Vector4 Row_4 = new Vector4((float)xBIM_Matrix.OffsetX, (float)xBIM_Matrix.OffsetY, (float)xBIM_Matrix.OffsetZ, (float)xBIM_Matrix.M44);
@@ -129,18 +111,4 @@ public class BIMPlacement
 
         return matrix;
     }
-
-    public Vector3 getProductOrigin(IIfcProduct AttachedProduct)
-    {
-        XbimMatrix3D placementTransform = BIMPlacement.GetTransform(AttachedProduct, this);
-        parentMatrix = BIMPlacement.translateUnityMatrix(placementTransform);
-        Vector3 point = parentMatrix.MultiplyPoint3x4(Vector3.zero);
-
-        Debug.LogFormat("BIM Coordinate Read : {0}", point);
-        
-        Vector3 result = new Vector3(point.x, point.z, point.y);
-
-        return result;
-    }
-
 }

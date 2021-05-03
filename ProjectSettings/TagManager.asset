@@ -4,26 +4,7 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - IfcRoof
-  - IfcFooting
-  - IfcWall
-  - IfcFurnishingElement
-  - IfcSpace
-  - IfcBeam
-  - IfcCovering
-  - IfcRailing
-  - IfcMember
-  - IfcStairFlight
-  - IfcStair
-  - IfcSlab
-  - IfcDoor
-  - IfcWindow
-  - IfcOpeningElement
-  - IfcWallStandardCase
-  - IfcBuildingStorey
-  - IfcBuilding
-  - IfcSite
-  - IfcProject
+  - DamageCamera
   layers:
   - Default
   - TransparentFX
@@ -38,7 +19,7 @@ TagManager:
   - Edges
   - Control
   - Origin
-  - 
+  - Preview
   - 
   - 
   - 

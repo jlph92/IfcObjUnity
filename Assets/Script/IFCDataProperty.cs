@@ -5,55 +5,25 @@ using Xbim.Ifc4.Interfaces;
 using Xbim.Common;
 using SFB;
 
-public class IFCDataProperty : DimModel
+public class IFCDataProperty
 {
     /// <summary>
     /// Storing IFC data properties
     /// </summary>
     protected readonly List<PropertyItem> _properties = new List<PropertyItem>();
 
-    /// <summary>
-    /// Binding IFC data properties to IFC Entity
-    /// </summary>
-    protected readonly List<PropertiesBinding> _propertiesBindings = new List<PropertiesBinding>();
-
-    public IFCDataProperty(CoreApplication app, DimController controller) : base(app, controller)
+    public static List<PropertyItem> GetProperties(IPersistEntity _entity)
     {
-
-    }
-
-    /// <summary>
-    /// Retrieve IFC data properties from  IFC Entity from Binding List
-    /// </summary>
-    public IEnumerable<PropertyItem> getProperties(IPersistEntity _entity)
-    {
-        if (_propertiesBindings.Count > 0 && _entity != null)
-        {
-            if (_propertiesBindings.Exists(x => x._entity.Equals(_entity)))
-                return _propertiesBindings.Find(x => x._entity.Equals(_entity)).getValue();
-            else
-                return null;
-        }
-        else return null;
-    }
-
-    /// <summary>
-    /// Adding Binding data
-    /// </summary>
-    public virtual void FillData(IPersistEntity _entity)
-    {
-        FillPropertyData(_entity);
-        _propertiesBindings.Add(new PropertiesBinding(_entity, _properties));
-        Clear();
+        return new IFCDataProperty().FillPropertyData(_entity);
     }
 
     /// <summary>
     /// Retrieve IFC data properties from  IFC Entity
     /// </summary>
-    protected void FillPropertyData(IPersistEntity _entity)
+    protected List<PropertyItem> FillPropertyData(IPersistEntity _entity)
     {
         if (_properties.Any()) //don't try to fill unless empty
-            return;
+            return _properties;
         //now the property sets for any 
         if (_entity is IIfcObject)
         {
@@ -72,12 +42,14 @@ public class IFCDataProperty : DimModel
         {
             var asIfcTypeObject = _entity as IIfcTypeObject;
             if (asIfcTypeObject.HasPropertySets == null)
-                return;
+                return _properties;
             foreach (var pSet in asIfcTypeObject.HasPropertySets.OfType<IIfcPropertySet>())
             {
                 AddPropertySet(pSet);
             }
         }
+
+        return _properties;
     }
 
     /// <summary>
@@ -145,66 +117,48 @@ public class IFCDataProperty : DimModel
             });
         }
     }
+}
 
-    /// <summary>
-    /// Reset Properties Set
-    /// </summary>
-    protected virtual void Clear(bool clearHistory = true)
+public class PropertyItem
+{
+    public string Units { get; set; }
+
+    public string PropertySetName { get; set; }
+
+    public string Name { get; set; }
+
+    public int IfcLabel { get; set; }
+
+    public System.Type IfcValueType { get; set; }
+
+    public string IfcUri
     {
-        _properties.Clear();
+        get { return "xbim://EntityLabel/" + IfcLabel; }
     }
 
-    public class PropertyItem
+    public bool IsLabel
     {
-        public string Units { get; set; }
+        get { return IfcLabel > 0; }
+    }
 
-        public string PropertySetName { get; set; }
+    public string Value { get; set; }
 
-        public string Name { get; set; }
+    private readonly string[] _schemas = { "file", "ftp", "http", "https" };
 
-        public int IfcLabel { get; set; }
-
-        public string IfcUri
+    public bool IsLink
+    {
+        get
         {
-            get { return "xbim://EntityLabel/" + IfcLabel; }
-        }
-
-        public bool IsLabel
-        {
-            get { return IfcLabel > 0; }
-        }
-
-        public string Value { get; set; }
-
-        private readonly string[] _schemas = { "file", "ftp", "http", "https" };
-
-        public bool IsLink
-        {
-            get
-            {
-                Uri uri;
-                if (!Uri.TryCreate(Value, UriKind.Absolute, out uri))
-                    return false;
-                var schema = uri.Scheme;
-                return _schemas.Contains(schema);
-            }
+            Uri uri;
+            if (!Uri.TryCreate(Value, UriKind.Absolute, out uri))
+                return false;
+            var schema = uri.Scheme;
+            return _schemas.Contains(schema);
         }
     }
 
-    protected class PropertiesBinding
+    public string ToString()
     {
-        public IPersistEntity _entity;
-        private List<PropertyItem> _properties;
-
-        public PropertiesBinding(IPersistEntity _entity, List<PropertyItem> _properties)
-        {
-            this._entity = _entity;
-            this._properties = _properties.ToList();
-        }
-
-        public IEnumerable<PropertyItem> getValue()
-        {
-            return this._properties;
-        }
+        return System.String.Format("{0}: {1}", this.Name, this.Value);
     }
 }

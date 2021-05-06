@@ -97,18 +97,72 @@ public class InputImageDialogBox : DialogBox
     {
         // Write Image Details
         _DamageInstance.SetImageProperties(ImageName: _ImageName, ImageDescription: _ImageDescription, ImageURL: _ImageFilePath);
-        // Write in 3D Object
-        if (Damage3DObject != null)
-        {
-            _DamageInstance.ImageObject = Damage3DObject;
-            Damage3DObject.transform.SetParent(null);
-            Damage3DObject.transform.position = Vector3.zero;
-            Damage3DObject.transform.rotation = Quaternion.identity;
-            Destroy(PreviewObject);
-        }
+
         // Call in Image Done Operation
-        DoneOperation(DimNotification.Next_InputImageOperation);
-    } 
+        nextSequence(_DamageInstance.ImageType);
+    }
+
+    void nextSequence(ImageType _imageType)
+    {
+        switch (_imageType)
+        {
+            case ImageType.Image_1D:
+                // Write in non 3D image Object
+                writeNon3DImage();
+                // Preview the image file
+                DoneOperation(DimNotification.Next_RefLoacationOperation);
+                break;
+
+            case ImageType.Image_2D:
+                // Write in non 3D image Object
+                writeNon3DImage();
+                // Preview the image file
+                DoneOperation(DimNotification.Next_RefLoacationOperation);
+                break;
+
+            case ImageType.Image_3D:
+
+                // Write in 3D Object
+                if (Damage3DObject != null)
+                {
+                    _DamageInstance.ImageObject = Damage3DObject;
+                    Damage3DObject.transform.SetParent(null);
+                    Damage3DObject.transform.position = Vector3.zero;
+                    Damage3DObject.transform.rotation = Quaternion.identity;
+                    Destroy(PreviewObject);
+                }
+
+                // Propose re-orientation function
+                DoneOperation(DimNotification.Next_Ref3DLoacationOperation);
+                break;
+        }
+    }
+
+    void writeNon3DImage()
+    {
+        if (_DamageInstance.Image2D != null)
+        {
+            Create2DImage();
+        }
+    }
+
+    void Create2DImage()
+    {
+        if (_DamageGUI != null)
+        {
+            var Image2DObject = (_DamageGUI as DamageGUI).Create2DImage();
+
+            if (Image2DObject != null)
+            {
+                var Image2D = Image2DObject.GetComponentInChildren<RawImage>();
+
+                if (Image2D != null) Image2D.texture = _DamageInstance.Image2D;
+
+                _DamageInstance.Image2DView = Image2DObject;
+                Image2DObject.SetActive(false);
+            }
+        }
+    }
 
     void browseFile()
     {

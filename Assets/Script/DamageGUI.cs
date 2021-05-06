@@ -93,6 +93,12 @@ public class DamageGUI : DimView
         if (_DialogBox != null) (_DialogBox as InputImageDialogBox).FeedIn3DImage(gmObj);
     }
 
+    public GameObject Create2DImage()
+    {
+        var ImageObject = Instantiate(Resources.Load<GameObject>("Prefabs/ImageView"), transform.parent);
+        return ImageObject;
+    }
+
     GameObject nextScene(string nexGUI)
     {
         Debug.Log(nexGUI);

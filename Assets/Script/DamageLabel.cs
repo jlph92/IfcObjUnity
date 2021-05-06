@@ -8,6 +8,9 @@ public class DamageLabel : MonoBehaviour
     private DamageModel _DamageModel;
     private Text LabelText;
     private Camera DamageCamera;
+    private Toggle toggleBtn;
+
+    private Button closeButton;
 
     public DamageModel DefectModel
     {
@@ -26,6 +29,28 @@ public class DamageLabel : MonoBehaviour
     {
         LabelText = GetComponentInChildren<Text>();
         DamageCamera = GameObject.FindGameObjectWithTag("DamageCamera").GetComponent<Camera>();
+        toggleBtn = GetComponent<Toggle>();
+        toggleBtn.onValueChanged.AddListener(delegate { ToggleValueChanged(); });
+
+        if (closeButton == null)
+        {
+            if (_DamageModel.Image2DView != null)
+            {
+                closeButton = _DamageModel.Image2DView.GetComponentInChildren<Button>();
+                closeButton.onClick.AddListener(closeImage);
+            }
+        }
+    }
+
+    void closeImage()
+    {
+        toggleBtn.isOn = false;
+    }
+
+    void ToggleValueChanged()
+    {
+        if (toggleBtn.isOn) _DamageModel.showImage();
+        else _DamageModel.hideImage();
     }
 
     // Update is called once per frame

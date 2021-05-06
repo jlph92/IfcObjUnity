@@ -237,6 +237,8 @@ public class DamageModel
 
     public virtual GameObject ImageObject { get; set; }
 
+    public virtual GameObject Image2DView { get; set; }
+
     public virtual Vector3 ImageOrigin { get; set; }
 
     public virtual Quaternion ImageRotation { get; set; }
@@ -247,6 +249,20 @@ public class DamageModel
     }
 
     public virtual void AddProperty(PropertyItem property) { }
+
+    public void showImage()
+    {
+        if (ImageObject != null) ImageObject.SetActive(true);
+        if (Image2DView != null) Image2DView.SetActive(true);
+    }
+
+    public void hideImage()
+    {
+        if (ImageObject != null) ImageObject.SetActive(false);
+        if (Image2DView != null) Image2DView.SetActive(false);
+    }
+
+    public virtual Texture2D Image2D { get; }
 }
 
 public enum DamageTypes
@@ -529,12 +545,8 @@ public class DamageInstance : DamageModel
         {
             if (_DamageContent != null)
             {
-                if (this.ImageType == ImageType.Image_3D)
-                {
-                    var _DamageImage = _DamageContent as DamageImage;
-                    return _DamageImage.imageObject;
-                }
-                else return null;
+                var _DamageImage = _DamageContent as DamageImage;
+                return _DamageImage.imageObject;
             }
             else return null;
         }
@@ -543,10 +555,11 @@ public class DamageInstance : DamageModel
         {
             if (_DamageContent != null)
             {
+                var _DamageImage = _DamageContent as DamageImage;
+                _DamageImage.imageObject = value;
+
                 if (this.ImageType == ImageType.Image_3D)
-                {
-                    var _DamageImage = _DamageContent as DamageImage;
-                    _DamageImage.imageObject = value;
+                { 
                     _DamageImage.imageObject.layer = 9;
                 }
             }  
@@ -641,6 +654,24 @@ public class DamageInstance : DamageModel
     {
         if (_DamageContent != null) _DamageContent.AddProperty(property);
     }
+
+    public override Texture2D Image2D
+    {
+        get
+        {
+            Debug.Log("Image Returned.");
+            if (_DamageContent != null)
+            {
+                if (_DamageContent is DamageImage)
+                {
+                    Debug.Log("Image Found.");
+                    return (_DamageContent as DamageImage).image2D;
+                }
+            }
+
+            return null;
+        }
+    }
 }
 
 // Damage Content newly built
@@ -679,6 +710,8 @@ public class DamageContent
     {
         get { return NewProperties; }
     }
+
+    public Texture2D image2D { get; }
 }
 
 // Damage Content based on Material Image
@@ -692,6 +725,30 @@ public class DamageImage: DamageContent
     public Vector3 imageOrigin { get; set; }
     public Quaternion imageRotation { get; set; }
     public GameObject imageObject { get; set; }
+
+    public Texture2D image2D
+    {
+        get
+        {
+            if (imageURL != null)
+            {
+                try
+                {
+                    Texture2D imageTexture = new Texture2D(400, 400);
+                    var image_bytes = System.IO.File.ReadAllBytes(this.imageURL);
+                    imageTexture.LoadImage(image_bytes);
+
+                    return imageTexture;
+                }
+                catch (System.Exception)
+                {
+
+                    return null;
+                }
+            }
+            return null;
+        }
+    }
 
     public DamageImage(IfcModel ifcModel, ImageType imageType) : base(ifcModel)
     {
@@ -711,11 +768,11 @@ public class DamageImage: DamageContent
             switch (imageType)
             {
                 case ImageType.Image_1D:
-                    return new string[] { "png", "jpg"};
+                    return new string[] { "png", "jpg" };
                     break;
 
                 case ImageType.Image_2D:
-                    return new string[] { "png", "jpg"};
+                    return new string[] { "png", "jpg" };
                     break;
 
                 case ImageType.Image_3D:

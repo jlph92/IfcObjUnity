@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CoreApplication : MonoBehaviour
 {
@@ -11,10 +12,12 @@ public class CoreApplication : MonoBehaviour
     public GameObject UI_item;
 
     private CameraControl _cameraControl;
+    private ToggleGroup UI_Toggles;
 
     void Start()
     {
-        _cameraControl = GetComponent<CameraControl>();
+        if (UI_Toggles == null) UI_Toggles = GetComponent<ToggleGroup>();
+        if (_cameraControl == null) _cameraControl = GetComponent<CameraControl>();
         DimView.Create(gameObject, "DimLocalDataVisualization", this, new DimLocalDataController(this, gameObject));
     }
 
@@ -48,6 +51,16 @@ public class CoreApplication : MonoBehaviour
 
     public GameObject CreateObject(GameObject gmObj, Transform parentTransform)
     {
-        return Instantiate(gmObj, parentTransform);
+        var createdObject = Instantiate(gmObj, parentTransform);
+
+        var ToggleElement = createdObject.GetComponentInChildren<Toggle>();
+        if (ToggleElement != null)
+        {
+            UI_Toggles.RegisterToggle(ToggleElement);
+            ToggleElement.group = UI_Toggles;
+        }
+            
+
+        return createdObject;
     }
 }

@@ -20,7 +20,7 @@ public class ScrollViewContent : MonoBehaviour
     {
         this._DamageInstance = _DamageInstance;
 
-        foreach (var property in _DamageInstance.NewProperties)
+        foreach (var property in _DamageInstance.Properties)
         {
             GameObject listItem = Instantiate(ListItem, contentBox);
             listItem.GetComponentInChildren<Text>().text = property.ToString();

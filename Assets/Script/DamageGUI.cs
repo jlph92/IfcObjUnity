@@ -6,8 +6,10 @@ public class DamageGUI : DimView
 {
     public GameObject General_DialogBox;
     public GameObject Image_DialogBox;
+    public GameObject EditImage_DialogBox;
     public GameObject InputImage_DialogBox;
     public GameObject Text_DialogBox;
+    public GameObject EditText_DialogBox;
     public GameObject InputText_DialogBox;
     public GameObject OrientationBox;
     public GameObject PlaneOrientationBox;
@@ -33,10 +35,28 @@ public class DamageGUI : DimView
         startDialogBox();
     }
 
+    public void initialise(DamageModel damageModel)
+    {
+        if (_DamageInstance == null) _DamageInstance = damageModel;
+        startEditBox();
+    }
+
     public void startDialogBox()
     {
         // Generate the General Dialog Box
         Create(General_DialogBox);
+    }
+
+    public void startEditBox()
+    {
+        // Generate the Edit Dialog Box
+        if (_DamageInstance.hasContent)
+        {
+            Debug.Log("Image Damage Model Detected");
+            if (_DamageInstance.hasImage) Create(EditImage_DialogBox);
+            else Create(EditText_DialogBox);
+        }
+        else Create(EditText_DialogBox);
     }
 
     void Start()
@@ -74,7 +94,11 @@ public class DamageGUI : DimView
         Destroy(currentDialogBox);
         // Create next scene
         var NextDialogBox = Create(nextScene(nexGUI));
-        if (NextDialogBox == null) this.app.Notify(controller: controller, message: DimNotification.FinishEditDim, parameters: _DamageInstance);
+        if (NextDialogBox == null)
+        {
+            this.app.Notify(controller: controller, message: DimNotification.FinishEditDim, parameters: _DamageInstance);
+            Destroy(gameObject);
+        }
     }
 
     public void deFreezeScreen()
@@ -90,7 +114,11 @@ public class DamageGUI : DimView
 
     public void FeedIn3DImage(GameObject gmObj)
     {
-        if (_DialogBox != null) (_DialogBox as InputImageDialogBox).FeedIn3DImage(gmObj);
+        if (_DialogBox != null)
+        {
+            if (_DialogBox is InputImageDialogBox) (_DialogBox as InputImageDialogBox).FeedIn3DImage(gmObj);
+            if (_DialogBox is EditImageDialogBox) (_DialogBox as EditImageDialogBox).FeedIn3DImage(gmObj);
+        }
     }
 
     public GameObject Create2DImage()
@@ -142,7 +170,7 @@ public class DamageGUI : DimView
                 break;
 
             case DimNotification.Next_RefLoacationOperation:
-                previousDialogBox = SurfaceBuilder;
+                previousDialogBox = InputImage_DialogBox;
                 return PlaneOrientationBox;
                 break;
 
@@ -156,6 +184,11 @@ public class DamageGUI : DimView
                 return InputText_DialogBox;
                 break;
 
+            case DimNotification.Next_EditTextOperation:
+                previousDialogBox = EditText_DialogBox;
+                return InputText_DialogBox;
+                break;
+
             case DimNotification.Next_OrienatationOperation:
                 return null;
                 break;
@@ -165,6 +198,20 @@ public class DamageGUI : DimView
                 break;
 
             case DimNotification.Finish_TextOperation:
+                return null;
+                break;
+
+            case DimNotification.Edit_Non3DLocationOperation:
+                previousDialogBox = EditImage_DialogBox;
+                return PlaneOrientationBox;
+                break;
+
+            case DimNotification.Edit_3DLocationOperation:
+                previousDialogBox = EditImage_DialogBox;
+                return SurfaceBuilder;
+                break;
+
+            case DimNotification.Finish_EditOperation:
                 return null;
                 break;
         }

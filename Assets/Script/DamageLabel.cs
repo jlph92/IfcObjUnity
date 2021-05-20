@@ -49,7 +49,12 @@ public class DamageLabel : MonoBehaviour
 
     void ToggleValueChanged()
     {
-        if (toggleBtn.isOn) _DamageModel.showImage();
+        if (toggleBtn.isOn)
+        {
+            _DamageModel.showImage();
+            _DamageModel.OnSelected(System.EventArgs.Empty);
+        }
+           
         else _DamageModel.hideImage();
     }
 

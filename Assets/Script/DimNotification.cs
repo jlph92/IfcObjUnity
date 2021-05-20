@@ -16,6 +16,9 @@ public class DimNotification
     // End Session with IFC file
     public const string UnloadIFCFile = "Unload.IFC.File";
 
+    // Write Ifc Triggered
+    public const string WriteIFCFile = "Write.IFC.FIle";
+
     // Load Ifc data
     public const string IfcLoaded = "IFC.Data.Loaded"; // Load in Data and update Ifc Tree View
     public const string OverwriteIFCFile = "Overwrite.IFC.FIle";
@@ -87,9 +90,13 @@ public class DimNotification
     public const string Next_OrienatationOperation = "Next.Orienatation.Operation";
     public const string Next_PlaneOrienatationOperation = "Next.Plane.Orienatation.Operation";
     public const string Finish_TextOperation = "Finish.Text.Operation";
+    public const string Edit_Non3DLocationOperation = "Edit.Non.3D.Location.Operation";
+    public const string Edit_3DLocationOperation = "Edit.3D.Location.Operation";
+    public const string Finish_EditOperation = "Finish.Edit.Operation";
 
     // Text Operation
     public const string Next_AddTextOperation = "Next.Add.Text.Operation";
+    public const string Next_EditTextOperation = "Next.Edit.Text.Operation";
 
     // Freeze & Unfreeze Viewer
     public const string FreezeScreen = "Freeze.Screen";

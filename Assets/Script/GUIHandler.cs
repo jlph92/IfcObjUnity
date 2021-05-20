@@ -5,6 +5,7 @@ using UnityEngine;
 public class GUIHandler : DimController
 {
     private IfcModel ifcModel;
+    private DamageModel damageModel;
 
     public event DimBuilt OnDimBuilt;
     public delegate void DimBuilt (DamageModel _DamageInstance);
@@ -14,11 +15,17 @@ public class GUIHandler : DimController
         this.ifcModel = ifcModel;
     }
 
+    public GUIHandler(CoreApplication app, DamageModel damageModel) : base(app)
+    {
+        this.damageModel = damageModel;
+    }
+
     public void setView(DimView UIView)
     {
         UnityEngine.Debug.Log("GUI View is set.");
         this.view = UIView;
-        (this.view as DamageGUI).initialise(this.ifcModel);
+        if (this.ifcModel != null) (this.view as DamageGUI).initialise(this.ifcModel);
+        if (this.damageModel != null) (this.view as DamageGUI).initialise(this.damageModel);
     }
 
     public override void notify(string message, params object[] parameters)

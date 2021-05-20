@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 using Xbim.Common;
 using SFB;
@@ -33,7 +34,7 @@ public class IFCDataProperty
                 var pSet in
                     asIfcObject.IsDefinedBy.Select(
                         relDef => relDef.RelatingPropertyDefinition as IIfcPropertySet)
-                )
+            )
             {
                 AddPropertySet(pSet);
             }
@@ -91,7 +92,8 @@ public class IFCDataProperty
             IfcLabel = item.EntityLabel,
             PropertySetName = groupName,
             Name = item.Name,
-            Value = val
+            Value = val,
+            IfcValueType = nomVal.UnderlyingSystemType
         });
     }
 
@@ -160,5 +162,26 @@ public class PropertyItem
     public string ToString()
     {
         return System.String.Format("{0}: {1}", this.Name, this.Value);
+    }
+
+    public IIfcProperty DIM2IfcProperty (IfcStore model)
+    {
+        var property = new Create(model).PropertySingleValue(p =>
+        {
+            p.Name = new Xbim.Ifc4.MeasureResource.IfcIdentifier(this.Name);
+        });
+
+        UnityEngine.Debug.LogFormat("Property Name: {0}, Property type: {1}", this.Name, this.IfcValueType.FullName);
+
+        try
+        {
+            property.NominalValue = Activator.CreateInstance(this.IfcValueType, this.Value) as Xbim.Ifc4.MeasureResource.IfcValue;
+        }
+        catch (Exception e)
+        {
+            property.NominalValue = Activator.CreateInstance(this.IfcValueType) as Xbim.Ifc4.MeasureResource.IfcValue;
+        }
+
+        return property;
     }
 }

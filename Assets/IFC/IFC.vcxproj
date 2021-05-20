@@ -141,6 +141,8 @@
     <None Include="..\Script\DimNotification.cs" />
     <None Include="..\Script\DragMouseOrbit.cs" />
     <None Include="..\Script\EdgeRT.cs" />
+    <None Include="..\Script\EditImageDialogBox.cs" />
+    <None Include="..\Script\EditTextDialogBox.cs" />
     <None Include="..\Script\ExternalDocumentLoaderFactory.cs" />
     <None Include="..\Script\ExternalFile.cs" />
     <None Include="..\Script\ExternalMetaData.cs" />

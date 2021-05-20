@@ -44,6 +44,7 @@ public class InputTextDialogBox : DialogBox
         OptionBox.onValueChanged.AddListener(delegate { setIfcType(); });
 
         Done_Btn.interactable = false;
+        _IfcValueType = DamageModel.IfcValueType(0);
     }
 
     void back()
@@ -56,6 +57,7 @@ public class InputTextDialogBox : DialogBox
         };
 
         _DamageInstance.AddProperty(newProperty);
+
         // Retrun to Properties Box
         DoneOperation(DimNotification.Back_Operation);
     }

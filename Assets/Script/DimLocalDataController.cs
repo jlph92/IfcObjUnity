@@ -4,6 +4,7 @@ public class DimLocalDataController : DimController
 {
     GameObject ctrlGameObject;
     string filePath;
+    private IFCProvider ifcProvider;
 
     public DimLocalDataController(CoreApplication app, GameObject ctrlGameObject) : base(app)
     {
@@ -26,6 +27,10 @@ public class DimLocalDataController : DimController
             case DimNotification.CreateIFCInterface:
                 CreateIfcInterface(parameters[0] as System.String);
                 break;
+
+            case DimNotification.WriteIFCFile:
+                writeIfcfile();
+                break;
         }
     }
 
@@ -41,7 +46,12 @@ public class DimLocalDataController : DimController
 
     void CreateIfcInterface(string filePath)
     {
-        IFCProvider ifcProvider = new IFCProvider(app, filePath, this.view);
+        ifcProvider = new IFCProvider(app, filePath, this.view);
+    }
+
+    void writeIfcfile()
+    {
+        this.app.Notify(controller: ifcProvider, message: DimNotification.OverwriteIFCFile, parameters: null);
     }
 
 }

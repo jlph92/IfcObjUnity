@@ -9,18 +9,18 @@ public class DialogBox : MonoBehaviour
     public GameObject Cancel_Button;
 
     // Abort Button
-    private Button CancelBtn;
+    protected Button CancelBtn;
 
     protected DimView _DamageGUI;
     protected DamageModel _DamageInstance;
 
-    void writeLabel(string ProductLabelText)
+    protected void writeLabel(string ProductLabelText)
     {
         Text text = getText(ProductLabel);
         text.text = ProductLabelText;
     }
 
-    public void assignBox(DamageModel _DamageInstance, DimView _DamageGUI)
+    public virtual void assignBox(DamageModel _DamageInstance, DimView _DamageGUI)
     {
         this._DamageInstance = _DamageInstance;
         this._DamageGUI = _DamageGUI;

@@ -49,7 +49,9 @@ public class IFCDataEntity : DimModel
 // Ifc wrapper data model for entity model
 public class IfcModel
 {
+    public bool isOriginal { get; private set; }
     private bool has_Geometry = false;
+    public bool is_bind = false;
 
     private string EntityName;
     private string EntityDescription;
@@ -72,13 +74,14 @@ public class IfcModel
     {
         this.Ifc_Entity = Ifc_Entity;
         Ifc_Semantic = IFCDataProperty.GetProperties(Ifc_Entity.Entity);
+        this.isOriginal = true;
 
         LazyLoadAll(this);
     }
 
     public IfcModel()
     {
-
+        Ifc_Semantic = new List<PropertyItem>();
     }
 
     private void LazyLoadAll(IfcModel parent)
@@ -90,6 +93,7 @@ public class IfcModel
 
         foreach (var child in children)
         {
+            child.isOriginal = true;
             child.Parent = parent;
         }
     }
@@ -166,6 +170,16 @@ public class IfcModel
     public List<PropertyItem> Properties
     {
         get { return Ifc_Semantic; }
+    }
+
+    public void AddProperty(PropertyItem propertyItem)
+    {
+        Ifc_Semantic.Add(propertyItem);
+    }
+
+    public void RemoveProperty(PropertyItem propertyItem)
+    {
+        Ifc_Semantic.Remove(propertyItem);
     }
 
     public IfcModel Parent { get; private set; }

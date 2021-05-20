@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using UnityEngine;
 using Xbim.Common;
@@ -25,51 +26,46 @@ public class DamageDataEntity : DimModel
     {
         if (filePath.Length != 0)
         {
-            using (var model = IfcStore.Open(filePath))
-            {
-                DamageViewModel damageViewModel = setup(model);
-                this.app.Notify(controller: controller, message: DimNotification.DamageLoaded, parameters: damageViewModel);
-            }
+            DamageViewModel damageViewModel = new DamageViewModel(ifcModel, filePath);
+            this.app.Notify(controller: controller, message: DimNotification.DamageLoaded, parameters: damageViewModel);
         }
-    }
-
-    protected virtual DamageViewModel setup(IfcStore Model)
-    {
-        // Filter damage entities
-        var Damages = Model.Instances.OfType<IIfcRelDefinesByType>()
-            .Where(dmg => dmg.RelatingType.ApplicableOccurrence.HasValue)
-            .Where(dmg => dmg.RelatingType.ApplicableOccurrence.Value.Equals("IfcProxy/Defect"))
-            .GroupBy(dmg => dmg.RelatingType as IIfcTypeObject,
-            (dmgType, dmgObj) => new DamageGroupModel
-            (
-                ObjectType: dmgType,
-                EntityLabels: dmgObj.SelectMany(dmg => dmg.RelatedObjects.Select(itm => itm.EntityLabel)
-            )
-            ))
-            .ToList<DamageGroupModel>();
-        
-        // Initialise Damage View Model
-        DamageViewModel damageViewModel = new DamageViewModel(ifcModel);
-        if (Damages.Count > 0) damageViewModel.AddTypes(Damages);
-
-        return damageViewModel;
     }
 }
 
 public class DamageGroupModel
 {
     IIfcTypeObject ObjectType;
+    List<IIfcRelDefinesByType> RelDefinesByTypes;
     IEnumerable<int> EntityLabels;
 
-    public DamageGroupModel(IIfcTypeObject ObjectType, IEnumerable<int> EntityLabels)
+    public DamageGroupModel(IIfcTypeObject ObjectType)
     {
         this.ObjectType = ObjectType;
+        this.RelDefinesByTypes = this.ObjectType.Types
+            .ToList<IIfcRelDefinesByType>();
+
+        if (RelDefinesByTypes != null)
+        {
+            foreach (var RelDefinesByType in RelDefinesByTypes)
+            {
+                var _EntityLabels = RelDefinesByType.RelatedObjects
+                    .Select(dmg => dmg.EntityLabel);
+
+                if (EntityLabels == null) EntityLabels = _EntityLabels;
+                else EntityLabels.Concat(_EntityLabels);
+            }
         this.EntityLabels = EntityLabels;
+        }
     }
 
     public IIfcTypeObject TypeObject
     {
         get {  return ObjectType; }
+    }
+
+    public IIfcRelDefinesByType ByTypesRelDefines
+    {
+        get { return RelDefinesByTypes.First(); }
     }
 
     public List<int> Items
@@ -83,12 +79,31 @@ public class DamageGroupModel
 public class DamageViewModel
 {
     private IfcModel rootModel;
+    private string filePath;
+    // Existing Damage Types
     private ObservableCollection<DamageModel> damageTypes = new ObservableCollection<DamageModel>();
 
-    public DamageViewModel(IfcModel rootModel)
+    public DamageViewModel(IfcModel rootModel, string filePath)
     {
         this.rootModel = rootModel;
+        this.filePath = filePath;
+        setup();
         damageTypes.CollectionChanged += damageTypesUpdate;
+    }
+
+    protected void setup()
+    {
+        using (var Model = IfcStore.Open(filePath))
+        {
+            // Filter damage entities
+            var Damages = Model.Instances.OfType<IIfcTypeObject>()
+                .Where(dmg => dmg.ApplicableOccurrence.HasValue)
+                .Where(dmg => dmg.ApplicableOccurrence.Value.Equals("IfcProxy/Defect"))
+                .Select(dmg => new DamageGroupModel(dmg))
+                .ToList<DamageGroupModel>();
+
+            if (Damages.Count > 0) this.AddTypes(Damages);
+        }
     }
 
     private void damageTypesUpdate(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -124,15 +139,249 @@ public class DamageViewModel
             damageTypes.Add(new DamageType(damageModel));
         }
     }
+
+    public void writeIfcFIle()
+    {
+        string file = System.IO.Path.GetFileNameWithoutExtension(filePath);
+        string NewPath = filePath.Replace(file, file + "-Edit");
+
+        var editor = new XbimEditorCredentials
+        {
+            ApplicationDevelopersName = "Jason Viewer",
+            ApplicationFullName = "xbim toolkit",
+            ApplicationIdentifier = "xbim",
+            ApplicationVersion = "4.0",
+            EditorsFamilyName = "Lai",
+            EditorsGivenName = "Jason Poh Hwa",
+            EditorsOrganisationName = "ITD"
+        };
+
+        using (var model = IfcStore.Open(filePath, editor))
+        {
+            using (var txn = model.BeginTransaction("Add in Proxy"))
+            {
+
+                foreach (var damageType in damageTypes)
+                {
+                    if (damageType.ObjectType == null)
+                    {
+                        damageType.ObjectType = new Create(model).TypeObject(p =>
+                        {
+                            p.GlobalId = System.Guid.NewGuid();
+                            p.Name = new Xbim.Ifc4.MeasureResource.IfcLabel(damageType.Name);
+                            p.ApplicableOccurrence = new Xbim.Ifc4.MeasureResource.IfcIdentifier("IfcProxy/Defect");
+                        });
+
+                        //create relationship between proxy and ObjectType
+                        damageType.ByTypesRelDefines = new Create(model).RelDefinesByType(r =>
+                        {
+                            r.GlobalId = System.Guid.NewGuid();
+                            r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage type");
+                            r.Description = new Xbim.Ifc4.MeasureResource.IfcText("Typification of a defect");
+                            // r.RelatedObjects.Add(_proxy);
+                            if (damageType.ObjectType != null) r.RelatingType = damageType.ObjectType;
+                        });
+                    }
+
+                    else
+                    {
+                        // Referesh to current version of model
+                        damageType.ObjectType = model.Instances.OfType<IIfcTypeObject>()
+                                    .Single(dmg => dmg.EntityLabel == damageType.EntityLabel);
+
+                        damageType.ByTypesRelDefines = model.Instances.OfType<IIfcRelDefinesByType>()
+                                    .Single(dmg => dmg.EntityLabel == damageType.ByTypesRelDefines.EntityLabel);
+                    }
+
+                    // The product attached to Type
+                    foreach (var damageInstance in damageType.Children)
+                    {
+                        if (damageInstance.isOriginal)
+                        {
+                            damageType.ObjectType = model.Instances.OfType<IIfcTypeObject>()
+                                    .Single(dmg => dmg.EntityLabel == damageType.EntityLabel);
+                        }
+
+                        else
+                        {
+                            var _proxy = new Create(model).BuildingElementProxy( p =>
+                            {
+                                p.GlobalId = System.Guid.NewGuid();
+                                p.Name = new Xbim.Ifc4.MeasureResource.IfcLabel(damageInstance.Name4Ifc);
+                                p.Description = new Xbim.Ifc4.MeasureResource.IfcText(damageInstance.Description);
+                                p.ObjectPlacement = getAttachedPlacement(model, damageInstance);
+                            });
+
+
+                            //create relationship between proxy and ifcProduct
+
+                            // Check if Parent already has relationship
+                            var ParentEntity = getAttachedProduct(model, damageInstance);
+
+                            if (ParentEntity != null)
+                            {
+                                var _RelAggrates = (ParentEntity as IIfcObject).IsDecomposedBy
+                                        .OfType<IIfcRelAggregates>()
+                                        .Where(dmg => dmg.Name.HasValue)
+                                        .Single(dmg => (dmg.Name.Value.Value as string) == "Damage to product");
+
+                                if (_RelAggrates != null) _RelAggrates.RelatedObjects.Add(_proxy);
+                            }
+
+                            else
+                            {
+                                var _RelAggrates = new Create(model).RelAggregates(r =>
+                                {
+                                    r.GlobalId = System.Guid.NewGuid();
+                                    r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Damage to product");
+                                    r.Description = new Xbim.Ifc4.MeasureResource.IfcText("The related product is damaged");
+                                    r.RelatingObject = ParentEntity;
+                                    r.RelatedObjects.Add(_proxy);
+                                });
+                            }
+
+                            damageType.ByTypesRelDefines.RelatedObjects.Add(_proxy);
+
+                            if (damageInstance.Entity == null)
+                            {
+                                damageInstance.IfcProperties = new Create(model).PropertySet(pset =>
+                                {
+                                    pset.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Pset_Condition");
+                                });
+
+                                var RefRelationProperties = new Create(model).RelDefinesByProperties(rel =>
+                                {
+                                    rel.GlobalId = System.Guid.NewGuid();
+                                    rel.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect Measurements");
+                                    rel.Description = new Xbim.Ifc4.MeasureResource.IfcText("Property parameters for Defect");
+
+                                    rel.RelatedObjects.Add(_proxy);
+                                    rel.RelatingPropertyDefinition = damageInstance.IfcProperties;
+                                });
+                            }
+
+                            if (damageInstance.hasContent)
+                            {
+                                if (damageInstance.hasImage)
+                                {
+                                    //create reference document metaData
+                                    var _docInformation = new Create(model).DocumentInformation(r =>
+                                    {
+                                        r.Identification = new Xbim.Ifc4.MeasureResource.IfcIdentifier(System.Guid.NewGuid().ToString());
+                                        r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("MetaData");
+                                        r.Description = new Xbim.Ifc4.MeasureResource.IfcText("Associate information for image file.");
+                                        r.Purpose = new Xbim.Ifc4.MeasureResource.IfcText("For external reference if any.");
+                                        r.Location = new Xbim.Ifc4.ExternalReferenceResource.IfcURIReference(damageInstance.ImageMetaLocation);
+                                        r.ElectronicFormat = new Xbim.Ifc4.MeasureResource.IfcIdentifier("Stl");
+                                    });
+
+                                    // create reference document
+                                    // build based on meta data information
+                                    var _imagePropertySet = new Create(model).PropertySet(pset =>
+                                    {
+                                        pset.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Image Properties");
+
+                                        foreach (var property in damageInstance.ImageProperties)
+                                            pset.HasProperties.Add(property.DIM2IfcProperty(model));
+                                    });
+
+                                    //create reference document
+                                    var _docReference = new Create(model).DocumentReference(r =>
+                                    {
+                                        r.Location = new Xbim.Ifc4.ExternalReferenceResource.IfcURIReference(damageInstance.ImageLocation);
+                                        r.Identification = new Xbim.Ifc4.MeasureResource.IfcIdentifier(System.Guid.NewGuid().ToString());
+                                        r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel(damageInstance.ImageName);
+                                        r.Description = new Xbim.Ifc4.MeasureResource.IfcText(damageInstance.ImageDescription);
+                                        r.ReferencedDocument = _docInformation;
+                                    });
+
+                                    //create relationship between proxy and external source
+                                    var _relAssociateDoc = new Create(model).RelAssociatesDocument(r =>
+                                    {
+                                        r.GlobalId = System.Guid.NewGuid();
+                                        r.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Related Parameters");
+                                        r.Description = new Xbim.Ifc4.MeasureResource.IfcText("Connect related parameters for the reference document.");
+                                        r.RelatedObjects.Add(_proxy);
+                                        r.RelatedObjects.Add(_imagePropertySet);
+                                        r.RelatingDocument = _docReference;
+                                    });
+                                }
+                            }
+                        }
+
+                        var _properties = damageInstance.IfcProperties.HasProperties;
+                        _properties.Clear();
+
+                        foreach (var property in damageInstance.Properties)
+                            _properties.Add(property.DIM2IfcProperty(model));
+                    }
+                }
+
+                //commit changes
+                txn.Commit();
+            }
+
+            model.SaveAs(NewPath);
+        }
+    }
+
+    IIfcObjectDefinition getAttachedProduct(IfcStore model, DamageModel damageInstance)
+    {
+        var ProductLabel = damageInstance.IfcParent.EntityLabel;
+        var AttachedProduct = model.Instances.FirstOrDefault<IIfcObjectDefinition>(d => d.EntityLabel == ProductLabel);
+        Debug.Log(AttachedProduct.Name);
+
+        return AttachedProduct;
+    }
+
+    IIfcObjectPlacement getAttachedPlacement(IfcStore model, DamageModel damageInstance)
+    {
+        var ProductLabel = damageInstance.IfcParent.EntityLabel;
+        var AttachedProduct = model.Instances.FirstOrDefault<IIfcProduct>(d => d.EntityLabel == ProductLabel);
+        Debug.Log(AttachedProduct.Name);
+
+        return AttachedProduct.ObjectPlacement;
+    }
 }
 
 public class DamageModel
 {
+    public event System.EventHandler OnSelectChanged; // event
+
+    public void OnSelected(System.EventArgs e) //protected virtual method
+    {
+        OnSelectChanged?.Invoke(this, e);
+    }
+
+    public virtual DamageModel Parent { get; }
+
+    public IIfcRelDefinesByType ByTypesRelDefines { get; set; }
+
     protected List<DamageModel> children = new List<DamageModel>();
 
     protected DamageModel() { }
 
     public DamageTypes DefectType { get; set; }
+
+    public virtual IfcModel IfcParent { get; }
+
+    public virtual IXbimViewModel Entity { get; }
+
+    public IIfcPropertySet IfcProperties { get; set; }
+
+    public int DefectTypeOption
+    {
+        get
+        {
+            List<DamageTypes> damageTypes = System.Enum.GetValues(typeof(DamageTypes))
+                .Cast<DamageTypes>()
+                .ToList();
+            Debug.LogFormat("Type of {0} is {1}", this.Name, this.DefectType.ToString());
+            return damageTypes.IndexOf(DefectType);
+        }
+    }
+
+    public IIfcTypeObject ObjectType { get; set; }
 
     public static List<string> DamageTypes
     {
@@ -180,6 +429,10 @@ public class DamageModel
         get { return null; }
     }
 
+    public virtual bool isOriginal { get; }
+
+    public virtual string Name4Ifc { get; }
+
     public virtual string Name { get; set; }
 
     public virtual string Description { get; set; }
@@ -195,17 +448,7 @@ public class DamageModel
         get { return 0; }
     }
 
-    public virtual IXbimViewModel Entity
-    {
-        get { return null; }
-    }
-
     public virtual List<PropertyItem> Properties
-    {
-        get { return null; }
-    }
-
-    public virtual List<PropertyItem> NewProperties
     {
         get { return null; }
     }
@@ -230,10 +473,29 @@ public class DamageModel
         get { return ImageType.Dummy; }
     }
 
+    public virtual string updateImageURL { set; get; }
+
     public virtual string ImageName
     {
         get { return System.String.Empty; }
     }
+
+    public virtual string ImageDescription
+    {
+        get { return System.String.Empty; }
+    }
+
+    public virtual string ImageMetaLocation { get; }
+
+    public virtual List<PropertyItem> ImageProperties { get; }
+
+    public virtual string ImageUrl { get; }
+
+    public virtual bool hasContent { get; }
+
+    public virtual bool hasImage { get; }
+
+    public virtual string ImageLocation { get; }
 
     public virtual GameObject ImageObject { get; set; }
 
@@ -277,18 +539,30 @@ public enum DamageTypes
 public class DamageType : DamageModel
 {
     private IfcModel rootModel;
-    private IIfcTypeObject ObjectType;
 
     // Properties for Damage Types
     private List<PropertyItem> TypeProperties = new List<PropertyItem>();
+
+    public override int EntityLabel
+    {
+        get { return this.ObjectType.EntityLabel; }
+    }
+
+    private bool _IsTypeOriginal;
+
+    public override bool isOriginal
+    {
+        get { return _IsTypeOriginal; }
+    }
 
     private ObservableCollection<DamageModel> damageModels = new ObservableCollection<DamageModel>();
 
     public DamageType(DamageGroupModel damageGroupModel, IfcModel rootModel) : base()
     {
+        this._IsTypeOriginal = true;
         this.ObjectType = damageGroupModel.TypeObject;
+        this.ByTypesRelDefines = damageGroupModel.ByTypesRelDefines;
         this.rootModel = rootModel;
-        this.Add(damageGroupModel.Items);
 
         if (ObjectType.Name.HasValue)
         {
@@ -301,6 +575,7 @@ public class DamageType : DamageModel
                 var elementType = m.Value;
                 // Debug.LogFormat("Damage Type Registered: {0}", elementType);
                 this.DefectType = (DamageTypes)System.Enum.Parse(typeof(DamageTypes), elementType, true);
+                Debug.LogFormat("********* Type {0} created. ************", this.DefectType.ToString());
             } 
         }
 
@@ -310,6 +585,9 @@ public class DamageType : DamageModel
             Name = "Description",
             Value = this.Description
         });
+
+        // Put in children Damage Model
+        this.Add(damageGroupModel.Items);
 
         damageModels.CollectionChanged += damageModelsUpdate;
     }
@@ -347,12 +625,33 @@ public class DamageType : DamageModel
         IfcModel damageModel = IfcModel.getIfcModel(rootModel, EntityLabel);
 
         if (damageModel != null)
-            damageModels.Add(new DamageInstance(damageModel));
+        {
+            var damageInstance = new DamageInstance(damageModel);
+
+            Debug.LogFormat("Damage Model: {0}, Type: {1}", damageInstance.Name, this.DefectType.ToString());
+
+            damageInstance.DefectType = this.DefectType;
+            damageModels.Add(damageInstance);
+            damageInstance.DamageTypeObject = this;
+        }   
     }
 
     public void Add(DamageModel _DamageInstance)
     {
-        damageModels.Add(_DamageInstance);
+        // Set Type Object
+        if (_DamageInstance is DamageInstance)
+            (_DamageInstance as DamageInstance).DamageTypeObject = this;
+
+        // Check if list duplicate Object
+        // Compare with main List
+        if (damageModels.Contains(_DamageInstance)) return;
+        else damageModels.Add(_DamageInstance);
+    }
+
+    public void Remove(DamageModel _DamageInstance)
+    {
+        Debug.LogFormat("Type {0} remove {1}", this.DefectType.ToString(), _DamageInstance.Name);
+        damageModels.Remove(_DamageInstance);
     }
 
     public override string Name
@@ -370,22 +669,13 @@ public class DamageType : DamageModel
                 return TypeName;
             }
 
-            return "Undefined";
+            return "< Missing >";
         }
     }
 
     public override GameObject DefectLabelObject
     {
         get { return null; }
-    }
-
-    public override int EntityLabel
-    {
-        get
-        {
-            if (ObjectType != null) return ObjectType.EntityLabel;
-            else return 1;
-        }
     }
 
     private string Description
@@ -395,7 +685,7 @@ public class DamageType : DamageModel
             if (ObjectType.Description.HasValue)
                 return ObjectType.Description.Value.Value as string;
 
-            else return "Undefined";
+            else return "< Missing >";
         }
     }
 
@@ -413,6 +703,41 @@ public class DamageType : DamageModel
 // Damage Model wrap around IFC model
 public class DamageInstance : DamageModel
 {
+    // Damage Type of instances
+    DamageType _DamageTypeObject;
+
+    // If the damage is bind with Tree Item
+    public bool is_bind = false;
+    
+
+    public DamageType DamageTypeObject
+    {
+        set
+        {
+            if (_DamageTypeObject == null) _DamageTypeObject = value;
+            else if (_DamageTypeObject != value)
+            {
+                _DamageTypeObject.Remove(this);
+                _DamageTypeObject = value;
+            }
+        }
+    }
+
+    public override DamageModel Parent
+    {
+        get { return _DamageTypeObject; }
+    }
+
+    public override IfcModel IfcParent
+    {
+        get { return this.ifcModel.Parent; }
+    }
+
+    public override IXbimViewModel Entity
+    {
+        get { return this.ifcModel.Entity; }
+    }
+
     private bool writable = true;
 
     private GameObject Damage_Geometry;
@@ -421,9 +746,27 @@ public class DamageInstance : DamageModel
 
     private IfcModel ifcModel;
 
+    public override bool isOriginal
+    {
+        get { return ifcModel.isOriginal; }
+    }
+
     public DamageInstance(IfcModel ifcModel): base()
     {
         this.ifcModel = ifcModel;
+
+        if (Entity != null)
+        {
+            var _IfcObject = Entity.Entity;
+            if (_IfcObject is IIfcObject)
+            {
+                var asIfcObject = _IfcObject as IIfcObject;
+
+                this.IfcProperties = asIfcObject.IsDefinedBy
+                    .Select(relDef => relDef.RelatingPropertyDefinition as IIfcPropertySet)
+                    .Single(relDef => relDef != null);
+            }
+        }
     }
 
     public static DamageInstance CreateInstance(IfcModel ifcModel)
@@ -444,9 +787,18 @@ public class DamageInstance : DamageModel
         get { return Damage_Geometry; }
     }
 
-    public override string Name
+    public override string Name4Ifc
     {
         get { return ifcModel.Name; }
+    }
+
+    public override string Name
+    {
+        get
+        {
+            if (isOriginal) return ifcModel.Name;
+            else return ifcModel.Name + " [Edit]";
+        }
 
         set { ifcModel.Name = value; }
     }
@@ -495,24 +847,14 @@ public class DamageInstance : DamageModel
         get { return ifcModel.EntityLabel; }
     }
 
-    public override IXbimViewModel Entity
-    {
-        get { return ifcModel.Entity; }
-    }
-
     public override List<PropertyItem> Properties
-    {
-        get { return ifcModel.Properties; }
-    }
-
-    public override List<PropertyItem> NewProperties
     {
         get
         {
             if (_DamageContent != null)
                 return _DamageContent.Properties;
 
-            else return null;
+            else return ifcModel.Properties;
         }
     }
 
@@ -535,8 +877,31 @@ public class DamageInstance : DamageModel
                 var _DamageImage = _DamageContent as DamageImage;
                 return _DamageImage.imageName;
             }
-            else return System.String.Empty;
+            else return "< Missing >";
         }
+    }
+
+    public override string ImageDescription
+    {
+        get
+        {
+            if (_DamageContent != null)
+            {
+                var _DamageImage = _DamageContent as DamageImage;
+                return _DamageImage.imageDescription;
+            }
+            else return "< Missing >";
+        }
+    }
+
+    public override bool hasContent
+    {
+        get { return _DamageContent != null; }
+    }
+
+    public override bool hasImage
+    {
+        get { return _DamageContent is DamageImage; }
     }
 
     public override GameObject ImageObject
@@ -545,8 +910,12 @@ public class DamageInstance : DamageModel
         {
             if (_DamageContent != null)
             {
-                var _DamageImage = _DamageContent as DamageImage;
-                return _DamageImage.imageObject;
+                if (_DamageContent is DamageImage)
+                {
+                    var _DamageImage = _DamageContent as DamageImage;
+                    return _DamageImage.imageObject;
+                }
+                else return null;
             }
             else return null;
         }
@@ -576,9 +945,69 @@ public class DamageInstance : DamageModel
         if (_DamageContent != null)
         {
             var _DamageImage = _DamageContent as DamageImage;
-            _DamageImage.imageName = ImageName;
-            _DamageImage.imageDescription = ImageDescription;
-            _DamageImage.imageURL = ImageURL;
+
+            if (_DamageImage.imageName == null) _DamageImage.imageName = ImageName;
+            if (_DamageImage.imageDescription == null) _DamageImage.imageDescription = ImageDescription;
+            if (_DamageImage.imageURL == null) _DamageImage.imageURL = ImageURL;
+        }
+    }
+
+    public override string ImageMetaLocation
+    {
+        get
+        {
+            if (_DamageContent != null)
+            {
+                var _DamageImage = _DamageContent as DamageImage;
+
+                if (_DamageImage.imageMetaURL != null)
+                {
+                    return _DamageImage.imageMetaURL;
+                }
+
+                else return "< Missing >";
+            }
+
+            else return "< Missing >";
+        }
+    }
+
+    public override string ImageLocation
+    {
+        get
+        {
+            if (_DamageContent != null)
+            {
+                var _DamageImage = _DamageContent as DamageImage;
+                return _DamageImage.imageURL;
+            } 
+
+            else return "< Missing >";
+        }
+    }
+
+    public override string updateImageURL
+    {
+        set
+        {
+            var _DamageImage = _DamageContent as DamageImage;
+
+            if (string.Compare(_DamageImage.imageURL, value) != 1)
+                _DamageImage.imageURL = value;
+        }
+    }
+
+    public override List<PropertyItem> ImageProperties
+    {
+        get
+        {
+            if (_DamageContent != null)
+            {
+                return _DamageContent.ImageProperties;
+                
+            }
+
+            else return null;
         }
     }
 
@@ -591,15 +1020,17 @@ public class DamageInstance : DamageModel
                 if (_DamageContent is DamageImage)
                 {
                     var _DamageImage = _DamageContent as DamageImage;
-                    return _DamageImage.imageOrigin;
+                    return _DamageImage.Location;
                 }
 
                 else
                 {
                     return ifcModel.Parent.position;
-                }               
+                }
             }
+
             else return Vector3.one;
+            
         }
 
         set
@@ -607,8 +1038,8 @@ public class DamageInstance : DamageModel
             if (_DamageContent != null)
             {
                 var _DamageImage = _DamageContent as DamageImage;
-                _DamageImage.imageOrigin = value;
-                Debug.LogFormat("Image Origin {0} is written.", _DamageImage.imageOrigin);
+                _DamageImage.Location = value;
+                Debug.LogFormat("Image Origin {0} is written.", _DamageImage.Location);
             }
         }
     }
@@ -653,6 +1084,11 @@ public class DamageInstance : DamageModel
     public override void AddProperty(PropertyItem property)
     {
         if (_DamageContent != null) _DamageContent.AddProperty(property);
+        else
+        {
+            _DamageContent = new DamageText(ifcModel);
+            _DamageContent.AddProperty(property);
+        }
     }
 
     public override Texture2D Image2D
@@ -684,11 +1120,42 @@ public class DamageContent
     protected IfcModel ifcModel;
 
     // List of new text properties
-    protected List<PropertyItem> NewProperties = new List<PropertyItem>();
+    protected ObservableCollection<PropertyItem> NewProperties;
+
+    // List for image properties only
+    public virtual List<PropertyItem> ImageProperties { get; }
 
     public DamageContent(IfcModel ifcModel)
     {
         this.ifcModel = ifcModel;
+        NewProperties = new ObservableCollection<PropertyItem>(this.ifcModel.Properties);
+
+        foreach (var property in NewProperties)
+            Debug.Log(property.ToString());
+
+        NewProperties.CollectionChanged += OnPropertyChanged;
+    }
+
+    void OnPropertyChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+        
+        if (e.Action == NotifyCollectionChangedAction.Add)
+        {
+            foreach (PropertyItem addProperty in e.NewItems)
+            {
+                Debug.LogFormat("Property Added: {0}", addProperty.ToString());
+                this.ifcModel.AddProperty(addProperty);
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Remove)
+        {
+            foreach (PropertyItem removeProperty in e.OldItems)
+            {
+                Debug.LogFormat("Property Removed: {0}", removeProperty.ToString());
+                this.ifcModel.RemoveProperty(removeProperty);
+            }
+        }
     }
 
     public virtual string[] ContentTypes
@@ -708,10 +1175,14 @@ public class DamageContent
 
     public List<PropertyItem> Properties
     {
-        get { return NewProperties; }
+        get { return new List<PropertyItem>(NewProperties); }
     }
 
-    public Texture2D image2D { get; }
+    public virtual List<PropertyItem> imageProperties { get; }
+
+    public virtual Texture2D image2D { get; }
+
+    public Vector3 Location { get; set; }
 }
 
 // Damage Content based on Material Image
@@ -721,12 +1192,37 @@ public class DamageImage: DamageContent
 
     public string imageName { get; set; }
     public string imageDescription { get; set; }
-    public string imageURL { get; set; }
-    public Vector3 imageOrigin { get; set; }
+
+    string _imageURL;
+    public string imageURL
+    {
+        get
+        {
+            if (_imageURL != null)
+                return _imageURL;
+            else
+                return "< Missing >";
+        }
+
+        set
+        {
+            _imageURL = value;
+            imageMetaURL = System.IO.Path.ChangeExtension(_imageURL, ".itd");
+        }
+    }
+
+    public string imageMetaURL { get; private set; }
+
     public Quaternion imageRotation { get; set; }
     public GameObject imageObject { get; set; }
+    
 
-    public Texture2D image2D
+    public override List<PropertyItem> imageProperties
+    {
+        get { return null; }
+    }
+
+    public override Texture2D image2D
     {
         get
         {

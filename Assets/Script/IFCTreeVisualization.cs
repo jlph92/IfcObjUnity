@@ -13,6 +13,7 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
 
     // Temporary store selectedItem
     protected IfcModel selectedItem = null;
+    protected bool fullyExpand = false;
 
     public IFCTreeVisualization(CoreApplication app, DimController controller) : base(app, controller)
     {
@@ -64,7 +65,11 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
     private void OnItemDataBinding(object sender, TreeViewItemDataBindingArgs e)
     {
         IfcModel dataItem = e.Item as IfcModel;
-        dataItem.OnSelectChanged += selectItem;
+        if (!dataItem.is_bind)
+        {
+            dataItem.OnSelectChanged += selectItem;
+            dataItem.is_bind = true;
+        }
 
         if (dataItem != null)
         {
@@ -91,14 +96,14 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
     /// <param name="e"></param>
     private void OnSelectionChanged(object sender, SelectionChangedArgs e)
     {
-
         if (e.NewItems.Length <= 0)
             return;
 
         var p = treeView.SelectedItem as IfcModel;
         var p2 = selectedItem;
 
-        
+        Debug.LogFormat("Current selected: {0}", p.Name);
+
         // Comparing if current_selected and prev_selected is similar
         if (p2 == null)
         {
@@ -148,13 +153,37 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
         //Explore children node
         IfcModel node = e.Item as IfcModel;
         e.Children = node.Children;
+
+        treeView.SelectedItem = node;
     }
 
     private void selectItem(object sender, System.EventArgs e)
     {
         var selectIfcModel = sender as IfcModel;
         Debug.LogFormat("{0} is selected.", selectIfcModel.Name);
-        if (treeView != null) treeView.SelectedItem = selectIfcModel;
+
+        if (treeView != null)
+        {
+            treeView.SelectedItem = selectIfcModel;
+            expandParent(selectIfcModel);
+            selectedItem = selectIfcModel;
+        }
+    }
+
+    private void expandParent(IfcModel selectIfcModel)
+    {
+        if (selectIfcModel.Parent != null)
+        {
+            //Debug.LogFormat("Expand Item {0}", selectIfcModel.Parent.Name);
+            var treeViewItem = treeView.GetTreeViewItem(selectIfcModel.Parent as object);
+            expandParent(selectIfcModel.Parent);
+
+            if (treeViewItem != null) treeViewItem.IsExpanded = true;
+        }
+        else
+        {
+            return;
+        }
     }
 
     void AddDamageData()
@@ -171,6 +200,7 @@ public class IFCTreeVisualization : DimView, IIFCDataVisualization
 
         //Bind data items
         treeView.Items = ifcItems;
+        treeView.AutoExpand = true;
     }
 
     void getProperty()

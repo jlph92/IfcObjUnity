@@ -153,16 +153,16 @@ public class IFCProvider : DimController
                 break;
 
             case DimNotification.EditDim:
-                //finishLoad(parameters[0] as OBJDataVisualization);
+                EditDamage(parameters[0] as DamageModel);
                 break;
 
             case DimNotification.FreezeScreen:
                 this.app.PauseViewControl();
                 break;
 
-            //case DimNotification.SelectItem:
-            //    SelectItem(parameters[0] as object);
-            //    break;
+            case DimNotification.OverwriteIFCFile:
+                writeIfc();
+                break;
         }
     }
 
@@ -258,6 +258,7 @@ public class IFCProvider : DimController
         UnityEngine.Debug.Log("Obj file adjust view.");
         _OBJDataVisualization.adjustView();
         hideLoadButton();
+        showCommitButton();
 
         storeVisualItems();
     }
@@ -344,6 +345,20 @@ public class IFCProvider : DimController
         guiHandler.OnDimBuilt += InvokeDamge;
     }
 
+    // Edit Damage manually 
+    void EditDamage(DamageModel damageModel)
+    {
+        this.app.Notify(controller: this, message: DimNotification.FreezeScreen, parameters: null);
+        GUIHandler guiHandler = new GUIHandler(app, damageModel);
+        DimView.InsertGUI(app.UI_item, app, guiHandler);
+        guiHandler.OnDimBuilt += InvokeDamge;
+    }
+
+    void writeIfc()
+    {
+        if(damageViewModel != null) damageViewModel.writeIfcFIle();
+    }
+
     void InvokeDamge(DamageModel _DamageInstance)
     {
         this.damageViewModel.AddItem(_DamageInstance);
@@ -373,5 +388,15 @@ public class IFCProvider : DimController
     void hideLoadButton()
     {
         (localView as DimLocalDataVisualization).deActiveLoad();
+    }
+
+    void showCommitButton()
+    {
+        (localView as DimLocalDataVisualization).ActiveCommit();
+    }
+
+    void hideCommitButton()
+    {
+        (localView as DimLocalDataVisualization).deActiveCommit();
     }
 }

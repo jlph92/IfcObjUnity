@@ -16,7 +16,6 @@ public class InputImageDialogBox : DialogBox
     public GameObject Browse_Button;
     public GameObject File_URL;
     public GameObject Object3D_Preview;
-    public Texture2D Object3DTexture;
 
     // Object 3D implant
     private GameObject PreviewObject;
@@ -133,7 +132,7 @@ public class InputImageDialogBox : DialogBox
                 }
 
                 // Propose re-orientation function
-                DoneOperation(DimNotification.Next_Ref3DLoacationOperation);
+                DoneOperation(DimNotification.Next_InputImageOperation);
                 break;
         }
     }

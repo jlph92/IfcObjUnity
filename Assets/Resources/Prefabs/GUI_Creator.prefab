@@ -52,9 +52,13 @@ MonoBehaviour:
     type: 3}
   Image_DialogBox: {fileID: 3379879710978816142, guid: 77c25fb0fc28147469af5eb37a4e7de4,
     type: 3}
+  EditImage_DialogBox: {fileID: 3379879710978816142, guid: e156dec46d599ba499a8e4da5bd28c17,
+    type: 3}
   InputImage_DialogBox: {fileID: 3379879710978816142, guid: d35230f3a44ead442a708b9da07e6f44,
     type: 3}
   Text_DialogBox: {fileID: 3379879710978816142, guid: 2bd788e02f2e29a4d9592a6130eec2ee,
+    type: 3}
+  EditText_DialogBox: {fileID: 3379879710978816142, guid: 920ce179c7b313c4eb21002d57199aaa,
     type: 3}
   InputText_DialogBox: {fileID: 3379879710978816142, guid: dfcaf1dd485249c4e9299c1e28ad9e5e,
     type: 3}

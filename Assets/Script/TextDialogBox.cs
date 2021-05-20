@@ -32,7 +32,7 @@ public class TextDialogBox : DialogBox
 
         if (_DamageInstance != null)
         {
-            var _DamageProperties = _DamageInstance.NewProperties;
+            var _DamageProperties = _DamageInstance.Properties;
 
             if (_DamageProperties != null)
             {

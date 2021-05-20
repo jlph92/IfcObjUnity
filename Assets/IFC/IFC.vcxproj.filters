@@ -102,9 +102,6 @@
     <None Include="..\Script\IFCTreeView.cs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\Script\MouseHighlight.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\NativeWindowsAlert.cs">
       <Filter>Source Files</Filter>
     </None>
@@ -291,9 +288,6 @@
     <None Include="..\Script\ExternalMetaData.cs">
       <Filter>Source Files\Interface</Filter>
     </None>
-    <None Include="..\Script\Camera3DPreview.cs">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\Script\RefLoacationDialogBox.cs">
       <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
     </None>
@@ -305,6 +299,18 @@
     </None>
     <None Include="..\Script\PlaneOrientationDialogBox.cs">
       <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\EditTextDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\EditImageDialogBox.cs">
+      <Filter>Source Files\Visualisation\GUI\GUI_Item</Filter>
+    </None>
+    <None Include="..\Script\Camera3DPreview.cs">
+      <Filter>Source Files\Visualisation\SupportClass</Filter>
+    </None>
+    <None Include="..\Script\MouseHighlight.cs">
+      <Filter>Source Files\Visualisation\SupportClass</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -59,6 +59,16 @@ public class DamageTreeVisualization : DimView, IIFCDataVisualization
     {
         DamageModel dataItem = e.Item as DamageModel;
 
+        if (dataItem is DamageInstance)
+        {
+            var damageInstance = dataItem as DamageInstance;
+            if (!damageInstance.is_bind)
+            {
+                damageInstance.OnSelectChanged += selectItem;
+                damageInstance.is_bind = true;
+            }
+        }
+
         if (dataItem != null)
         {
             //We display dataItem.name using UI.Text 
@@ -140,10 +150,38 @@ public class DamageTreeVisualization : DimView, IIFCDataVisualization
         e.Children = node.Children;
     }
 
+    private void selectItem(object sender, System.EventArgs e)
+    {
+        var selectDamageModel = sender as DamageModel;
+        Debug.LogFormat("{0} is selected.", selectDamageModel.Name);
+
+        if (treeView != null)
+        {
+            expandParent(selectDamageModel);
+            treeView.SelectedItem = selectDamageModel;
+        }
+    }
+
+    private void expandParent(DamageModel selectDamageModel)
+    {
+        if (selectDamageModel.Parent != null)
+        {
+            var treeViewItem = treeView.GetTreeViewItem(selectDamageModel.Parent as object);
+            expandParent(selectDamageModel.Parent);
+
+            if (treeViewItem != null) treeViewItem.IsExpanded = true;
+        }
+        else
+        {
+            return;
+        }
+    }
+
     public void insertIfcData2Tree(DamageViewModel damageViewModel)
     {
         //Bind data items
         treeView.Items = damageViewModel.DamageModels;
+        treeView.AutoExpand = true;
     }
 
     void EditDamageData()

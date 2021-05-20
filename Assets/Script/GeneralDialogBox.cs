@@ -84,7 +84,7 @@ public class GeneralDialogBox : DialogBox
     void writeDataIn()
     {
        if (this.defectName != null)  _DamageInstance.Name = this.defectName;
-       if (this.defectDescription != null) _DamageInstance.Name = this.defectDescription;
+       if (this.defectDescription != null) _DamageInstance.Description = this.defectDescription;
     }
 
     void checkStatus()

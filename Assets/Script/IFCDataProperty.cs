@@ -93,7 +93,7 @@ public class IFCDataProperty
             PropertySetName = groupName,
             Name = item.Name,
             Value = val,
-            IfcValueType = nomVal.UnderlyingSystemType
+            IfcValueType = nomVal.GetType()
         });
     }
 

@@ -361,6 +361,7 @@ public class IFCProvider : DimController
 
     void InvokeDamge(DamageModel _DamageInstance)
     {
+        if (_DamageInstance == null || this.damageViewModel == null) return;
         this.damageViewModel.AddItem(_DamageInstance);
         updateDamageTreeView(this.damageViewModel);
     }

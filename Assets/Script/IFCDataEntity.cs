@@ -24,7 +24,7 @@ public class IFCDataEntity : DimModel
                 IfcModel ifcRoot = setup(model);
 
                 // Asign Location
-                BIMPlacement.extractLocation(ifcRoot);
+                BIMPlacement.extractLocation(ifcRoot, model);
 
                 this.app.Notify(controller: controller, message: DimNotification.IfcLoaded, parameters: ifcRoot);
             }
@@ -205,27 +205,29 @@ public class IfcModel
 
     public static void attachGeometry(IfcModel ifcModel, List<GameObject> visualItems)
     {
-        string entity_label = System.String.Format("id-{0}", ifcModel.EntityLabel);
-
-        var attachedVisualItems = from visualItem in visualItems
-                                 where System.String.Compare(visualItem.name, entity_label) == 0
-                                 select visualItem;
-
-        if (attachedVisualItems != null)
+        if (ifcModel != null)
         {
-            foreach (var attachedVisualItem in attachedVisualItems)
-                ifcModel.assignGeometric(attachedVisualItem);
-        }
+            string entity_label = System.String.Format("id-{0}", ifcModel.EntityLabel);
 
-        if (ifcModel.Children.Length > 0)
-        {
-            foreach (IfcModel child in ifcModel.Children)
+            var attachedVisualItems = from visualItem in visualItems
+                                      where System.String.Compare(visualItem.name, entity_label) == 0
+                                      select visualItem;
+
+            if (attachedVisualItems != null)
             {
-                IfcModel.attachGeometry(child, visualItems);
+                foreach (var attachedVisualItem in attachedVisualItems)
+                    ifcModel.assignGeometric(attachedVisualItem);
+            }
+
+            if (ifcModel.Children.Length > 0)
+            {
+                foreach (IfcModel child in ifcModel.Children)
+                {
+                    IfcModel.attachGeometry(child, visualItems);
+                }
             }
         }
-
-        return;
+        else return;
     }
 
     private bool checkModel (int EntityLabel)

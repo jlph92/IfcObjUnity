@@ -262,7 +262,7 @@ public class EditImageDialogBox : DialogBox
 
         defectName = _DamageInstance.Name;
         defectDescription = _DamageInstance.Description;
-        _ImageFilePath = _DamageInstance.ImageUrl;
+        _ImageFilePath = _DamageInstance.ImageLocation;
 
         writeExistingData();
     }

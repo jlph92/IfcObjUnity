@@ -200,10 +200,14 @@ public class DamageViewModel
                         {
                             damageType.ObjectType = model.Instances.OfType<IIfcTypeObject>()
                                     .Single(dmg => dmg.EntityLabel == damageType.EntityLabel);
+
+                            damageInstance.IfcProperties = model.Instances.OfType<IIfcPropertySet>()
+                                    .Single(dmg => dmg.EntityLabel == damageInstance.IfcProperties.EntityLabel);
                         }
 
                         else
                         {
+                            // Create Proxy for the damage entity
                             var _proxy = new Create(model).BuildingElementProxy( p =>
                             {
                                 p.GlobalId = System.Guid.NewGuid();
@@ -212,9 +216,64 @@ public class DamageViewModel
                                 p.ObjectPlacement = getAttachedPlacement(model, damageInstance);
                             });
 
+                            if (damageInstance.Entity == null)
+                            {
+                                damageInstance.IfcProperties = new Create(model).PropertySet(pset =>
+                                {
+                                    pset.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Pset_Condition");
+                                });
 
-                            //create relationship between proxy and ifcProduct
+                                //set a few basic properties
+                                var RefRelationProperties = new Create(model).RelDefinesByProperties(rel =>
+                                {
+                                    rel.GlobalId = System.Guid.NewGuid();
+                                    rel.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect Measurements");
+                                    rel.Description = new Xbim.Ifc4.MeasureResource.IfcText("Property parameters for Defect");
 
+                                    rel.RelatedObjects.Add(_proxy);
+                                    rel.RelatingPropertyDefinition = damageInstance.IfcProperties;
+                                });
+                            }
+
+                            // Check if local placement is special assigned
+                            if (damageInstance.ImageOrigin != Vector3.zero)
+                            {
+                                IIfcCartesianPoint cartesianPoint;
+
+                                var relativePoint = damageInstance.relativeCartesianPoint;
+
+                                try
+                                {
+                                    cartesianPoint = model.Instances.New<Xbim.Ifc4.GeometryResource.IfcCartesianPoint>(r =>
+                                    {
+                                        r.X = relativePoint.x;
+                                        r.Y = relativePoint.y;
+                                        r.Z = relativePoint.z;
+                                    });
+                                }
+                                catch
+                                {
+                                    cartesianPoint = model.Instances.New<Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint>(r =>
+                                    {
+                                        r.X = relativePoint.x;
+                                        r.Y = relativePoint.y;
+                                        r.Z = relativePoint.z;
+                                    });
+                                }
+
+                                var axis2Placement3D = new Create(model).Axis2Placement3D(r =>
+                                {
+                                    r.Location = cartesianPoint;
+                                });
+
+                                var localPlacement = new Create(model).LocalPlacement(r =>
+                                {
+                                    r.PlacementRelTo = _proxy.ObjectPlacement;
+                                    r.RelativePlacement = axis2Placement3D;
+                                });
+
+                                _proxy.ObjectPlacement = localPlacement;
+                            }
                             // Check if Parent already has relationship
                             var ParentEntity = getAttachedProduct(model, damageInstance);
 
@@ -242,24 +301,7 @@ public class DamageViewModel
 
                             damageType.ByTypesRelDefines.RelatedObjects.Add(_proxy);
 
-                            if (damageInstance.Entity == null)
-                            {
-                                damageInstance.IfcProperties = new Create(model).PropertySet(pset =>
-                                {
-                                    pset.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Pset_Condition");
-                                });
-
-                                var RefRelationProperties = new Create(model).RelDefinesByProperties(rel =>
-                                {
-                                    rel.GlobalId = System.Guid.NewGuid();
-                                    rel.Name = new Xbim.Ifc4.MeasureResource.IfcLabel("Defect Measurements");
-                                    rel.Description = new Xbim.Ifc4.MeasureResource.IfcText("Property parameters for Defect");
-
-                                    rel.RelatedObjects.Add(_proxy);
-                                    rel.RelatingPropertyDefinition = damageInstance.IfcProperties;
-                                });
-                            }
-
+                            // External reference file
                             if (damageInstance.hasContent)
                             {
                                 if (damageInstance.hasImage)
@@ -284,6 +326,8 @@ public class DamageViewModel
                                         foreach (var property in damageInstance.ImageProperties)
                                             pset.HasProperties.Add(property.DIM2IfcProperty(model));
                                     });
+
+                                    Debug.LogFormat("Image URL: {0}", damageInstance.ImageLocation);
 
                                     //create reference document
                                     var _docReference = new Create(model).DocumentReference(r =>
@@ -313,7 +357,7 @@ public class DamageViewModel
                         _properties.Clear();
 
                         foreach (var property in damageInstance.Properties)
-                            _properties.Add(property.DIM2IfcProperty(model));
+                            _properties.AddRange(new[] { property.DIM2IfcProperty(model) });
                     }
                 }
 
@@ -489,8 +533,6 @@ public class DamageModel
 
     public virtual List<PropertyItem> ImageProperties { get; }
 
-    public virtual string ImageUrl { get; }
-
     public virtual bool hasContent { get; }
 
     public virtual bool hasImage { get; }
@@ -502,6 +544,8 @@ public class DamageModel
     public virtual GameObject Image2DView { get; set; }
 
     public virtual Vector3 ImageOrigin { get; set; }
+
+    public virtual Vector3 relativeCartesianPoint { get; }
 
     public virtual Quaternion ImageRotation { get; set; }
 
@@ -765,8 +809,86 @@ public class DamageInstance : DamageModel
                 this.IfcProperties = asIfcObject.IsDefinedBy
                     .Select(relDef => relDef.RelatingPropertyDefinition as IIfcPropertySet)
                     .Single(relDef => relDef != null);
+
+                if (asIfcObject.HasAssociations.Count(relDoc => relDoc is IIfcRelAssociatesDocument) > 0)
+                {
+                    var externalDocument = asIfcObject.HasAssociations
+                    .Where(relDoc => relDoc is IIfcRelAssociatesDocument)
+                    .Single(relDoc => relDoc.Name.Value.Equals("Related Parameters")) as IIfcRelAssociatesDocument;
+
+                    if (externalDocument != null)
+                    {
+                        AssignImagePropertySet(externalDocument);
+                    }
+                }
             }
         }
+    }
+
+    /// <summary>
+    /// Building Property set
+    /// </summary>
+    private void AssignImagePropertySet(IIfcRelAssociatesDocument relDoc)
+    {
+        // Extract Image Properties from MetaFile
+        var imageProperties = relDoc.RelatedObjects
+            .Where(prop => prop is IIfcPropertySet)
+            .Single() as IIfcPropertySet;
+
+        if (imageProperties == null)
+            return;
+
+        List<PropertyItem> extractedProperties = new List<PropertyItem>();
+
+        foreach (var item in imageProperties.HasProperties.OfType<IIfcPropertySingleValue>()) //handle IfcPropertySingleValue
+        {
+            AddImageProperty(item, extractedProperties);
+        }
+
+        if (extractedProperties.Count() > 0)
+        {
+            var imageTypeValue = extractedProperties.Where(prop => prop.Name.Equals("Image Type"))
+                .Select(prop => prop.Value)
+                .Single();
+
+            var imageType = System.Enum.GetValues(typeof(ImageType))
+                .Cast<ImageType>()
+                .Single(d => d.ToString().Equals(imageTypeValue));
+
+            if (imageType != null)
+                _DamageContent = new DamageImage(ifcModel, imageType);
+        }
+
+        if (_DamageContent != null)
+        {
+            var document = relDoc.RelatingDocument as IIfcDocumentReference;
+
+            var _DamageImage = _DamageContent as DamageImage;
+
+            if (_DamageImage.imageName == null) _DamageImage.imageName = document.Name;
+            if (_DamageImage.imageURL == null) _DamageImage.imageURL = document.Location;
+        }
+        
+    }
+
+    /// <summary>
+    /// Building Single Value Property
+    /// </summary>
+    private void AddImageProperty(IIfcPropertySingleValue item, List<PropertyItem> extractedProperties)
+    {
+        var val = System.String.Empty;
+        var nomVal = item.NominalValue;
+
+        if (nomVal != null)
+            val = nomVal.ToString();
+
+        extractedProperties.Add(new PropertyItem
+        {
+            IfcLabel = item.EntityLabel,
+            Name = item.Name,
+            Value = val,
+            IfcValueType = nomVal.GetType()
+        });
     }
 
     public static DamageInstance CreateInstance(IfcModel ifcModel)
@@ -948,7 +1070,7 @@ public class DamageInstance : DamageModel
 
             if (_DamageImage.imageName == null) _DamageImage.imageName = ImageName;
             if (_DamageImage.imageDescription == null) _DamageImage.imageDescription = ImageDescription;
-            if (_DamageImage.imageURL == null) _DamageImage.imageURL = ImageURL;
+            if (_DamageImage.imageURL == "< Missing >") _DamageImage.imageURL = ImageURL;
         }
     }
 
@@ -1004,7 +1126,6 @@ public class DamageInstance : DamageModel
             if (_DamageContent != null)
             {
                 return _DamageContent.ImageProperties;
-                
             }
 
             else return null;
@@ -1041,6 +1162,27 @@ public class DamageInstance : DamageModel
                 _DamageImage.Location = value;
                 Debug.LogFormat("Image Origin {0} is written.", _DamageImage.Location);
             }
+        }
+    }
+
+    public override Vector3 relativeCartesianPoint
+    {
+        get
+        {
+            if (this.ifcModel.Parent != null)
+            {
+                Debug.LogFormat("Parent Name: {0}", ifcModel.Parent.Name);
+                Debug.LogFormat("Parent Matrix: {0}", ifcModel.Parent.placementNode.GlobalUnityMatrix);
+
+                var ParentGlobalMatrix = this.ifcModel.Parent.placementNode.GlobalUnityMatrix;
+                var BimPoint = new Vector3(ImageOrigin.x, ImageOrigin.z, ImageOrigin.y);
+
+                var relativePoint = ParentGlobalMatrix.inverse.MultiplyPoint3x4(BimPoint);
+
+                return relativePoint;
+            }
+
+            else return Vector3.zero;
         }
     }
 
@@ -1178,8 +1320,6 @@ public class DamageContent
         get { return new List<PropertyItem>(NewProperties); }
     }
 
-    public virtual List<PropertyItem> imageProperties { get; }
-
     public virtual Texture2D image2D { get; }
 
     public Vector3 Location { get; set; }
@@ -1189,6 +1329,7 @@ public class DamageContent
 public class DamageImage: DamageContent
 {
     private ImageType imageType;
+    private List<PropertyItem> imageProperties = new List<PropertyItem>();
 
     public string imageName { get; set; }
     public string imageDescription { get; set; }
@@ -1215,11 +1356,15 @@ public class DamageImage: DamageContent
 
     public Quaternion imageRotation { get; set; }
     public GameObject imageObject { get; set; }
-    
 
-    public override List<PropertyItem> imageProperties
+
+    // List for image properties only
+    public override List<PropertyItem> ImageProperties
     {
-        get { return null; }
+        get
+        {
+            return imageProperties;
+        }
     }
 
     public override Texture2D image2D
@@ -1250,6 +1395,13 @@ public class DamageImage: DamageContent
     {
         this.imageType = imageType;
         Debug.LogFormat("{0} instance is created.", this.imageType.ToString());
+
+        imageProperties.Add(new PropertyItem
+        {
+            Name = "Image Type",
+            Value = ImageType.ToString(),
+            IfcValueType = typeof(Xbim.Ifc4.MeasureResource.IfcIdentifier)
+        });
     }
 
     public override ImageType ImageType

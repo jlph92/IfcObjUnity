@@ -2,6 +2,7 @@
 using System.Linq;
 using Xbim.Common;
 using Xbim.Common.Geometry;
+using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 using Xbim.ModelGeometry.Scene;
 using UnityEngine;
@@ -16,11 +17,33 @@ public class BIMPlacement
     ///     If there is a single root displacement, this is removed from the tree and added to the World
     ///     Coordinate System. Useful for models where the site has been located into a geographical context
     /// </param>
-    public static void extractLocation(IfcModel ifcModel)
+    public static void extractLocation(IfcModel ifcModel, IfcStore model)
     {
+        Debug.Log("**************** Extract local placement. ***********************");
+
         // Extract Local Placement Node
-        var localPlacements = ifcModel.Entity.Model.Instances.OfType<IIfcLocalPlacement>(true)
-            .Select(node => new XbimPlacementNode(node, ifcModel));
+        var localPlacements = model.Instances.OfType<IIfcLocalPlacement>(true);
+        var Nodes = new Dictionary<int, XbimPlacementNode>();
+
+        foreach (var localPlacement in localPlacements)
+        {
+            Nodes.Add(localPlacement.EntityLabel, new XbimPlacementNode(localPlacement));
+        }
+
+        foreach (var localPlacement in localPlacements)
+        {
+            if (localPlacement.PlacementRelTo != null) //resolve parent
+            {
+                var xbimPlacement = Nodes[localPlacement.EntityLabel];
+                var xbimPlacementParent = Nodes[localPlacement.PlacementRelTo.EntityLabel];
+                xbimPlacement.Parent = xbimPlacementParent;
+            }
+        }
+
+        foreach (XbimPlacementNode node in Nodes.Values)
+        {
+            node.computePosition(ifcModel);
+        }
     }
 }
 
@@ -30,32 +53,66 @@ public class BIMPlacement
 /// </summary>
 public class XbimPlacementNode
 {
-    public IfcModel ifcModel { get; private set; }
+    public XbimPlacementNode Parent { get; set; }
     XbimMatrix3D LocalMatrix { get; set; }
     XbimMatrix3D GlobalMatrix { get; set; }
+    public Matrix4x4 GlobalUnityMatrix { get; private set; }
+    private bool isGlobal { get; set; }
+
+    private IIfcLocalPlacement placement;
 
     // Construct XbimPlacementNode to IfcModel
-    public XbimPlacementNode(IIfcLocalPlacement placement, IfcModel rootModel)
+    public XbimPlacementNode(IIfcLocalPlacement placement)
     {
-        ifcModel = IfcModel.getIfcModel(rootModel, placement.EntityLabel);
-        ifcModel.placementNode = this;
-        LocalMatrix = placement.RelativePlacement.ToMatrix3D();
-
-        // Insert Location for IfcModel
-        ifcModel.localPosition = getUnityLocalPosition();
-        ifcModel.position = getUnityGlobalPosition();
+        this.placement = placement;
+        isGlobal = false;
     }
 
     // Return World Coordinate / Or so called Absolute Coordinate
     internal void ToGlobalMatrix()
     {
-        var Parent = ifcModel.Parent.placementNode;
-        if (!GlobalMatrix.IsIdentity && Parent != null)
+        if (Parent != null)
         {
-            if (!Parent.GlobalMatrix.IsIdentity) Parent.ToGlobalMatrix();
-            GlobalMatrix = LocalMatrix * Parent.GlobalMatrix;
+            if (!isGlobal)
+            {
+                if (!Parent.isGlobal) Parent.ToGlobalMatrix();
+                GlobalMatrix = LocalMatrix * Parent.GlobalMatrix;
+                isGlobal = true;
+            }
         }
+
         else return;
+    }
+
+    public void computePosition(IfcModel rootModel)
+    {
+        var localPosition = getUnityLocalPosition();
+        var globalPosition = getUnityGlobalPosition();
+
+        if (placement == null) return;
+
+        foreach (var ifcProduct in placement.PlacesObject)
+        {
+            // Debug.LogFormat("Placement Name: {0}, Entity Label: {1}", ifcProduct.Name, ifcProduct.EntityLabel);
+
+            var ifcModel = IfcModel.getIfcModel(rootModel, ifcProduct.EntityLabel);
+
+            //Debug.LogFormat("Placement Name: {0}, Entity Label: {1}", ifcModel.Name, ifcModel.EntityLabel);
+
+            if (ifcModel != null)
+            {
+                ifcModel.placementNode = this;
+                LocalMatrix = placement.RelativePlacement.ToMatrix3D();
+
+                // Insert Location for IfcModel
+                ifcModel.localPosition = localPosition;
+                ifcModel.position = globalPosition;
+
+                Debug.LogFormat("{0} in BIM Local Coordinate Read : {1}", ifcModel.Name, LocalMatrix);
+                Debug.LogFormat("{0} in BIM World Coordinate Read : {1}", ifcModel.Name, GlobalMatrix);
+                Debug.LogFormat("{0} in Unity World Coordinate Read : {1}", ifcModel.Name, GlobalUnityMatrix);
+            }
+        }
     }
 
     // Extract global placement from Entity
@@ -63,21 +120,16 @@ public class XbimPlacementNode
     {
         if (GlobalMatrix.IsIdentity) ToGlobalMatrix();
 
-        if (!GlobalMatrix.IsIdentity)
-        {
-            // Convert to Unity Matrix
-            var globalMatrix = translateUnityMatrix(this.GlobalMatrix);
-            // Move point under Matrix
-            Vector3 point = globalMatrix.MultiplyPoint3x4(Vector3.zero);
+        // Convert to Unity Matrix
+        GlobalUnityMatrix = translateUnityMatrix(this.GlobalMatrix);
+        // Move point under Matrix
+        Vector3 point = GlobalUnityMatrix.MultiplyPoint3x4(Vector3.zero);
 
-            //Debug.LogFormat("BIM World Coordinate Read : {0}", point);
+        //Debug.LogFormat("BIM World Coordinate Read : {0}", point);
 
-            Vector3 result = new Vector3(point.x, point.z, point.y);
+        Vector3 result = new Vector3(point.x, point.z, point.y);
 
-            return result;
-        }
-
-        else return Vector3.zero;
+        return result;
     }
 
     // Extract local placement from Entity
